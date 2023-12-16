@@ -13,6 +13,7 @@ import Createteamaccount from "./scenes/createteamaccount";
 import Calendar from "./scenes/calendar";
 import Kanban from "./scenes/kanban";
 import Team from "./scenes/team";
+import Viewuser from "./scenes/viewuser";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -33,6 +34,7 @@ function App() {
       <Route path="/calendar" element={<Calendar />}></Route>
       <Route path="/kanban" element={<Kanban />}></Route>
       <Route path="/team" element={<Team />}></Route>
+      <Route path="/viewuser" element={<Viewuser />}></Route>
       <Route path="/createproject" element={<Createproject />}></Route>
       <Route path="/createteamaccount" element={<Createteamaccount/>}></Route>
 

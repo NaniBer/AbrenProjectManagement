@@ -1,4 +1,5 @@
-import { Box, Button, TextField } from "@mui/material";
+import React, { useState } from 'react';
+import { Box, Button, TextField} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -6,14 +7,31 @@ import Header from "../../components/Header";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [username, setUsername] = useState("");
 
   const handleFormSubmit = (values) => {
     console.log(values);
   };
 
+  const handleFirstNameChange = (event, handleChange, values) => {
+    handleChange(event);
+    const { value } = event.target;
+    const { lastName } = values;
+    const generatedUsername = `${value.toLowerCase()}${lastName.toLowerCase()}.kaizen`;
+    setUsername(generatedUsername);
+  };
+
+  const handleLastNameChange = (event, handleChange, values) => {
+    handleChange(event);
+    const { value } = event.target;
+    const { firstName } = values;
+    const generatedUsername = `${firstName.toLowerCase()}${value.toLowerCase()}.kaizen`;
+    setUsername(generatedUsername);
+  };
+
   return (
     <Box m="20px">
-      <Header title="CREATE TEAM" subtitle="Create a New Team Member Profile" />
+      <Header title="CREATE USER" subtitle="Create a New User Profile" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -43,7 +61,7 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleFirstNameChange(event, handleChange, values)}
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -56,7 +74,7 @@ const Form = () => {
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleLastNameChange(event, handleChange, values)}
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -80,45 +98,33 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Contact Number"
+                label="Username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.contact}
-                name="contact"
-                error={!!touched.contact && !!errors.contact}
-                helperText={touched.contact && errors.contact}
+                value={username}
+                name="username"
+                error={!!touched.username && !!errors.username}
+                helperText={touched.username && errors.username}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Address 1"
+                type="password"
+                label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address1}
-                name="address1"
-                error={!!touched.address1 && !!errors.address1}
-                helperText={touched.address1 && errors.address1}
+                value={values.password}
+                name="password"
+                error={!!touched.password && !!errors.password}
+                helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Skill"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.skill}
-                name="skill"
-                error={!!touched.skill && !!errors.skill}
-                helperText={touched.skill && errors.skill}
-                sx={{ gridColumn: "span 4" }}
-              />
+                
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Create New Team Account
+                Create New User Account
               </Button>
             </Box>
           </form>
@@ -128,27 +134,21 @@ const Form = () => {
   );
 };
 
-const phoneRegExp =
-  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
 const checkoutSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  contact: yup
-    .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required("required"),
-  address1: yup.string().required("required"),
-  skill: yup.string().required("required"),
+  password: yup.string().required("required"),
+  CreatedBy: yup.string().required("required")
 });
+
 const initialValues = {
   firstName: "",
   lastName: "",
   email: "",
-  contact: "",
-  address1: "",
-  skill: "",
+  role: "",
+  password: "",
+  CreatedBy: "",
 };
 
 export default Form;

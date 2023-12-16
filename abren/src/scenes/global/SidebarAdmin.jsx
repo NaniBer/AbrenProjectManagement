@@ -6,9 +6,13 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import LogoutIcon from '@mui/icons-material/Logout';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import Logo from "../../images/abren2.png";
 
 
 
@@ -79,7 +83,9 @@ const SidebarAdmin = () => {
                 </Typography> */}
                 <img
                 alt="idk"
-                src={`./scenes/`}
+                width="80px"
+                height="80px"
+                src={Logo}
                 ></img>
               
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
@@ -139,41 +145,56 @@ const SidebarAdmin = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Create Team Account"
+              title="Create User"
               to="/createteamaccount"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-             <Item
-              title="Add Team to Project"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Typography
+              <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Team info
+              View info
             </Typography>
-            <Item
-              title="Team Accounts"
+             <Item
+              title="View User"
+              to="/viewuser"
+              icon={<ViewListIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+             <Item
+              title="View Project"
               to="/team"
-              icon={<PeopleOutlinedIcon />}
+              icon={<ViewCompactIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            
-            <Item
-              title="Disable Team Account"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
+             <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Account
+            </Typography>
+               <Item
+              title="Update and Reset"
+              to="/team"
+              icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+              <Item
+              title="Log Out"
+              to="/team"
+              icon={<LogoutIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+      
+         
          
 
           </Box>

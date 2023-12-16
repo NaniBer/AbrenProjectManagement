@@ -3,34 +3,41 @@ import { tokens } from "../theme";
 export const mockDataTeam = [
   {
     id: 1,
-    name: "Jon Snow",
+    firstname: "Saron",
+    lastname: "Bisrat",
     email: "jonsnow@gmail.com",
+    username: "someone.kaizen",
     role: "admin",
+    status: "inactive"
   },
   {
     id: 2,
-    name: "Cersei Lannister",
-    email: "cerseilannister@gmail.com",
+    firstname: "Romhay",
+    lastname: "Yemane",
+    email: "jonsnow@gmail.com",
+    username: "someone.kaizen",
     role: "user",
+    status: "active"
   },
   {
     id: 3,
-    name: "Jaime Lannister",
+    firstname: "Nazrawit",
+    lastname: "Berhanu",
     email: "jaimelannister@gmail.com",
+    username: "someone.kaizen",
     role: "user",
+    status: "inactive"
   },
   {
     id: 4,
-    name: "Anya Stark",
-    email: "anyastark@gmail.com",
-    role: "admin",
-  },
-  {
-    id: 5,
-    name: "Daenerys Targaryen",
-    email: "daenerystargaryen@gmail.com",
+    firstname: "Nardos",
+    lastname: "Dagnachew",
+    email: "jaimelannister@gmail.com",
+    username: "someone.kaizen",
     role: "user",
-  },
+    status: "inactive"
+
+  }
 
 ];
 
