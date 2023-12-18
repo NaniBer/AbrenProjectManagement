@@ -13,11 +13,11 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  role: {
-    type: String,
-    required: true,
-    enum: ['teammember', 'projectmanager']
+  disabled: { 
+    type: Boolean, 
+    default: false 
   },
+  
   username: {
     type: String,
     required: true
@@ -25,7 +25,7 @@ const usersSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    // default: 'admin'
+    default: 'admin'
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

@@ -18,12 +18,13 @@ const ResourceSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    // Cost: {
-    //     enu ]
-
-    // }
+     Cost: {
+         enum: ['per Hour', 'per Person'],
+         required: true
+     },
     TotalCost : {
         type: Number, 
         required: true
     }
+   
 })

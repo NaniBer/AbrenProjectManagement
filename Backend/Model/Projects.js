@@ -7,36 +7,36 @@ const ProjectSchema = mongoose.Schema({
     }, 
     StartDate : {
         type: Date, 
-        required : true
+        //required : true
     },
     EndDate : {
         type: Date,
-        required : true
+        //required : true
 
     },
     ProjectDescription : {
         type: String, 
-        requred : true, 
+        //requred : true, 
 
     }, 
     ProjectManager : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Users',
-        required : true
+        //required : true
     },
     EstimatedCost :{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Resource',
-        required: true
+       // required: true
      },
      AllocatedCost: {
         type: mongoose.Schema.Types.ObjectId,
-        ref : 'Resource',
-        required: true
+        ref: 'BudgetPlan',
+        //required: true
      },
      ProjectStatus : {
-        type : mongoose.Schema.Types.ObjectId, 
-        required : true
+        type : String, 
+     //   required : true
      }
 });
 const Projects = mongoose.model('Projects', ProjectSchema);

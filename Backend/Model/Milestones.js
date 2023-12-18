@@ -10,6 +10,10 @@ const MilestonesSchema = mongoose.Schema({
         type: Date,
         required: true
     },
+    Description: {
+        type: String,
+        
+    }
 
 })
 const Milestones = schema.model('Milestones', MilestonesSchema)
