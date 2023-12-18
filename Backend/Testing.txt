@@ -1,0 +1,22 @@
+Sign-in Admin
+
+{   "firstname": "Abebe",
+    "lastname": "Kebede",
+    "username": "Kebe",
+    "password": "abren",
+    "email": "kebe@gmail.com" 
+     
+}
+
+Login Admin Wrong
+{   
+    "username": "kebe",
+    "password": "abrenn"
+}
+
+Login Admin
+{   
+    "username": "kebe",
+    "password": "abren"
+}
+https://cloud.mongodb.com/v2/65265643000bc537a98ffe43#/metrics/replicaSet/652658466e8aa17c2bed13d9/explorer/test/admins/find
