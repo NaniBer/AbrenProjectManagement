@@ -2,6 +2,7 @@
   "name": "abren",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000/",
   "dependencies": {
     "@asseinfo/react-kanban": "^2.2.0",
     "@emotion/react": "^11.11.1",
