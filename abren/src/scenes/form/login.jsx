@@ -56,11 +56,11 @@ const Login = () => {
     }
     const formData = { username, password };
 
-    await fetch("/admin/Login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    // await fetch("/admin/Login", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(formData),
+    // });
 
     // Simulating login process
     if (username === "example@example.com" && password === "password123") {

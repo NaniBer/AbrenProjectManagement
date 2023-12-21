@@ -49,13 +49,13 @@ const Form = () => {
   const handleCreateUser = (event) => {
     event.preventDefault();
     const formData = { firstName, lastName, username, email, password };
-    fetch("/admin/CreateUsers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then(console.log("Account created successfully"));
+    // fetch("/admin/CreateUsers", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(formData),
+    // })
+    //   .then((response) => response.json())
+    //   .then(console.log("Account created successfully"));
   };
 
   return (
