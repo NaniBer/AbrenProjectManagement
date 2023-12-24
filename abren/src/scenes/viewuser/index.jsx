@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {  useNavigate } from 'react-router-dom';
 import { Box, Typography, useTheme, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { tokens } from '../../theme';
@@ -12,6 +13,7 @@ const Team = () => {
   const colors = tokens(theme.palette.mode);
 
   const [teamData, setTeamData] = useState(mockDataTeam);
+  const navigate = useNavigate();
 
 //   If a match is found, we create a new object using the spread operator ({ ...row }) 
 //   to copy all the properties of the current row. We then update the status property of 
@@ -34,9 +36,21 @@ const handleDisable = (rowId) => {
     });
     setTeamData(updatedTeamData);
   };
+  const handleUpdate = (rowId) => {
+    const updatedTeamData = teamData.map((row) => {
+      if (row.id === rowId) {
+        // Perform the necessary update logic here
+        // For example, update the firstname and lastname properties
+        return { ...row, firstname: 'Updated Firstname', lastname: 'Updated Lastname' };
+      }
+      return row;
+    });
+    setTeamData(updatedTeamData);
+    navigate(`/updateuser/${rowId}`);
+  };
 
   const columns = [
-    { field: 'id', headerName: 'ID' },
+    { field: 'id', headerName: 'ID', flex: 0.5 },
     {
       field: 'firstname',
       headerName: 'Firstname',
@@ -57,16 +71,16 @@ const handleDisable = (rowId) => {
     {
       field: 'username',
       headerName: 'Username',
-      flex: 1,
+      flex: 1.5,
     },
     {
       field: 'role',
       headerName: 'Role',
-      flex: 1,
+      flex: 1.5,
       renderCell: ({ row: { role } }) => {
         return (
           <Box
-            width="78%"
+            width="80%"
             m="0 auto"
             p="5px"
             display="flex"
@@ -113,9 +127,14 @@ const handleDisable = (rowId) => {
     {
       field: 'update',
       headerName: 'Update',
-      flex: 1,
-      cellClassName: 'name-column--cell',
-    }
+      width: 120,
+      renderCell: ({ row }) => (
+        <Button variant="contained" color="primary" onClick={() => handleUpdate(row.id)}>
+          Update
+        </Button>
+      ),
+        
+      }
   ];
 
   return (
