@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { Box, Button, TextField} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import { response } from "../../../../Backend/app";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleFormSubmit = (values) => {
     console.log(values);
@@ -17,6 +22,7 @@ const Form = () => {
     handleChange(event);
     const { value } = event.target;
     const { lastName } = values;
+    setFirstName(value);
     const generatedUsername = `${value.toLowerCase()}${lastName.toLowerCase()}.kaizen`;
     setUsername(generatedUsername);
   };
@@ -25,8 +31,31 @@ const Form = () => {
     handleChange(event);
     const { value } = event.target;
     const { firstName } = values;
+    setLastName(value);
     const generatedUsername = `${firstName.toLowerCase()}${value.toLowerCase()}.kaizen`;
     setUsername(generatedUsername);
+  };
+  const handleEmailChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setEmail(value);
+  };
+  const handlePasswordChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setPassword(value);
+  };
+
+  const handleCreateUser = (event) => {
+    event.preventDefault();
+    const formData = { firstName, lastName, username, email, password };
+    // fetch("/admin/CreateUsers", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(formData),
+    // })
+    //   .then((response) => response.json())
+    //   .then(console.log("Account created successfully"));
   };
 
   return (
@@ -61,7 +90,9 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleFirstNameChange(event, handleChange, values)}
+                onChange={(event) =>
+                  handleFirstNameChange(event, handleChange, values)
+                }
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -74,7 +105,9 @@ const Form = () => {
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleLastNameChange(event, handleChange, values)}
+                onChange={(event) =>
+                  handleLastNameChange(event, handleChange, values)
+                }
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -87,7 +120,7 @@ const Form = () => {
                 type="text"
                 label="Email"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleEmailChange(event, handleChange)}
                 value={values.email}
                 name="email"
                 error={!!touched.email && !!errors.email}
@@ -100,7 +133,7 @@ const Form = () => {
                 type="text"
                 label="Username"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => setUsername(event.target.value)}
                 value={username}
                 name="username"
                 error={!!touched.username && !!errors.username}
@@ -113,17 +146,21 @@ const Form = () => {
                 type="password"
                 label="Password"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handlePasswordChange(event, handleChange)}
                 value={values.password}
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
-                
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button
+                type="submit"
+                color="secondary"
+                variant="contained"
+                onClick={handleCreateUser}
+              >
                 Create New User Account
               </Button>
             </Box>
@@ -139,7 +176,7 @@ const checkoutSchema = yup.object().shape({
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
-  CreatedBy: yup.string().required("required")
+  CreatedBy: yup.string().required("required"),
 });
 
 const initialValues = {
