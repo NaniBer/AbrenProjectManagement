@@ -88,7 +88,7 @@ const Viewproject = () => {
 
   return (
     <Box m="20px">
-      <Header title="View User" subtitle="Managing the members" />
+      <Header title="View Project" subtitle="Managing the projects" />
       <Box
         m="40px 0 0 0"
         height="75vh"

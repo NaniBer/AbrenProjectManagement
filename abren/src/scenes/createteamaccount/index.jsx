@@ -1,12 +1,10 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import Swal from  "sweetalert";
-
-// import { response } from "../../../../Backend/app";
+import swal from "sweetalert";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -16,21 +14,22 @@ const Form = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-    const handleFormSubmit = (values, formik) => {
+  const handleFormSubmit = (values, formik) => {
     const { firstName, lastName, email, password } = values;
     console.log(firstName, lastName, email, password);
-    if (values.firstname
-      && values.lastName
-      && values.username 
-      && values.email
-      &&  values.password 
-      && values.username ) 
-        {
-     Swal("Successful!", "You have created a new project!", "success", {
-      button: "Yes!",
-     });
-       formik.setSubmitting(false); // Set submitting to false after successful submission
-   }
+    if (
+      values.firstName &&
+      values.lastName &&
+      values.email &&
+      values.username &&
+      values.password 
+    ) {
+      // Perform your form submission logic here
+      formik.setSubmitting(false); // Set submitting to false after successful submission
+  
+      // Show success SweetAlert
+      swal("User Account Created", "The new user account has been created successfully.", "success");
+    }
   };
   const handleFirstNameChange = (event, handleChange, values) => {
     handleChange(event);
@@ -49,33 +48,18 @@ const Form = () => {
     const generatedUsername = `${firstName.toLowerCase()}${value.toLowerCase()}.kaizen`;
     setUsername(generatedUsername);
   };
+
   const handleEmailChange = (event, handleChange) => {
     handleChange(event);
     const { value } = event.target;
     setEmail(value);
   };
+
   const handlePasswordChange = (event, handleChange) => {
     handleChange(event);
     const { value } = event.target;
     setPassword(value);
   };
-
- 
-  // const handleCreateUser = (event) => {
-  //   event.preventDefault();
-  //   // const formData = { firstName, lastName, username, email, password };
-
-  //   Swal("Successful!", "Account created successfully!", "success", {
-  //     button: "Yes!",
-  //   });
-  //   // fetch("/admin/CreateUsers", {
-  //   //   method: "POST",
-  //   //   headers: { "Content-Type": "application/json" },
-  //   //   body: JSON.stringify(formData),
-  //   // })
-  //   //   .then((response) => response.json())
-  //   //   .then(console.log("Account created successfully"));
-  // };
 
   return (
     <Box m="20px">
@@ -195,16 +179,17 @@ const checkoutSchema = yup.object().shape({
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
-  CreatedBy: yup.string().required("required"),
 });
 
 const initialValues = {
   firstName: "",
   lastName: "",
   email: "",
-  role: "",
+  username: "",
   password: "",
-  CreatedBy: "",
 };
 
 export default Form;
+
+
+

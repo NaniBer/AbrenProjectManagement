@@ -4,6 +4,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import swal from "sweetalert";
 
 const initialValues = {
   username: "",
@@ -21,6 +22,7 @@ const Form = () => {
 
   const handleFormSubmit = (values) => {
     console.log(values);
+    swal("Success!", "You have successfully updated your account.", "success");
   };
 
   const handleUsernameChange = (event, handleChange) => {
@@ -48,12 +50,22 @@ const Form = () => {
   };
 
   const handleReset = () => {
-    setUsername("");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    swal({
+      title: "Are you sure?",
+      text: "This will reset the form fields to 'admin' for username and password",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((confirmed) => {
+      if (confirmed) {
+        setUsername("admin");
+        setCurrentPassword("admin");
+        setNewPassword("");
+        setConfirmPassword("");
+        swal("Reset!", "The form has been reset.", "success");
+      }
+    });
   };
-
   const passwordSchema = yup.object().shape({
     username: yup.string().required("Username is required"),
     currentPassword: yup.string().required("Current Password is required"),
@@ -69,7 +81,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="CHANGE PASSWORD" subtitle="Update Your Password" />
+      <Header title="UPDATE ACCOUNT" subtitle="Update Your Account" />
 
       <Box
         display="flex"
