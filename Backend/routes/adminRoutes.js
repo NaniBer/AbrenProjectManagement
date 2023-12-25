@@ -51,11 +51,21 @@ router.post("/addAdmin", async (req, res) => {
   }
 });
 
+//Get admin users list
+router.get("/getAdminList", async (req, res) => {
+  try {
+    const adminsList = await Admin.find();
+    res.json(adminsList);
+  } catch (err) {
+    console.error("Error retrieving Admin list:", err);
+    res.status(500).json({ message: "Error rerieving admin list" });
+  }
+});
+
 //User Account Created by The System Admin
 router.post("/CreateUsers", async (req, res) => {
   try {
     const { firstName, lastName, username, password, email } = req.body;
-    const status = "active";
 
     // const createdBy = req.session.adminId;
     const createdBy = "65842e544adaddc07c71d473";
@@ -73,9 +83,9 @@ router.post("/CreateUsers", async (req, res) => {
       username,
       password: hashedPassword,
       email,
-      status,
       createdBy,
     });
+
     // Save the user to the database
     await newUsers.save();
     console.log("Created Successfully");
@@ -167,6 +177,17 @@ router.put("/ResetAdmin", async (req, res) => {
   } catch (error) {
     console.error("Error resetting admin credentials:", error);
     res.status(500).json({ message: "Error resetting admin credentials" });
+  }
+});
+
+//View Users
+router.get("/getUsers", async (req, res) => {
+  try {
+    const usersList = await Users.find();
+    res.json(usersList);
+  } catch (err) {
+    console.error("Error retrieving users:", err);
+    res.status(500).json({ message: "Error rerieving user list" });
   }
 });
 
