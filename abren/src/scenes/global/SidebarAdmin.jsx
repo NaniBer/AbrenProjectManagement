@@ -167,7 +167,7 @@ const SidebarAdmin = () => {
             />
              <Item
               title="View Project"
-              to="/team"
+              to="/viewproject"
               icon={<ViewCompactIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -181,7 +181,7 @@ const SidebarAdmin = () => {
             </Typography>
                <Item
               title="Update and Reset"
-              to="/team"
+              to="/updateandreset"
               icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}

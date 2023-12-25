@@ -54,7 +54,7 @@ const Login = () => {
       setErrors({ password: "Please enter your password" });
       return;
     }
-    const formData = { username, password };
+    // const formData = { username, password };
 
     // await fetch("/admin/Login", {
     //   method: "POST",

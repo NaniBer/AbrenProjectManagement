@@ -9,11 +9,15 @@ import Topbar from "./scenes/global/Topbar";
 // import Sidebar from "./scenes/global/Sidebar";
 import SidebarAdmin from "./scenes/global/SidebarAdmin";
 import Createproject from "./scenes/createproject";
-// import Createteamaccount from "./scenes/createteamaccount";
+ import Createteamaccount from "./scenes/createteamaccount";
 import Calendar from "./scenes/calendar";
 import Kanban from "./scenes/kanban";
 import Team from "./scenes/team";
+import Updateuser from "./scenes/updateuser";
+import Updateproject from "./scenes/updateproject";
 import Viewuser from "./scenes/viewuser";
+import Viewproject from "./scenes/viewproject";
+import Reset from "./scenes/updateandreset";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -34,7 +38,14 @@ function App() {
               <Route path="/kanban" element={<Kanban />}></Route>
               <Route path="/team" element={<Team />}></Route>
               <Route path="/viewuser" element={<Viewuser />}></Route>
+              <Route path="/viewproject" element={<Viewproject />}></Route>
               <Route path="/createproject" element={<Createproject />}></Route>
+              <Route path="/createteamaccount" element={<Createteamaccount />}></Route>
+              <Route path="/updateuser/:id" element={<Updateuser />}></Route>
+              <Route path="/updateproject/:rowId" element={<Updateproject />}></Route>
+              <Route path="/updateandreset" element={<Reset />}></Route>
+
+
               {/* <Route
                 path="/createteamaccount"
                 element={<Createteamaccount />}

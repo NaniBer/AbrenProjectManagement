@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Button, TextField} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,26 +7,43 @@ import Header from "../../components/Header";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [username, setUsername] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    password: "",
+  });
+
+  // Simulate fetching user data and pre-fill the form fields
+  useEffect(() => {
+    // Dummy data to pre-fill the form fields
+    const dummyData = {
+      firstName: "John",
+      lastName: "Doe",
+      email: "johndoe@example.com",
+      username: "johndoe123",
+      password: "password123",
+    };
+
+    setFormData(dummyData);
+  }, []);
 
   const handleFormSubmit = (values) => {
     console.log(values);
   };
 
-  const handleFirstNameChange = (event, handleChange, values) => {
-    handleChange(event);
-    const { value } = event.target;
-    const { lastName } = values;
-    const generatedUsername = `${value.toLowerCase()}${lastName.toLowerCase()}.kaizen`;
-    setUsername(generatedUsername);
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleLastNameChange = (event, handleChange, values) => {
-    handleChange(event);
-    const { value } = event.target;
-    const { firstName } = values;
-    const generatedUsername = `${firstName.toLowerCase()}${value.toLowerCase()}.kaizen`;
-    setUsername(generatedUsername);
+  const handleCreateUser = (event) => {
+    event.preventDefault();
+    console.log("Account created successfully");
   };
 
   return (
@@ -35,7 +52,7 @@ const Form = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={formData}
         validationSchema={checkoutSchema}
       >
         {({
@@ -43,7 +60,6 @@ const Form = () => {
           errors,
           touched,
           handleBlur,
-          handleChange,
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit}>
@@ -61,7 +77,7 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleFirstNameChange(event, handleChange, values)}
+                onChange={handleChange}
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -74,7 +90,7 @@ const Form = () => {
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleLastNameChange(event, handleChange, values)}
+                onChange={handleChange}
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -101,7 +117,7 @@ const Form = () => {
                 label="Username"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={username}
+                value={values.username}
                 name="username"
                 error={!!touched.username && !!errors.username}
                 helperText={touched.username && errors.username}
@@ -120,10 +136,14 @@ const Form = () => {
                 helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
-                
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button
+                type="submit"
+                color="secondary"
+                variant="contained"
+                onClick={handleCreateUser}
+              >
                 Create New User Account
               </Button>
             </Box>
@@ -139,16 +159,7 @@ const checkoutSchema = yup.object().shape({
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
-  CreatedBy: yup.string().required("required")
+  CreatedBy: yup.string().required("required"),
 });
-
-const initialValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  role: "",
-  password: "",
-  CreatedBy: "",
-};
 
 export default Form;

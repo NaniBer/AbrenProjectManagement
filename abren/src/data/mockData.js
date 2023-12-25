@@ -41,6 +41,20 @@ export const mockDataTeam = [
 
 ];
 
+export const mockDataProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen"
+  },
+  {
+    id: 2,
+    projectname: "smth website",
+    description: "smth is a tech company ",
+    projectmanager: "saronbisrat.kaizen"
+  },
+];
 
 export const mockDataContacts = [
   {

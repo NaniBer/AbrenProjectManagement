@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { response } from "../../../../Backend/app";
+import Swal from  "sweetalert";
+
+// import { response } from "../../../../Backend/app";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -14,10 +16,22 @@ const Form = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
+    const handleFormSubmit = (values, formik) => {
+    const { firstName, lastName, email, password } = values;
+    console.log(firstName, lastName, email, password);
+    if (values.firstname
+      && values.lastName
+      && values.username 
+      && values.email
+      &&  values.password 
+      && values.username ) 
+        {
+     Swal("Successful!", "You have created a new project!", "success", {
+      button: "Yes!",
+     });
+       formik.setSubmitting(false); // Set submitting to false after successful submission
+   }
   };
-
   const handleFirstNameChange = (event, handleChange, values) => {
     handleChange(event);
     const { value } = event.target;
@@ -46,17 +60,22 @@ const Form = () => {
     setPassword(value);
   };
 
-  const handleCreateUser = (event) => {
-    event.preventDefault();
-    const formData = { firstName, lastName, username, email, password };
-    // fetch("/admin/CreateUsers", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(formData),
-    // })
-    //   .then((response) => response.json())
-    //   .then(console.log("Account created successfully"));
-  };
+ 
+  // const handleCreateUser = (event) => {
+  //   event.preventDefault();
+  //   // const formData = { firstName, lastName, username, email, password };
+
+  //   Swal("Successful!", "Account created successfully!", "success", {
+  //     button: "Yes!",
+  //   });
+  //   // fetch("/admin/CreateUsers", {
+  //   //   method: "POST",
+  //   //   headers: { "Content-Type": "application/json" },
+  //   //   body: JSON.stringify(formData),
+  //   // })
+  //   //   .then((response) => response.json())
+  //   //   .then(console.log("Account created successfully"));
+  // };
 
   return (
     <Box m="20px">
@@ -159,7 +178,7 @@ const Form = () => {
                 type="submit"
                 color="secondary"
                 variant="contained"
-                onClick={handleCreateUser}
+                onClick={handleFormSubmit}
               >
                 Create New User Account
               </Button>
