@@ -15,8 +15,8 @@ const Form = () => {
   const [password, setPassword] = useState("");
 
   const handleFormSubmit = (values, formik) => {
-    const { firstName, lastName, email, password } = values;
-    console.log(firstName, lastName, email, password);
+    const { firstName, lastName, username,email, password } = values;
+    console.log(firstName, lastName,username, email, password);
     if (
       values.firstName &&
       values.lastName &&
@@ -31,23 +31,23 @@ const Form = () => {
       swal("User Account Created", "The new user account has been created successfully.", "success");
     }
   };
-  const handleFirstNameChange = (event, handleChange, values) => {
+  const handleFirstNameChange = (event, handleChange) => {
     handleChange(event);
     const { value } = event.target;
-    const { lastName } = values;
     setFirstName(value);
-    const generatedUsername = `${value.toLowerCase()}${lastName.toLowerCase()}.kaizen`;
-    setUsername(generatedUsername);
   };
 
-  const handleLastNameChange = (event, handleChange, values) => {
+  const handleLastNameChange = (event, handleChange) => {
     handleChange(event);
     const { value } = event.target;
-    const { firstName } = values;
     setLastName(value);
-    const generatedUsername = `${firstName.toLowerCase()}${value.toLowerCase()}.kaizen`;
-    setUsername(generatedUsername);
-  };
+   };
+   const handleUsernameChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setUsername(value);
+   };
+
 
   const handleEmailChange = (event, handleChange) => {
     handleChange(event);
@@ -93,9 +93,7 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={(event) =>
-                  handleFirstNameChange(event, handleChange, values)
-                }
+                onChange={(event) => handleFirstNameChange(event, handleChange)}
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -108,9 +106,7 @@ const Form = () => {
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={(event) =>
-                  handleLastNameChange(event, handleChange, values)
-                }
+                onChange={(event) => handleLastNameChange(event, handleChange)}
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -136,7 +132,7 @@ const Form = () => {
                 type="text"
                 label="Username"
                 onBlur={handleBlur}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={(event) => handleUsernameChange(event, handleChange)}
                 value={username}
                 name="username"
                 error={!!touched.username && !!errors.username}
@@ -177,8 +173,13 @@ const Form = () => {
 const checkoutSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
+  username: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
+  password: yup
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .matches(/^(?=.*[0-9])/, "Password must contain at least one number")
+  .required(" required"),
 });
 
 const initialValues = {
