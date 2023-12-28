@@ -3,6 +3,7 @@ const { schema } = require('./admin');
 const TasksSchema = mongoose.Schema({
     milestone : {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Milestones',
         required: true
     },
     TaskName : {
@@ -21,10 +22,11 @@ const TasksSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    InitiatedBy: {
-        type: mongoose.Schema.Types.ObjectId,
+    viewed: {
+        type: Boolean,
         required: true
     }
+    
 })
 const Tasks = mongoose.model('Tasks', TasksSchema)
 module.exports = Tasks;

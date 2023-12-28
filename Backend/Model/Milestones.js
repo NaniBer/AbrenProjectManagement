@@ -1,6 +1,12 @@
 const mongoose = require ('mongoose')
 
 const MilestonesSchema = mongoose.Schema({
+    ProjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Projects',
+        required: true
+
+    },
     MilestoneName: {
         type: String,
         required : true
