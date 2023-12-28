@@ -5,32 +5,18 @@ import * as yup from 'yup';
 import Header from '../../components/Header';
 import Autocomplete from '@mui/material/Autocomplete';
 import { mockDataTeam } from '../../data/mockData';
-import Swal from  "sweetalert";
 
-
-const Form = () => {
+const Form = ({ initialValues }) => {
   const [selectedUser, setSelectedUser] = useState('');
 
-  const handleFormSubmit = (values, formik) => {
-    if (values.projectname && values.description && selectedUser) {
-      Swal("Successful!", "You have created a new project!", "success", {
-        button: "Yes!",
-      });
-        formik.setSubmitting(false); // Set submitting to false after successful submission
-    }
+  const handleFormSubmit = (values) => {
+    console.log(values);
   };
-  
-
 
   const handleUserSelect = (event, value) => {
     setSelectedUser(value);
   };
 
-  // const handleCreateProject = (event) => {
-  //   event.preventDefault();
-
-   
-  // }
   const checkoutSchema = yup.object().shape({
     projectname: yup.string().required('Required'),
     description: yup.string().required('Required'),
@@ -51,7 +37,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="CREATE PROJECT" subtitle="Create a New Project" />
+      <Header title="CREATE USER" subtitle="Create a New User Profile" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -114,13 +100,8 @@ const Form = () => {
             </Box>
 
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button 
-              type="submit" 
-              color="secondary" 
-              variant="contained"
-              onClick={handleFormSubmit}
-              >
-              Create New Project
+              <Button type="submit" color="secondary" variant="contained">
+                Create New Project
               </Button>
             </Box>
           </form>
@@ -135,12 +116,6 @@ const Form = () => {
       )} */}
     </Box>
   );
-};
-
-const initialValues = {
-  projectname: '',
-  description: '',
-  projectmanager: ''
 };
 
 export default Form;

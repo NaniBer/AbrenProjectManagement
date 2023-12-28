@@ -5,13 +5,14 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import AddCardIcon from '@mui/icons-material/AddCard';
+// import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewCompactIcon from '@mui/icons-material/ViewCompact';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Logo from "../../images/abren2.png";
 
 
@@ -135,29 +136,37 @@ const SidebarAdmin = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Form
+              Project
             </Typography>
             <Item
               title="Create Project"
               to="/createproject"
-              icon={<AccountTreeOutlinedIcon />}
+              icon={<AddCardIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Create User"
-              to="/createteamaccount"
-              icon={<PeopleOutlinedIcon />}
+             <Item
+              title="View Project"
+              to="/viewproject"
+              icon={<ViewCompactIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+          
               <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              View info
+              User
             </Typography>
+            <Item
+              title="Create User"
+              to="/createteamaccount"
+              icon={<PersonAddIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
              <Item
               title="View User"
               to="/viewuser"
@@ -165,13 +174,7 @@ const SidebarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
-             <Item
-              title="View Project"
-              to="/team"
-              icon={<ViewCompactIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            
              <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -181,7 +184,7 @@ const SidebarAdmin = () => {
             </Typography>
                <Item
               title="Update and Reset"
-              to="/team"
+              to="/updateandreset"
               icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}

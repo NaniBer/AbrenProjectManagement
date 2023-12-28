@@ -1,67 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import swal from "sweetalert";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [username, setUsername] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    password: "",
+  });
 
-  const handleFormSubmit = (values, formik) => {
-    const { firstName, lastName, username, email, password } = values;
-    console.log(firstName, lastName, username, email, password);
-    if (
-      values.firstName &&
-      values.lastName &&
-      values.email &&
-      values.username &&
-      values.password
-    ) {
-      // Perform your form submission logic here
-      formik.setSubmitting(false); // Set submitting to false after successful submission
+  // Simulate fetching user data and pre-fill the form fields
+  useEffect(() => {
+    // Dummy data to pre-fill the form fields
+    const dummyData = {
+      firstName: "John",
+      lastName: "Doe",
+      email: "johndoe@example.com",
+      username: "johndoe123",
+      password: "password123",
+    };
 
-      // Show success SweetAlert
-      swal(
-        "User Account Created",
-        "The new user account has been created successfully.",
-        "success"
-      );
-    }
-  };
-  const handleFirstNameChange = (event, handleChange) => {
-    handleChange(event);
-    const { value } = event.target;
-    setFirstName(value);
+    setFormData(dummyData);
+  }, []);
+
+  const handleFormSubmit = (values) => {
+    console.log(values);
   };
 
-  const handleLastNameChange = (event, handleChange) => {
-    handleChange(event);
-    const { value } = event.target;
-    setLastName(value);
-  };
-  const handleUsernameChange = (event, handleChange) => {
-    handleChange(event);
-    const { value } = event.target;
-    setUsername(value);
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleEmailChange = (event, handleChange) => {
-    handleChange(event);
-    const { value } = event.target;
-    setEmail(value);
-  };
-
-  const handlePasswordChange = (event, handleChange) => {
-    handleChange(event);
-    const { value } = event.target;
-    setPassword(value);
+  const handleCreateUser = (event) => {
+    event.preventDefault();
+    console.log("Account created successfully");
   };
 
   return (
@@ -70,7 +52,7 @@ const Form = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={formData}
         validationSchema={checkoutSchema}
       >
         {({
@@ -78,7 +60,6 @@ const Form = () => {
           errors,
           touched,
           handleBlur,
-          handleChange,
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit}>
@@ -96,7 +77,7 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleFirstNameChange(event, handleChange)}
+                onChange={handleChange}
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -109,7 +90,7 @@ const Form = () => {
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={(event) => handleLastNameChange(event, handleChange)}
+                onChange={handleChange}
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -122,7 +103,7 @@ const Form = () => {
                 type="text"
                 label="Email"
                 onBlur={handleBlur}
-                onChange={(event) => handleEmailChange(event, handleChange)}
+                onChange={handleChange}
                 value={values.email}
                 name="email"
                 error={!!touched.email && !!errors.email}
@@ -135,8 +116,8 @@ const Form = () => {
                 type="text"
                 label="Username"
                 onBlur={handleBlur}
-                onChange={(event) => handleUsernameChange(event, handleChange)}
-                value={username}
+                onChange={handleChange}
+                value={values.username}
                 name="username"
                 error={!!touched.username && !!errors.username}
                 helperText={touched.username && errors.username}
@@ -148,7 +129,7 @@ const Form = () => {
                 type="password"
                 label="Password"
                 onBlur={handleBlur}
-                onChange={(event) => handlePasswordChange(event, handleChange)}
+                onChange={handleChange}
                 value={values.password}
                 name="password"
                 error={!!touched.password && !!errors.password}
@@ -161,7 +142,7 @@ const Form = () => {
                 type="submit"
                 color="secondary"
                 variant="contained"
-                onClick={handleFormSubmit}
+                onClick={handleCreateUser}
               >
                 Create New User Account
               </Button>
@@ -176,21 +157,9 @@ const Form = () => {
 const checkoutSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
-  username: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .matches(/^(?=.*[0-9])/, "Password must contain at least one number")
-    .required(" required"),
+  password: yup.string().required("required"),
+  CreatedBy: yup.string().required("required"),
 });
-
-const initialValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  username: "",
-  password: "",
-};
 
 export default Form;

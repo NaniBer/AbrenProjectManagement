@@ -6,7 +6,7 @@ export const mockDataTeam = [
     firstname: "Saron",
     lastname: "Bisrat",
     email: "jonsnow@gmail.com",
-    username: "someone.kaizen",
+    username: "saronbisrat.kaizen",
     role: "admin",
     status: "inactive"
   },
@@ -15,7 +15,7 @@ export const mockDataTeam = [
     firstname: "Romhay",
     lastname: "Yemane",
     email: "jonsnow@gmail.com",
-    username: "someone.kaizen",
+    username: "romahayyemane.kaizen",
     role: "user",
     status: "active"
   },
@@ -24,7 +24,7 @@ export const mockDataTeam = [
     firstname: "Nazrawit",
     lastname: "Berhanu",
     email: "jaimelannister@gmail.com",
-    username: "someone.kaizen",
+    username: "nazrawitberhanu.kaizen",
     role: "user",
     status: "inactive"
   },
@@ -33,7 +33,7 @@ export const mockDataTeam = [
     firstname: "Nardos",
     lastname: "Dagnachew",
     email: "jaimelannister@gmail.com",
-    username: "someone.kaizen",
+    username: "nardosdagnachew.kaizen",
     role: "user",
     status: "inactive"
 
@@ -41,6 +41,20 @@ export const mockDataTeam = [
 
 ];
 
+export const mockDataProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen"
+  },
+  {
+    id: 2,
+    projectname: "smth website",
+    description: "smth is a tech company ",
+    projectmanager: "saronbisrat.kaizen"
+  },
+];
 
 export const mockDataContacts = [
   {
