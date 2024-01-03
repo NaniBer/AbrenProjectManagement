@@ -16,20 +16,11 @@ import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import swal from "sweetalert";
 
-import React, { useEffect, useState } from "react";
-import { Box, Typography, useTheme, Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import Header from "../../components/Header";
-
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [teamData, setTeamData] = useState(mockDataTeam);
+  const [teamData, setTeamData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null); // Track the selected row for the modal
   const [openModal, setOpenModal] = useState(false); // Control the visibility of the modal
   const [updatedFirstName, setUpdatedFirstName] = useState("");
@@ -37,13 +28,34 @@ const Team = () => {
   const [updatedEmail, setUpdatedEmail] = useState("");
   const [updatedUsername, setUpdatedUsername] = useState("");
 
+  useEffect(() => {
+    fetch("/admin/getUsers")
+      .then((response) => response.json())
+      .then((data) => {
+        const fetchedData = data.map((row) => ({
+          ...row,
+          id: row._id,
+          status: row.disabled ? "inactive" : "active", // Set the status based on the disabled value
+          role: "User",
+        }));
+        console.log(fetchedData);
+        setTeamData(fetchedData);
+      });
+  }, []);
   const handleDisable = (rowId) => {
     // Update the teamData state array
     const updatedTeamData = teamData.map((row) => {
       if (row.id === rowId) {
+        const newStatus = row.status === "inactive" ? "active" : "inactive";
+        console.log(newStatus);
+        fetch(`/admin/disableUsers/${rowId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newStatus: newStatus }),
+        });
         return {
           ...row,
-          status: row.status === "inactive" ? "active" : "inactive",
+          status: newStatus,
         };
       }
       return row;
@@ -66,13 +78,36 @@ const Team = () => {
   const handleModalSave = () => {
     const updatedTeamData = teamData.map((row) => {
       if (row.id === selectedRow.id) {
-        return {
-          ...row,
-          firstname: updatedFirstName || row.firstname,
-          lastname: updatedLastName || row.lastname,
-          email: updatedEmail || row.email,
-          username: updatedUsername || row.username,
+        const id = selectedRow.id;
+        console.log(id);
+        const firstname = updatedFirstName || row.firstname;
+        const lastname = updatedLastName || row.lastname;
+        const email = updatedEmail || row.email;
+        const username = updatedUsername || row.username;
+        const formData = {
+          id,
+          firstName: firstname,
+          lastName: lastname,
+          email,
+          username,
         };
+        console.log(formData);
+        fetch(`/admin/updateUser/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }).then((response) => {
+          const statusCode = response.status;
+          if (statusCode == 200) {
+            return {
+              ...row,
+              firstname: updatedFirstName || row.firstname,
+              lastname: updatedLastName || row.lastname,
+              email: updatedEmail || row.email,
+              username: updatedUsername || row.username,
+            };
+          }
+        });
       }
       swal("Updated!", "The row has been updated.", "success");
 

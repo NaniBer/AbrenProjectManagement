@@ -5,18 +5,26 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import swal from "sweetalert";
+import { useSelector } from "react-redux";
 
 const Form = () => {
+  const user = useSelector((state) => state.auth.user);
+
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState("");
 
   const handleFormSubmit = (values, formik) => {
     const { firstName, lastName, username, email, password } = values;
-    console.log(firstName, lastName, username, email, password);
+    const userId = user.id;
+  
+
+    const formData = { firstName, lastName, username, email, password, userId };
+    console.log(formData);
     if (
       values.firstName &&
       values.lastName &&
@@ -27,12 +35,38 @@ const Form = () => {
       // Perform your form submission logic here
       formik.setSubmitting(false); // Set submitting to false after successful submission
 
-      // Show success SweetAlert
-      swal(
-        "User Account Created",
-        "The new user account has been created successfully.",
-        "success"
-      );
+      // fetch("/admin/CreateUsers", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(formData),
+      // })
+      //   .then((response) => {
+      //     const statusCode = response.status;
+      //     if (statusCode == 200) {
+      //       // Show success SweetAlert
+      //       swal(
+      //         "User Account Created",
+      //         "The new user account has been created successfully.",
+      //         "success"
+      //       );
+      //     } else if (statusCode == 409) {
+      //       swal(
+      //         "Username exists",
+      //         "The new user account has not been created successfully.",
+      //         "Fail"
+      //       );
+      //     }
+
+      //     return response.json();
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
+      // .then((response) => {
+      //   if (response.ok) {
+      //     console.log("Request succeed");
+      //   }
+      // });
     }
   };
   const handleFirstNameChange = (event, handleChange) => {
@@ -157,12 +191,7 @@ const Form = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button
-                type="submit"
-                color="secondary"
-                variant="contained"
-                onClick={handleFormSubmit}
-              >
+              <Button type="submit" color="secondary" variant="contained">
                 Create New User Account
               </Button>
             </Box>

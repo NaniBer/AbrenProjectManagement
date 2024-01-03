@@ -4,15 +4,21 @@ import { Typography, useTheme } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-
+import { useNavigate } from "react-router-dom";
+import { loginSucess } from "../../Actions/authActions";
+import { useDispatch } from "react-redux";
+// import useDispatch from "react-redux";
 const Login = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [admin, setAdmin] = useState(false);
   const [errors, setErrors] = useState({});
 
   const fontFamilyStyle = {
@@ -37,6 +43,10 @@ const Login = () => {
     const newValue = e.target.checked;
     setRememberMe(newValue);
   };
+  const handleAdminChange = (e) => {
+    const newValue = e.target.checked;
+    setAdmin(newValue);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,13 +64,29 @@ const Login = () => {
       setErrors({ password: "Please enter your password" });
       return;
     }
-    // const formData = { username, password };
 
-    // await fetch("/admin/Login", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(formData),
-    // });
+    const formData = { username, password };
+    if (admin) {
+      fetch("/admin/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      }).then((response) => {
+        const statusCode = response.status;
+        if (statusCode === 200) {
+          response.json().then((data) => {
+            const user = data.admin;
+            console.log({ user: user });
+            dispatch(loginSucess(user));
+            // Do something with 'user' data
+            navigate("/");
+          });
+        } else {
+          // Handle non-200 status codes if needed
+          console.error("Request failed with status code:", statusCode);
+        }
+      });
+    }
 
     // Simulating login process
     if (username === "example@example.com" && password === "password123") {
@@ -184,25 +210,45 @@ const Login = () => {
               )}
             </div>
             <div
-              className="mb-3  form-check"
+              className="col"
               style={{ display: "flex", alignItems: "center" }}
             >
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={handleRememberMeChange}
-              />
-              <label
-                className="form-check-label px-2"
-                htmlFor="rememberMe"
-                style={{
-                  color: colors.primary[500],
-                }}
-              >
-                Remember Me
-              </label>
+              <div className="mb-3  form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="admin"
+                  checked={admin}
+                  onChange={handleAdminChange}
+                />
+                <label
+                  className="form-check-label px-2"
+                  htmlFor="admin"
+                  style={{
+                    color: colors.primary[500],
+                  }}
+                >
+                  I am an Admin
+                </label>
+              </div>
+              <div className="mb-3  form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={handleRememberMeChange}
+                />
+                <label
+                  className="form-check-label px-2"
+                  htmlFor="rememberMe"
+                  style={{
+                    color: colors.primary[500],
+                  }}
+                >
+                  Remember Me
+                </label>
+              </div>
             </div>
             <button
               type="submit"

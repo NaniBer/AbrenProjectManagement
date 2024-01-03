@@ -9,7 +9,7 @@ import Topbar from "./scenes/global/Topbar";
 // import Sidebar from "./scenes/global/Sidebar";
 import SidebarAdmin from "./scenes/global/SidebarAdmin";
 import Createproject from "./scenes/createproject";
- import Createteamaccount from "./scenes/createteamaccount";
+import Createteamaccount from "./scenes/createteamaccount";
 import Calendar from "./scenes/calendar";
 import Kanban from "./scenes/kanban";
 import Team from "./scenes/team";
@@ -40,11 +40,16 @@ function App() {
               <Route path="/viewuser" element={<Viewuser />}></Route>
               <Route path="/viewproject" element={<Viewproject />}></Route>
               <Route path="/createproject" element={<Createproject />}></Route>
-              <Route path="/createteamaccount" element={<Createteamaccount />}></Route>
+              <Route
+                path="/createteamaccount"
+                element={<Createteamaccount />}
+              ></Route>
               <Route path="/updateuser/:id" element={<Updateuser />}></Route>
-              <Route path="/updateproject/:rowId" element={<Updateproject />}></Route>
+              <Route
+                path="/updateproject/:rowId"
+                element={<Updateproject />}
+              ></Route>
               <Route path="/updateandreset" element={<Reset />}></Route>
-
 
               {/* <Route
                 path="/createteamaccount"

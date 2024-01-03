@@ -1,0 +1,90 @@
+Parent Route: /admin
+----------------------------------------------------------------------------
+
+Route: /addAdmin
+Method: POST
+Description: Creates a new administrator account.
+
+Input:
+- None
+
+Success Output:
+- Status code: 201 (Created)
+- Response body: An object with the following fields:
+  - message: A success message indicating that the account was created successfully.
+
+---
+
+Route: /getAdmins
+Method: GET
+Description: Retrieves a list of all administrator users.
+
+---
+
+Route: /CreateUsers
+Method: POST
+Description: Creates a user account by the system administrator.
+
+Input:
+  - firstName
+  - lastName
+  - username
+  - password
+  - email
+
+Success Output:
+- Status code: 201 (Created)
+- Response body: An object with the following fields:
+  - message: A success message indicating that the account was created successfully.
+
+---
+
+Route: /UpdateUser/:id
+Method: PUT
+Description: Updates a user account by the system administrator.
+
+Input:
+- Path parameter: id (string) - The unique identifier of the user to be updated.
+- Request body: An object with the following fields:
+  - firstname
+  - lastname
+  - email
+  - status
+  - username
+  - password
+  - disabled
+
+Success Output:
+- Status code: 200 (OK)
+- Response body: An object with the following fields:
+  - message: A success message indicating that the account was updated successfully.
+
+---
+
+Route: /CreateProject
+Method: POST
+Description: Creates a new project.
+
+Input:
+  - ProjectName
+  - ProjectDescription
+  - ProjectManager
+
+Success Output:
+- Status code: 201 (Created)
+- Response body: An object with the following fields:
+  - message: A success message indicating that the project was created successfully.
+
+---
+
+Route: /ResetAdmin
+Method: PUT
+Description: Resets the credentials of the system administrator to admin admin.
+
+Input:
+- None
+
+Success Output:
+- Status code: 200 (OK)
+- Response body: An object with the following fields:
+  - message: A success message indicating that the admin credentials were reset successfully.

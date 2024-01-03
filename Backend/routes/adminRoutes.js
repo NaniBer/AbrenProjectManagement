@@ -8,8 +8,8 @@ const Users = require("../Model/Users");
 // System Adminstartor Login
 router.post("/Login", async (req, res) => {
   try {
-    // console.log(req.body);
     const { username, password } = req.body;
+    console.log(username, password);
     // Check if the user exists
     const admin = await Admin.findOne({ username });
     if (!admin) {
@@ -22,8 +22,9 @@ router.post("/Login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
     req.session.adminId = admin._id;
+    console.log(admin);
 
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({ admin });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in" });
@@ -52,7 +53,7 @@ router.post("/addAdmin", async (req, res) => {
 });
 
 //Get admin users list
-router.get("/getAdminList", async (req, res) => {
+router.get("/getAdmins", async (req, res) => {
   try {
     const adminsList = await Admin.find();
     res.json(adminsList);
@@ -97,12 +98,13 @@ router.post("/CreateUsers", async (req, res) => {
 });
 
 //updating user
-router.put("/UpdateUser/:id", async (req, res) => {
+router.put("/updateUser/:id", async (req, res) => {
   try {
-    const { firstname, lastname, email, status, username, password, disabled } =
-      req.body;
+    const { firstName, lastName, username, email } = req.body;
+
     // const updatedBy = req.session.adminId;
     const userId = req.params.id;
+    console.log(userId, firstName, lastName, username, email);
 
     // Check if the user exists
     const existingUser = await Users.findById(userId);
@@ -111,19 +113,12 @@ router.put("/UpdateUser/:id", async (req, res) => {
     }
 
     // Update the user's information
-    existingUser.firstname = firstname;
-    existingUser.lastname = lastname;
+    existingUser.firstname = firstName;
+    existingUser.lastname = lastName;
     existingUser.email = email;
     existingUser.username = username;
-    existingUser.disabled = disabled;
+    // existingUser.disabled = disabled;
     // existingUser.updatedBy = updatedBy;
-
-    // If a new password is provided, hash and update it
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      existingUser.password = hashedPassword;
-    }
-
     // Save the updated user to the database
     await existingUser.save();
 
@@ -134,29 +129,81 @@ router.put("/UpdateUser/:id", async (req, res) => {
   }
 });
 
+//Delete Users
+router.delete("/deleteUsers/:id", async (req, res) => {
+  try {
+    const deletedUser = await Users.deleteOne({ _id: req.params.id });
+    console.log(req.params.id);
+    res.status(200).json(deletedUser);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+
+router.patch("/disableUsers/:id", async (req, res) => {
+  try {
+    const status = req.body.newStatus;
+    const id = req.params.id;
+    if (status == "inactive") {
+      const result = await Users.updateOne(
+        { _id: id },
+        { $set: { disabled: true } }
+      );
+    } else {
+      const result = await Users.updateOne(
+        { _id: id },
+        { $set: { disabled: false } }
+      );
+    }
+    console.log("Successful");
+    res.status(200);
+
+    console.log(status, id);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+
 //create project
 router.post("/CreateProject", async (req, res) => {
   try {
     const { ProjectName, ProjectDescription, ProjectManager } = req.body;
+    console.log(req.body);
     // const createdBy = req.session.adminId;
     // Check if the user already exists
     const existingProject = await Admin.findOne({ ProjectName });
     if (existingProject) {
       return res.status(409).json({ message: "Project already exists" });
     }
+    //Search for project manager id
+    const user = await Users.findOne({ username: ProjectManager });
+    const ProjectManagerId = user._id;
     // Create a new Project
     const newProject = new Projects({
       ProjectName,
       ProjectDescription,
-      ProjectManager,
+      ProjectManager: ProjectManagerId,
     });
+    console.log(newProject);
 
     // Save the Project to the database
     await newProject.save();
+    console.log("Successful");
     res.status(201).json({ message: "Project created successfully" });
   } catch (error) {
     console.error("Error creating Project:", error);
     res.status(500).json({ message: "Error creating Project" });
+  }
+});
+
+//Get Usernames
+router.get("/getUsernames", async (req, res) => {
+  try {
+    const usernames = await Users.find().select("username");
+    res.json(usernames);
+  } catch (err) {
+    console.error("Error retrieving Admin list:", err);
+    res.status(500).json({ message: "Error rerieving admin list" });
   }
 });
 
@@ -191,7 +238,55 @@ router.get("/getUsers", async (req, res) => {
   }
 });
 
+//View Projects
+router.get("/getProjects", async (req, res) => {
+  try {
+    // const projectList = await Projects.find();
+    // res.json(projectList);
+    const projectList = await Projects.find()
+      .populate("ProjectManager", "username")
+      .select("ProjectName ProjectDescription ProjectManager");
+
+    res.json(projectList);
+  } catch (err) {
+    console.error("Error retrieving projects:", err);
+    res.status(500).json({ message: "Error rerieving Project list" });
+  }
+});
+
+//delete projects
+router.delete("/deleteProjects/:id", async (req, res) => {
+  try {
+    const deletedProject = await Projects.deleteOne({ _id: req.params.id });
+    console.log(req.params.id);
+    res.status(200).json(deletedProject);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
 //updating Project
+router.put("/updateProjects/:id", async (req, res) => {
+  try {
+    const { id, ProjectName, ProjectDescription, ProjectManager } = req.body;
+    // console.log(id, ProjectName, ProjectDescription, ProjectManager);
+    const user = await Users.findOne({ username: ProjectManager });
+    const ProjectManagerId = user._id;
+    const updatedBusiness = await Projects.updateOne(
+      { _id: id },
+      {
+        $set: {
+          ProjectName: ProjectName,
+          ProjectDescription: ProjectDescription,
+          ProjectManager: ProjectManagerId,
+        },
+      }
+    );
+    console.log(updatedBusiness);
+    res.status(200).json(updatedBusiness);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
 
 //update Admin
 // router.put('/UpdateAdmin', async (req, res) => {

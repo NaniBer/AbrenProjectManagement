@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -19,6 +19,9 @@ const Form = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // useEffect(()=>{
+  //   fetch
+  // },[])
 
   const handleFormSubmit = (values) => {
     console.log(values);
@@ -84,16 +87,8 @@ const Form = () => {
     <Box m="20px">
       <Header title="UPDATE ACCOUNT" subtitle="Update Your Account" />
 
-      <Box
-        display="flex"
-        justifyContent="flex-end"
-        marginBottom="20px"
-      >
-        <Button
-          color="warning"
-          variant="contained"
-          onClick={handleReset}
-        >
+      <Box display="flex" justifyContent="flex-end" marginBottom="20px">
+        <Button color="warning" variant="contained" onClick={handleReset}>
           Reset
         </Button>
       </Box>
@@ -128,9 +123,7 @@ const Form = () => {
                 type="text"
                 label="Username"
                 onBlur={handleBlur}
-                onChange={(event) =>
-                  handleUsernameChange(event, handleChange)
-                }
+                onChange={(event) => handleUsernameChange(event, handleChange)}
                 value={username}
                 name="username"
                 error={!!touched.username && !!errors.username}
@@ -148,9 +141,7 @@ const Form = () => {
                 }
                 value={currentPassword}
                 name="currentPassword"
-                error={
-                  !!touched.currentPassword && !!errors.currentPassword
-                }
+                error={!!touched.currentPassword && !!errors.currentPassword}
                 helperText={touched.currentPassword && errors.currentPassword}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -180,9 +171,7 @@ const Form = () => {
                 }
                 value={confirmPassword}
                 name="confirmPassword"
-                error={
-                  !!touched.confirmPassword && !!errors.confirmPassword
-                }
+                error={!!touched.confirmPassword && !!errors.confirmPassword}
                 helperText={touched.confirmPassword && errors.confirmPassword}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -191,7 +180,6 @@ const Form = () => {
               <Button type="submit" color="secondary" variant="contained">
                 SaveChanges
               </Button>
-            
             </Box>
           </form>
         )}
