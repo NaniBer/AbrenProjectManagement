@@ -31,6 +31,29 @@ router.post("/Login", async (req, res) => {
   }
 });
 
+//Logout
+router.post("/logout", async (req, res) => {
+  try {
+    console.log("Logout ");
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error logging out:", err);
+        return res.status(500).json({ message: "Error logging out" });
+      }
+
+      // Clear the session cookie
+      res.clearCookie("sessionID");
+
+      // Respond with success message
+      res.status(200).json({ message: "Logout successful" });
+    });
+  } catch (error) {
+    console.error("Error logging out:", error);
+    res.status(500).json({ message: "Error logging out" });
+  }
+});
+3;
 router.post("/addAdmin", async (req, res) => {
   try {
     const username = "admin";
@@ -288,23 +311,64 @@ router.put("/updateProjects/:id", async (req, res) => {
   }
 });
 
-//update Admin
-// router.put('/UpdateAdmin', async (req, res) => {
+// update Admin
+router.put("/UpdateAdmin", async (req, res) => {
+  try {
+    const { username, currentPassword, newPassword } = req.body;
+
+    // Find the admin user by username
+    const adminUser = await Admin.findOne({ username });
+
+    if (!adminUser) {
+      return res.status(404).json({ message: "Admin user not found" });
+    }
+
+    // Verify the old password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      adminUser.password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid old password" });
+    }
+
+    // Generate a new password hash
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    // Update the admin user's password
+    adminUser.password = newPasswordHash;
+
+    // Save the updated admin user
+    await adminUser.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating admin password:", error);
+    res.status(500).json({ message: "Error updating admin password" });
+  }
+});
+
+//reset Password
+// router.put("/ResetAdmin", async (req, res) => {
 //   try {
-//     const { username, oldPassword, newPassword } = req.body;
+//     const { username, currentPassword, newPassword } = req.body;
 
 //     // Find the admin user by username
 //     const adminUser = await Admin.findOne({ username });
 
 //     if (!adminUser) {
-//       return res.status(404).json({ message: 'Admin user not found' });
+//       return res.status(404).json({ message: "Admin user not found" });
 //     }
 
 //     // Verify the old password
-//     const isPasswordValid = await bcrypt.compare(oldPassword, adminUser.password);
+//     const isPasswordValid = await bcrypt.compare(
+//       currentPassword,
+//       adminUser.password
+//     );
 
 //     if (!isPasswordValid) {
-//       return res.status(401).json({ message: 'Invalid old password' });
+//       return res.status(401).json({ message: "Invalid old password" });
 //     }
 
 //     // Generate a new password hash
@@ -316,10 +380,10 @@ router.put("/updateProjects/:id", async (req, res) => {
 //     // Save the updated admin user
 //     await adminUser.save();
 
-//     res.status(200).json({ message: 'Password updated successfully' });
+//     res.status(200).json({ message: "Password updated successfully" });
 //   } catch (error) {
-//     console.error('Error updating admin password:', error);
-//     res.status(500).json({ message: 'Error updating admin password' });
+//     console.error("Error updating admin password:", error);
+//     res.status(500).json({ message: "Error updating admin password" });
 //   }
 // });
 module.exports = router;
