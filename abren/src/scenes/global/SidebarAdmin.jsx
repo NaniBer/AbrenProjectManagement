@@ -1,21 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import AddCardIcon from '@mui/icons-material/AddCard';
+import AddCardIcon from "@mui/icons-material/AddCard";
 // import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import LogoutIcon from '@mui/icons-material/Logout';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import ViewCompactIcon from '@mui/icons-material/ViewCompact';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LogoutIcon from "@mui/icons-material/Logout";
+import ViewListIcon from "@mui/icons-material/ViewList";
+import ViewCompactIcon from "@mui/icons-material/ViewCompact";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Logo from "../../images/abren2.png";
-
-
+// import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { logoutSucess } from "../../Actions/authActions";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -40,6 +41,22 @@ const SidebarAdmin = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    console.log("logout");
+    fetch("/admin/Logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }).then((response) => {
+      const statusCode = response.status;
+      if (statusCode == 200) {
+        dispatch(logoutSucess());
+        navigate("/login");
+      }
+    });
+  };
 
   return (
     <Box
@@ -82,13 +99,8 @@ const SidebarAdmin = () => {
                 {/* <Typography variant="h3" color={colors.grey[100]}>
                   ADMINIS
                 </Typography> */}
-                <img
-                alt="idk"
-                width="80px"
-                height="80px"
-                src={Logo}
-                ></img>
-              
+                <img alt="idk" width="80px" height="80px" src={Logo}></img>
+
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
@@ -131,7 +143,7 @@ const SidebarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
- <Typography
+            <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -145,15 +157,15 @@ const SidebarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
-             <Item
+            <Item
               title="View Project"
               to="/viewproject"
               icon={<ViewCompactIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-          
-              <Typography
+
+            <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -167,39 +179,36 @@ const SidebarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
-             <Item
+            <Item
               title="View User"
               to="/viewuser"
               icon={<ViewListIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            
-             <Typography
+
+            <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Account
             </Typography>
-               <Item
+            <Item
               title="Update and Reset"
               to="/updateandreset"
               icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+            <div onClick={handleLogout}>
               <Item
-              title="Log Out"
-              to="/team"
-              icon={<LogoutIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-      
-         
-         
-
+                title="Log Out"
+                icon={<LogoutIcon />}
+                // selected={selected}
+                setSelected={setSelected}
+              />
+            </div>
           </Box>
         </Menu>
       </ProSidebar>

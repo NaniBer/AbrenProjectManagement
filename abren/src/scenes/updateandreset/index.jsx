@@ -5,6 +5,7 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import swal from "sweetalert";
+import { useSelector } from "react-redux";
 
 const initialValues = {
   username: "",
@@ -19,13 +20,40 @@ const Form = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // useEffect(()=>{
-  //   fetch
-  // },[])
+  const user = useSelector((state) => state.auth.user.username);
+
+  useEffect(() => {
+    setUsername(user);
+  }, []);
 
   const handleFormSubmit = (values) => {
     console.log(values);
-    swal("Success!", "You have successfully updated your account.", "success");
+    fetch("/admin/UpdateAdmin", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    })
+      .then((response) => {
+        const statusCode = response.status;
+        console.log(statusCode);
+        if (statusCode == 200) {
+          swal(
+            "Success!",
+            "You have successfully updated your account.",
+            "success"
+          );
+        } else if (statusCode == 409) {
+          swal(
+            "Error",
+            "The new user account has not been created successfully.",
+            "Fail"
+          );
+        }
+        return response.json();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   const handleUsernameChange = (event, handleChange) => {
@@ -65,12 +93,14 @@ const Form = () => {
         setCurrentPassword("admin");
         setNewPassword("");
         setConfirmPassword("");
+        const values = { username, newPassword, currentPassword };
         swal("Reset!", "The form has been reset.", "success");
+        handleFormSubmit(values);
       }
     });
   };
   const passwordSchema = yup.object().shape({
-    username: yup.string().required("Username is required"),
+    // username: yup.string().required("Username is required"),
     currentPassword: yup.string().required("Current Password is required"),
     newPassword: yup
       .string()

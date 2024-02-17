@@ -7,6 +7,8 @@ import Header from "../../components/Header";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  // const username = useSelector((state) => state.auth.username);
+  // console.log(username);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -55,13 +57,7 @@ const Form = () => {
         initialValues={formData}
         validationSchema={checkoutSchema}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleSubmit,
-        }) => (
+        {({ values, errors, touched, handleBlur, handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"

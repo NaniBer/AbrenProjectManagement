@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, TextField, CircularProgress } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -12,18 +12,29 @@ const Form = () => {
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
 
+  const storeState = useSelector((state) => state);
+  useEffect(() => {
+    console.log(storeState.auth.user._id);
+  }, []);
+
   const handleFormSubmit = (values, formik) => {
     const { firstName, lastName, username, email, password } = values;
-    const userId = user.id;
-  
-
-    const formData = { firstName, lastName, username, email, password, userId };
+    const adminId = storeState.auth.user._id;
+    const formData = {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      adminId,
+    };
     console.log(formData);
     if (
       values.firstName &&
@@ -32,41 +43,37 @@ const Form = () => {
       values.username &&
       values.password
     ) {
+      setLoading(true);
       // Perform your form submission logic here
       formik.setSubmitting(false); // Set submitting to false after successful submission
-
-      // fetch("/admin/CreateUsers", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(formData),
-      // })
-      //   .then((response) => {
-      //     const statusCode = response.status;
-      //     if (statusCode == 200) {
-      //       // Show success SweetAlert
-      //       swal(
-      //         "User Account Created",
-      //         "The new user account has been created successfully.",
-      //         "success"
-      //       );
-      //     } else if (statusCode == 409) {
-      //       swal(
-      //         "Username exists",
-      //         "The new user account has not been created successfully.",
-      //         "Fail"
-      //       );
-      //     }
-
-      //     return response.json();
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error:", error);
-      //   });
-      // .then((response) => {
-      //   if (response.ok) {
-      //     console.log("Request succeed");
-      //   }
-      // });
+      fetch("/admin/CreateUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => {
+          const statusCode = response.status;
+          console.log(statusCode);
+          if (statusCode == 201) {
+            // Show success SweetAlert
+            swal(
+              "User Account Created",
+              "The new user account has been created successfully.",
+              "success"
+            );
+            console.log("Created Successfully");
+          } else if (statusCode == 409) {
+            swal(
+              "Username exists",
+              "The new user account has not been created successfully.",
+              "Fail"
+            );
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     }
   };
   const handleFirstNameChange = (event, handleChange) => {
@@ -195,6 +202,11 @@ const Form = () => {
                 Create New User Account
               </Button>
             </Box>
+            {loading && (
+              <Box display="flex" justifyContent="center" my={3}>
+                <CircularProgress />
+              </Box>
+            )}
           </form>
         )}
       </Formik>

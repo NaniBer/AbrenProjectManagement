@@ -6,10 +6,14 @@ import Header from "../../components/Header";
 // import GeographyChart from "../../components/GeographyChart";
 // import BarChart from "../../components/BarChart";
 // import ProgressCircle from "../../components/ProgressCircle";
-
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 const DashboardAdmin = () => {
-
+  const storeState = useSelector((state) => state);
+  useEffect(() => {
+    console.log(storeState);
+  }, []);
 
   // const theme = useTheme();
   // const colors = tokens(theme.palette.mode);
