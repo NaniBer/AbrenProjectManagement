@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import Calendar from "../../components/calendar";
+import Resource from "../../components/resource";
 import {
   CheckCircleOutline,
   PeopleAlt,
@@ -19,6 +20,8 @@ const App = () => {
   };
 
   const isCalendarSelected = selectedItem === "Calendar";
+  const isResourceSelected = selectedItem === "Resource";
+
 
   return (
     <div>
@@ -34,7 +37,7 @@ const App = () => {
           <div style={{ display: "flex" }}>
             
             <div
-              style={{ flex: 0.2, textAlign: "center", padding: "2px", marginLeft: "-2px" }}
+              style={{ flex: 0.2, textAlign: "center", padding: "2px"}}
               onClick={() => handleItemClick("Task")}
             >
               <CheckCircleOutline sx={{ fontSize: 16 }} />
@@ -42,7 +45,17 @@ const App = () => {
             </div>
             
             <div
-              style={{ flex: 0.2, textAlign: "center", padding: "2px", marginLeft: "-2px" }}
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                color: isResourceSelected ? "#6870fa" : "inherit",
+                textDecoration: isResourceSelected ? "italic" : "none",
+                cursor: "pointer",
+              }}
               onClick={() => handleItemClick("Resource")}
             >
               <PeopleAlt sx={{ fontSize: 16 }} />
@@ -71,7 +84,7 @@ const App = () => {
                 display: "flex",
                 alignItems: "center",
                 color: isCalendarSelected ? "#6870fa" : "inherit",
-                textDecoration: isCalendarSelected ? "underline" : "none",
+                textDecoration: isCalendarSelected ? "italic" : "none",
                 cursor: "pointer",
               }}
               onClick={() => handleItemClick("Calendar")}
@@ -98,6 +111,8 @@ const App = () => {
       </Toolbar>
 
       {isCalendarSelected && <Calendar />}
+      {isResourceSelected && <Resource />}
+
     </div>
   );
 };
