@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-const Team = () => {
+const Resource = () => {
   const theme = useTheme();
 
   const [teamName, setTeamName] = useState('');
@@ -225,4 +225,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default Resource;

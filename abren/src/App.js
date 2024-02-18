@@ -21,6 +21,7 @@ import Viewuser from "./scenes/viewuser";
 import Viewproject from "./scenes/viewproject";
 import Reset from "./scenes/updateandreset";
 import Project from "./scenes/project";
+import Resource from "./components/resource";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -49,6 +50,8 @@ function App() {
               <Route path="/updateproject/:rowId" element={<Updateproject />}></Route>
               <Route path="/updateandreset" element={<Reset />}></Route>
               <Route path="/project" element={<Project />}></Route>
+              <Route path="/resource" element={<Resource />}></Route>
+
 
 
 
