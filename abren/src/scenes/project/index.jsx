@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
+import { useDispatch } from "react-redux";
 import Calendar from "../../components/calendar";
 import Resource from "../../components/resource";
 import Milestone from "../../components/milestone";
+import { loadProject } from "../../Actions/projectActions";
 
 import {
   CheckCircleOutline,
@@ -15,6 +17,7 @@ import {
 } from "@mui/icons-material";
 
 const App = () => {
+  const dispatch = useDispatch();
   const [selectedItem, setSelectedItem] = useState("");
 
   const [jsonData, setJsonData] = useState(null);
@@ -25,7 +28,7 @@ const App = () => {
         const response = await fetch("./ProjectDummy.json"); // Assuming data.json is in the public folder
         const data = await response.json();
         setJsonData(data);
-        console.log(data);
+        dispatch(loadProject(data));
       } catch (error) {
         console.error("Error reading JSON file:", error);
       }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,10 +17,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { tokens } from "../../theme";
+import { useSelector } from "react-redux";
 
 const Milestone = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const project = useSelector((state) => state.project.project);
+  console.log(project);
 
   const [milestoneName, setMilestoneName] = useState("");
   const [description, setDescription] = useState("");
@@ -28,10 +31,17 @@ const Milestone = () => {
   const [priority, setPriority] = useState("");
   const [budget, setBudget] = useState(0);
   const [resources, setResources] = useState([]);
+  const [quantity, setQuantity] = useState(0);
+  const [projectResources, setProjectResources] = useState([]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedMilestones, setSubmittedMilestones] = useState([]);
 
+  useEffect(() => {
+    const resources = Object.keys(project.Resources);
+    console.log(resources);
+    setProjectResources(resources);
+  }, []);
   const handleMilestoneNameChange = (e) => {
     setMilestoneName(e.target.value);
   };
@@ -51,7 +61,9 @@ const Milestone = () => {
   const handleResourceChange = (e) => {
     setResources([...resources, e.target.value]);
   };
-
+  const handleQuantityChange = (e) => {
+    setQuantity(e.target.value);
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -60,6 +72,10 @@ const Milestone = () => {
       milestoneName,
       description,
       status,
+      priority,
+      budget,
+      resources,
+      quantity,
     };
 
     // Update the submitted miletsones list
@@ -72,6 +88,10 @@ const Milestone = () => {
     setMilestoneName("");
     setDescription("");
     setStatus("");
+    setPriority("");
+    setBudget(0);
+    setResources("");
+    setQuantity(0);
 
     setIsFormOpen(false); // Close the form after submission
   };
@@ -84,6 +104,10 @@ const Milestone = () => {
     setMilestoneName(milestone.milestoneName);
     setDescription(milestone.description);
     setStatus(milestone.status);
+    setPriority(milestone.priority);
+    setBudget(milestone.budget);
+    setResources(milestone.resources);
+    setQuantity(milestone.quantity);
 
     // Remove the selected milestones from the submitted milestoness list
     setSubmittedMilestones((prevMilestones) => {
@@ -226,11 +250,11 @@ const Milestone = () => {
                 <TextField
                   id="priority"
                   select
-                  label="Status"
+                  label="Priority"
                   variant="outlined"
                   fullWidth
-                  value={status}
-                  onChange={handleStatusChange}
+                  value={priority}
+                  onChange={handlePriorityChange}
                   sx={{
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
@@ -275,12 +299,40 @@ const Milestone = () => {
               </Box>
               <Box sx={{ mb: 2 }}>
                 <TextField
-                  id="resources"
-                  label="Resources"
+                  id="resource"
+                  select
+                  label="Status"
                   variant="outlined"
                   fullWidth
                   value={resources}
                   onChange={handleResourceChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderColor: "#868dfb",
+                      },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      "&.Mui-focused": {
+                        color: "#868dfb",
+                      },
+                    },
+                  }}
+                >
+                  {projectResources.map((resource) => (
+                    <MenuItem value={resource}>{resource}</MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <TextField
+                  id="resourceQuantity"
+                  label="Resource Quantity"
+                  variant="outlined"
+                  fullWidth
+                  value={quantity}
+                  onChange={handleQuantityChange}
                   sx={{
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
@@ -359,6 +411,50 @@ const Milestone = () => {
                     >
                       {" "}
                       {milestone.status}
+                    </Typography>
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Priority:{" "}
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      color={colors.greenAccent[400]}
+                    >
+                      {" "}
+                      {milestone.priority}
+                    </Typography>
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Allocated Budget:{" "}
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      color={colors.greenAccent[400]}
+                    >
+                      {" "}
+                      {milestone.budget}
+                    </Typography>
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Resource required:{" "}
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      color={colors.greenAccent[400]}
+                    >
+                      {" "}
+                      {milestone.resources}
+                    </Typography>
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Quantity of resource:{" "}
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      color={colors.greenAccent[400]}
+                    >
+                      {" "}
+                      {milestone.quantity}
                     </Typography>
                   </Typography>
 
