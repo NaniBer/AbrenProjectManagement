@@ -1,5 +1,53 @@
 import { tokens } from "../theme";
 
+export const Team = [
+  {
+    id: 1,
+    name: "Saron Bisrat",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive"
+  },
+  {
+    id: 1,
+    name: "Romhay Yemane",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "active"
+  },
+  {
+    id: 1,
+    name: "Nazrawit Berhanu",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive"
+  },
+  {
+    id: 1,
+    name: "Nardos Dagnachew",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "active"
+  },
+  // Add more team members...
+];
+
+export const profile = [
+  {
+    id: 1,
+    firstname: "Saron",
+    lastname: "Bisrat",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive"
+  },
+];
+
 export const mockDataTeam = [
   {
     id: 1,

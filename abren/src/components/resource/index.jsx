@@ -17,6 +17,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { tokens } from "../../theme";
+import Header from "../Header";
+
 
 const Resource = () => {
   const theme = useTheme();
@@ -104,17 +106,18 @@ const Resource = () => {
 
   return (
     <Box m="20px">
+     <Header title="Resource" subtitle="Manages the resources we have" />
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h4" component="h2">
+        {/* <Typography variant="h4" component="h2">
           RESOURCE
-        </Typography>
+        </Typography> */}
 
         <Button
           startIcon={<AddIcon />}
           sx={{
-            backgroundColor: theme.palette.primary.main,
+            backgroundColor: colors.primary[400],
             color: theme.palette.common.white,
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: 'bold',
             padding: '10px 20px',
           }}
@@ -271,19 +274,22 @@ const Resource = () => {
             <Accordion style={{ backgroundColor: '#1F2A40' }} key={index}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h5">Resource Name: <Typography variant="h4" component="span" color={colors.greenAccent[400]}>{resource.resourceName}</Typography></Typography>
-
               </AccordionSummary>
               <AccordionDetails>
+
                 <Box display="flex" flexDirection="column" width="100%">
                 <Typography variant="body1" gutterBottom>
                   Category: <Typography variant="body1" component="span" color={colors.greenAccent[400]}>{resource.category}</Typography>
                 </Typography>
+                 
                   <Typography variant="body1" gutterBottom>
                     Quantity: <Typography variant="body1" component="span" color={colors.greenAccent[400]}>{resource.quantity}</Typography>
                   </Typography>
+                  
                   <Typography variant="body1" gutterBottom>
                     Cost:<Typography variant="body1" component="span" color={colors.greenAccent[400]}>{resource.cost}</Typography> 
                   </Typography>
+                  
                   <Box display="flex" justifyContent="flex-end" mt={2}>
                     <IconButton color="secondary" onClick={() => handleEditResource(index)}>
                       <EditIcon />
