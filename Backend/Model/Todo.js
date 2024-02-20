@@ -10,7 +10,7 @@ TodoSchema= mongoose.Schema({
     },
     UserId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+       // required: true
     },
     TodoDescribtion: {
         type: String,
@@ -22,7 +22,7 @@ TodoSchema= mongoose.Schema({
     },
     Viewed: {
         type: Boolean,
-        required: true
+       // required: true
     }
 
 

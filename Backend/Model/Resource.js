@@ -5,23 +5,30 @@ const ResourceSchema = mongoose.Schema({
 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'projects',
-        required: true,
+       // required: true,
     },
     ResourceName : {
         type: String,
         required : true
     },
     Category: {
-        enum: ['Material', 'Work', 'Cost'],
-        required: true
+        type: String,
+        required: true,
+        enum: ['Material', 'Work', 'Cost']
     },
     Quantity: {
         type: Number,
         required: true
     },
+     CostCategory: {
+        type: String,
+        required: true,
+        enum: ['per Hour', 'per Person'],
+        
+     },
      Cost: {
-         enum: ['per Hour', 'per Person'],
-         required: true
+        type: Number,
+        required: true
      },
      Frequency: {
         type: Number,

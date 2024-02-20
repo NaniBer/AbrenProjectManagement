@@ -4,7 +4,7 @@ const TasksSchema = mongoose.Schema({
     milestone : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Milestones',
-        required: true
+      //  required: true
     },
     TaskName : {
         type: String,
@@ -20,13 +20,20 @@ const TasksSchema = mongoose.Schema({
     },
     TaskDescription : {
         type: String,
-        required: true
+       // required: true
     },
     viewed: {
         type: Boolean,
-        required: true
-    }
-    
+        //required: true
+    },
+    assignedTo: {
+         type: [String], 
+         required: true
+     }, 
+     status: {
+        type: Number,
+     }
+
 })
 const Tasks = mongoose.model('Tasks', TasksSchema)
 module.exports = Tasks;

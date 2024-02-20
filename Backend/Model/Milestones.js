@@ -22,5 +22,5 @@ const MilestonesSchema = mongoose.Schema({
     }
 
 })
-const Milestones = schema.model('Milestones', MilestonesSchema)
+const Milestones = mongoose.model('Milestones', MilestonesSchema)
 module.exports= Milestones;
