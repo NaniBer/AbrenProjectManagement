@@ -78,11 +78,9 @@ UserRouter.post('/addTodolist', async (req, res) => {
     try {
         const { TodoName, Date, TodoDescribtion, Status } = req.body;
 
-        // Assuming you have a logged-in user and their ID is available in req.user
-        // If not, you might want to implement authentication middleware to get the user ID
+
         const loggedInUserId= req.session.UserId;
 
-        // Create a new Todo instance
         const todo = new Todo({
             TodoName,
             Date, 
@@ -107,13 +105,11 @@ UserRouter.post('/addResource', async (req, res) => {
     try {
         const { projectId, ResourceName, Category, Quantity, CostCategory,Cost, Frequency, TotalCost } = req.body;
 
-        // Example validation for 'Category'
+       
         const validCategories = ['Material', 'Work', 'Cost'];
         if (!validCategories.includes(Category)) {
             return res.status(400).json({ success: false, error: 'Invalid Category' });
         }
-
-        // Example validation for 'Cost'
         const validCostOptions = ['per Hour', 'per Person'];
         if (!validCostOptions.includes(CostCategory)) {
             return res.status(400).json({ success: false, error: 'Invalid Cost' });
@@ -141,9 +137,79 @@ UserRouter.post('/addResource', async (req, res) => {
 });
 
 //Update resource
+UserRouter.put ('/updateResource/:ResourceName', async (req, res) =>{
+    try {
+        const {ResourceName } = req.params;
+        const {Category, Quantity, CostCategory, Cost, Frequency, TotalCost } = req.body;
+
+        const existingResource = await Resource.findOne({ResourceName: ResourceName});
+
+        if (!existingResource) {
+            return res.status(404).json({ success: false, error: 'Resource not found'});
+
+            }
+        existingResource.Category = Category || existingResource.Category;
+        existingResource.Quantity = Quantity || existingResource.Quantity;
+        existingResource.CostCategory = CostCategory || existingResource.CostCategory;
+        existingResource.Cost = Cost || existingResource.Cost;
+        existingResource.Frequency = Frequency || existingResource.Frequency;
+        existingResource.TotalCost = TotalCost || existingResource.TotalCost;
+        
+    await existingResource.save();
+
+    res.json({ success: true, updatedResource: existingResource})
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 
 
-//Delete Resources
+//Delete Resources (one attribute taking Resource's Name)
+UserRouter.put('deleteResource/:ResourceName', async (req, res) => {
+    try{
+        const { ResourceName }= req.params;
+        const {deletedattribute }= req.body;
+
+        const existingResource= await Resource.findOne({ ResourceName});
+        if (!existingResource) {
+            return res.status(404).json({ success: false, error:'resource not found'});
+
+        }
+
+        existingResource[deletedattribute]= undefined;
+
+        await existingResource.save();
+        res.json({ success:true, updatedResource: existingResource});
+    } catch (error) { 
+        console.error(error);
+        res.status(500).json({ success: false, error: error.message });
+
+    }
+
+});
+//Delete a certain Resource
+
+
+UserRouter.delete('/deleteResource/:ResourceName', async (req, res) => {
+    try {
+        const { ResourceName } = req.params;
+        const filter = { ResourceName };
+
+        
+        const result = await Resource.deleteOne(filter);
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ success: false, error: 'No record found for the given attribute' });
+        }
+
+        res.json({ success: true, deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 
 
  //Generate report 
