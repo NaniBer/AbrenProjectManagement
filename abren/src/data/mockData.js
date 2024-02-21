@@ -35,6 +35,79 @@ export const Team = [
   },
   // Add more team members...
 ];
+export const Task = [
+  {
+    taskList: 'Task 1',
+    startDate: '2024-02-21',
+    endDate: '2024-02-28',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    teamMembers: [
+      { id: 1, firstname: 'John', lastname: 'Doe', email: 'john@example.com' },
+      { id: 2, firstname: 'Jane', lastname: 'Doe', email: 'jane@example.com' },
+    ],
+    subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+  },
+  {
+    taskList: 'Task 2',
+    startDate: '2024-03-01',
+    endDate: '2024-03-07',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    teamMembers: [
+      { id: 3, firstname: 'Alice', lastname: 'Smith', email: 'alice@example.com' },
+      { id: 4, firstname: 'Bob', lastname: 'Smith', email: 'bob@example.com' },
+    ],
+    subtasks: ['Subtask 1', 'Subtask 2'],
+  },
+];
+
+export const Project = [
+  {
+    id: 1,
+    name: "Project A",
+    startDate: "2024-02-21",
+    endDate: "2024-02-28",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project B",
+    startDate: "2024-03-01",
+    endDate: "2024-03-07",
+    teamMembers: [
+      { id: 3, firstname: "Alice", lastname: "Smith", email: "alice@example.com" },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 4, name: "Task 1", progress: 60 },
+      { id: 5, name: "Task 2", progress: 30 },
+      { id: 6, name: "Task 3", progress: 90 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project C",
+    startDate: "2024-03-06",
+    endDate: "2024-03-12",
+    teamMembers: [
+      { id: 3, firstname: "Alice", lastname: "Smith", email: "alice@example.com" },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 4, name: "Task 1", progress: 70 },
+      { id: 5, name: "Task 2", progress: 100 },
+      { id: 6, name: "Task 3", progress: 90 },
+    ],
+  },
+];
+
 
 export const profile = [
   {

@@ -13,7 +13,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+// import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the expand icon
 import Header from '../Header';
 import { tokens } from '../../theme';
@@ -328,14 +328,14 @@ const Resource = () => {
                     )}
                     sx={{
                       '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: validationErrors.teamMembers ? 'red' : '#868dfb',
+                        borderColor:'#868dfb',
                       },
                     }}
                     InputLabelProps={{
                       shrink: true,
                       sx: {
                         '&.Mui-focused': {
-                          color: validationErrors.teamMembers ? 'red' : '#868dfb',
+                          color:'#868dfb',
                         },
                       },
                     }}
@@ -370,11 +370,6 @@ const Resource = () => {
                 </Box>
 
                
-
-               
-
-               
-
                 
               </Grid>
               <Grid item xs={12}>
@@ -392,6 +387,19 @@ const Resource = () => {
                             fullWidth
                             value={subtask}
                             onChange={(e) => handleSubtaskChange(index, e)}
+                            sx={{
+                              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor:'#868dfb',
+                              },
+                            }}
+                            InputLabelProps={{
+                              shrink: true,
+                              sx: {
+                                '&.Mui-focused': {
+                                  color:'#868dfb',
+                                },
+                              },
+                            }}
                           />
                           <Button onClick={() => handleRemoveSubtask(index)}>
                             <DeleteIcon />
@@ -443,16 +451,16 @@ const Resource = () => {
                 </Button>
               </Box>
                 <Typography variant="body1" sx={{ mt: 1 }}>
+                <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
                   Start Date:{' '}
-                  <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
-                    {resource.startDate}
                   </Typography>
+                    {resource.startDate}
                 </Typography>
                 <Typography variant="body1">
+                <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
                   End Date:{' '}
-                  <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
-                    {resource.endDate}
                   </Typography>
+                    {resource.endDate}
                 </Typography>
 
                 <Tooltip title={resource.description} arrow>
@@ -469,15 +477,15 @@ const Resource = () => {
                       WebkitBoxOrient: 'vertical',
                     }}
                   >
+                  <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
                     Description:{' '}
-                    <Typography variant="body1" component="span" color={colors.greenAccent[400]}>
-                      {truncateDescription(resource.description)}
                     </Typography>
+                      {truncateDescription(resource.description)}
                   </Typography>
                 </Tooltip>
 
                 <Box display="flex" alignItems="center" mt={2}>
-                  <Typography variant="body1" sx={{ mr: 1, marginTop: 2 }}>
+                  <Typography variant="body1" sx={{ mr: 1, marginTop: 2 }} color={colors.greenAccent[400]}>
                     Team Members:
                   </Typography>
                   {resource.teamMembers.map((member) => (
@@ -504,11 +512,15 @@ const Resource = () => {
                 )}
 
                 <Box display="flex" justifyContent="flex-end" mt={5}>
-                  <Button color="secondary" width="2px" height="2px" startIcon={<EditIcon />} onClick={() => handleEditResource(index)} sx={{ mr: -3 }}>
-                    {/* Edit */}
+                  <Button color="secondary" width="2px" height="2px" 
+                  // startIcon={<EditIcon />} 
+                  onClick={() => handleEditResource(index)} sx={{ mr: -3 }}>
+                    Edit
                   </Button>
-                  <Button color="secondary" width="5px" height="5px" startIcon={<DeleteIcon />} onClick={() => handleDeleteResource(index)}>
-                    {/* Delete */}
+                  <Button color="secondary" width="5px" height="5px" 
+                  // startIcon={<DeleteIcon />} 
+                  onClick={() => handleDeleteResource(index)}>
+                    Delete
                   </Button>
                 </Box>
               </CardContent>

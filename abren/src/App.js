@@ -22,6 +22,12 @@ import Viewproject from "./scenes/viewproject";
 import Reset from "./scenes/updateandreset";
 import Project from "./scenes/project";
 import Resource from "./components/resource";
+import List from "./components/list";
+import Milestone from "./components/milestone";
+import ProjectInfo from "./components/projectInfo";
+import Analytic from "./components/analytic";
+import ProjectAnalytic from "./components/projectAnalytic";
+// import Analytic from "./components/analytic";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -51,6 +57,16 @@ function App() {
               <Route path="/updateandreset" element={<Reset />}></Route>
               <Route path="/project" element={<Project />}></Route>
               <Route path="/resource" element={<Resource />}></Route>
+              <Route path="/list" element={<List />}></Route>
+              <Route path="/milestone" element={<Milestone/>}></Route>
+              <Route path="/analytic" element={<Analytic/>}></Route>
+              <Route path="/projectInfo" element={<ProjectInfo/>}></Route>
+              <Route path="/projectAnalytic" element={<ProjectAnalytic/>}></Route>
+
+              {/* <Route path="/analytic" element={<Analytic/>}></Route> */}
+
+
+
 
 
 
