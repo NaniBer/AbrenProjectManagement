@@ -11,17 +11,12 @@ import {
   AccordionSummary,
   AccordionDetails,
   IconButton,
-<<<<<<< HEAD
-  Grid
+  Grid,
   } from "@mui/material";
-=======
-} from "@mui/material";
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-<<<<<<< HEAD
 import * as yup from "yup"; // Import yup for validation
 import { tokens } from "../../theme";
 import { useSelector } from "react-redux";
@@ -55,10 +50,6 @@ const schema = yup.object().shape({
     .positive("Quantity must be a positive number")
     .required("Quantity is required"),
 });
-=======
-import { tokens } from "../../theme";
-import { useSelector } from "react-redux";
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
 
 const Milestone = () => {
   const theme = useTheme();
@@ -77,7 +68,6 @@ const Milestone = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedMilestones, setSubmittedMilestones] = useState([]);
-<<<<<<< HEAD
   const [errors, setErrors] = useState({}); // State variable to hold validation errors
 
   useEffect(() => {
@@ -88,14 +78,6 @@ const Milestone = () => {
     }
   }, [project]);
 
-=======
-
-  useEffect(() => {
-    const resources = Object.keys(project.Resources);
-    console.log(resources);
-    setProjectResources(resources);
-  }, []);
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
   const handleMilestoneNameChange = (e) => {
     setMilestoneName(e.target.value);
   };
@@ -118,7 +100,6 @@ const Milestone = () => {
   const handleQuantityChange = (e) => {
     setQuantity(e.target.value);
   };
-<<<<<<< HEAD
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,38 +167,6 @@ const Milestone = () => {
       });
       setErrors(validationErrors);
     }
-=======
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Create a new Milestone object
-    const newMilestone = {
-      milestoneName,
-      description,
-      status,
-      priority,
-      budget,
-      resources,
-      quantity,
-    };
-
-    // Update the submitted miletsones list
-    setSubmittedMilestones((prevMilestones) => [
-      ...prevMilestones,
-      newMilestone,
-    ]);
-
-    // Clear the form fields
-    setMilestoneName("");
-    setDescription("");
-    setStatus("");
-    setPriority("");
-    setBudget(0);
-    setResources("");
-    setQuantity(0);
-
-    setIsFormOpen(false); // Close the form after submission
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
   };
 
   const handleEditMilestone = (index) => {
@@ -252,7 +201,6 @@ const Milestone = () => {
     });
   };
 
-<<<<<<< HEAD
   const handleCancel = () => {
     setMilestoneName("");
     setDescription("");
@@ -279,31 +227,12 @@ const Milestone = () => {
             backgroundColor: colors.primary[400],
             color: theme.palette.common.white,
             fontSize: "12px",
-=======
-  return (
-    <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h4" component="h2">
-          MILESTONES
-        </Typography>
-
-        <Button
-          startIcon={<AddIcon />}
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.common.white,
-            fontSize: "14px",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
             fontWeight: "bold",
             padding: "10px 20px",
           }}
           onClick={() => setIsFormOpen(true)}
         >
-<<<<<<< HEAD
           Add Milestone
-=======
-          Add Miletsone
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
         </Button>
       </Box>
 
@@ -318,7 +247,6 @@ const Milestone = () => {
               bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
-<<<<<<< HEAD
               maxWidth: 700,
               width: "100%",
               outline: "none",
@@ -332,17 +260,6 @@ const Milestone = () => {
             <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
             <Grid item xs={6}>
-=======
-              maxWidth: 500,
-              width: "100%",
-              outline: "none",
-            }}
-          >
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Add Miletsone
-            </Typography>
-            <form onSubmit={handleSubmit}>
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
               <Box sx={{ mb: 2 }}>
                 <TextField
                   id="milestoneName"
@@ -351,7 +268,6 @@ const Milestone = () => {
                   fullWidth
                   value={milestoneName}
                   onChange={handleMilestoneNameChange}
-<<<<<<< HEAD
                   error={!!errors.milestoneName} // Set error prop based on whether there's an error for this field
                   helperText={errors.milestoneName} // Display error message for this field
                   sx={{
@@ -364,18 +280,6 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
@@ -387,7 +291,6 @@ const Milestone = () => {
                   id="milestoneDescription"
                   label="Milestone Description"
                   variant="outlined"
-<<<<<<< HEAD
                   multiline
                   rows={4.5}
                   fullWidth
@@ -405,21 +308,6 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  fullWidth
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
@@ -434,7 +322,6 @@ const Milestone = () => {
                   fullWidth
                   value={status}
                   onChange={handleStatusChange}
-<<<<<<< HEAD
                   error={!!errors.status}
                   helperText={errors.status}
                   sx={{
@@ -447,18 +334,6 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
@@ -468,11 +343,8 @@ const Milestone = () => {
                   <MenuItem value="Completed">Completed</MenuItem>
                 </TextField>
               </Box>
-<<<<<<< HEAD
              </Grid>
              <Grid item xs={6}>
-=======
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
 
               <Box sx={{ mb: 2 }}>
                 <TextField
@@ -483,7 +355,6 @@ const Milestone = () => {
                   fullWidth
                   value={priority}
                   onChange={handlePriorityChange}
-<<<<<<< HEAD
                   error={!!errors.priority}
                   helperText={errors.priority}
                   sx={{
@@ -496,18 +367,6 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
@@ -525,7 +384,6 @@ const Milestone = () => {
                   fullWidth
                   value={budget}
                   onChange={handleBudgetChange}
-<<<<<<< HEAD
                   error={!!errors.budget}
                   helperText={errors.budget}
                   sx={{
@@ -542,37 +400,17 @@ const Milestone = () => {
                     },
                   }}
                   
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
-                      },
-                    },
-                  }}
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                 />
               </Box>
               <Box sx={{ mb: 2 }}>
                 <TextField
                   id="resource"
                   select
-<<<<<<< HEAD
                   label="Resource"
-=======
-                  label="Status"
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                   variant="outlined"
                   fullWidth
                   value={resources}
                   onChange={handleResourceChange}
-<<<<<<< HEAD
                   // error={!!errors.resources}
                   // helperText={errors.resources}
                   sx={{
@@ -585,24 +423,11 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
                 >
                   {projectResources.map((resource) => (
-<<<<<<< HEAD
                     <MenuItem key={resource} value={resource}>
                       {resource}
                     </MenuItem>
@@ -610,12 +435,6 @@ const Milestone = () => {
                 </TextField>
               </Box>
               
-=======
-                    <MenuItem value={resource}>{resource}</MenuItem>
-                  ))}
-                </TextField>
-              </Box>
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
               <Box sx={{ mb: 2 }}>
                 <TextField
                   id="resourceQuantity"
@@ -624,7 +443,6 @@ const Milestone = () => {
                   fullWidth
                   value={quantity}
                   onChange={handleQuantityChange}
-<<<<<<< HEAD
                   error={!!errors.quantity}
                   helperText={errors.quantity}
                   sx={{
@@ -637,24 +455,11 @@ const Milestone = () => {
                     sx: {
                       '&.Mui-focused': {
                         color:'#868dfb',
-=======
-                  sx={{
-                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#868dfb",
-                      },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      "&.Mui-focused": {
-                        color: "#868dfb",
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                       },
                     },
                   }}
                 />
               </Box>
-<<<<<<< HEAD
               </Grid>
               <Grid item xs={12}>
 
@@ -677,31 +482,12 @@ const Milestone = () => {
                 </Box>
                 </Grid>
             </Grid>
-=======
-
-              <Box display="flex" justifyContent="flex-end">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: theme.palette.primary.main,
-                    color: theme.palette.common.white,
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    padding: "10px 20px",
-                  }}
-                >
-                  Submit
-                </Button>
-              </Box>
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
             </form>
           </Box>
         </Modal>
       )}
 
       {submittedMilestones.length > 0 && (
-<<<<<<< HEAD
         <Box
           display="grid"
           gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
@@ -722,15 +508,6 @@ const Milestone = () => {
                   alignItems: "center",
                 }}
               >
-=======
-        <Box mt={4}>
-          {/* <Typography variant="h5" component="h3" mb={2}>
-            Submitted milestoness
-          </Typography> */}
-          {submittedMilestones.map((milestone, index) => (
-            <Accordion style={{ backgroundColor: "#1F2A40" }} key={index}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                 <Typography variant="h5">
                   Milestone Name:{" "}
                   <Typography
@@ -738,15 +515,10 @@ const Milestone = () => {
                     component="span"
                     color={colors.greenAccent[400]}
                   >
-<<<<<<< HEAD
-=======
-                    {" "}
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                     {milestone.milestoneName}
                   </Typography>
                 </Typography>
               </AccordionSummary>
-<<<<<<< HEAD
               <AccordionDetails
                 style={{
                   flexDirection: "column",
@@ -756,16 +528,12 @@ const Milestone = () => {
                   textAlign: "left",
                 }}
               >
-=======
-              <AccordionDetails>
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                 <Typography variant="body1" gutterBottom>
                   Description:
                   <Typography
                     variant="body1"
                     component="span"
                     color={colors.greenAccent[400]}
-<<<<<<< HEAD
                     sx={{
                       mt: 1,
                       wordWrap: 'break-word',
@@ -852,89 +620,18 @@ const Milestone = () => {
                         bottom: "3px",
                         right: "8px",
                       }}
-=======
-                  >
-                    {" "}
-                    {milestone.description}
-                  </Typography>
-                </Typography>
-                <Box display="flex" flexDirection="column" width="100%">
-                  <Typography variant="body1" gutterBottom>
-                    Status:{" "}
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      color={colors.greenAccent[400]}
-                    >
-                      {" "}
-                      {milestone.status}
-                    </Typography>
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    Priority:{" "}
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      color={colors.greenAccent[400]}
-                    >
-                      {" "}
-                      {milestone.priority}
-                    </Typography>
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    Allocated Budget:{" "}
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      color={colors.greenAccent[400]}
-                    >
-                      {" "}
-                      {milestone.budget}
-                    </Typography>
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    Resource required:{" "}
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      color={colors.greenAccent[400]}
-                    >
-                      {" "}
-                      {milestone.resources}
-                    </Typography>
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    Quantity of resource:{" "}
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      color={colors.greenAccent[400]}
-                    >
-                      {" "}
-                      {milestone.quantity}
-                    </Typography>
-                  </Typography>
-
-                  <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <IconButton
-                      color="secondary"
-                      onClick={() => handleEditMilestone(index)}
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       color="secondary"
                       onClick={() => handleDeleteMilestone(index)}
-<<<<<<< HEAD
                       style={{
                         position: "absolute",
                         bottom: "3px",
                         right: "38px",
                         paddingTop: "10px",
                       }}
-=======
->>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
                     >
                       <DeleteIcon />
                     </IconButton>
