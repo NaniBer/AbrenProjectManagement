@@ -1,0 +1,17 @@
+{
+  "name": "Kaizen ERP system",
+  "AllocatedBudget": 3000000,
+  "Resources": {
+    "Computers": 20,
+    "SoftwareLicense": 3
+  },
+  "startDate": "12/12/2023",
+  "endDate": "05/05/2024",
+  "status": "not started",
+  "teamMembers": [
+    "Nardos Dagnachew",
+    "Nazrawit Berhanu",
+    "Saron Bisrat",
+    "Romhay Yemane"
+  ]
+}

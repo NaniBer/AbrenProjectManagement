@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -6,15 +7,32 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import store from "./store";
 import { Provider } from 'react-redux';
+=======
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter } from "react-router-dom";
+import store from "./store";
+>>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+<<<<<<< HEAD
      <Provider store={store}>
     <App />
     </Provider>
 </BrowserRouter>
+=======
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BrowserRouter>
+>>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
   </React.StrictMode>
 );
 

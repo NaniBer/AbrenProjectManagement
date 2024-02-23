@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import React from "react";
 
 // const Card = ({ task }) => {
@@ -365,3 +366,12 @@ const Kanban = () => {
 };
 
 export default Kanban;
+=======
+import React from "react";
+
+const Card = ({ task }) => {
+  return <div className="card bg-success">{task.content}</div>;
+};
+
+export default Card;
+>>>>>>> 0d0ec9c507e0997f1bd8c03263731b8b1ba43e08
