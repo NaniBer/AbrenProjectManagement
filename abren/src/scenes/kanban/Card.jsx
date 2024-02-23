@@ -1,3 +1,11 @@
+// import React from "react";
+
+// const Card = ({ task }) => {
+//   return <div className="card bg-success">{task.content}</div>;
+// };
+
+// export default Card;
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -9,12 +17,9 @@ import {
   Modal,
   Card,
   CardContent,
-  IconButton
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import { color } from "@mui/system";
@@ -37,8 +42,6 @@ const Kanban = () => {
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [submittedtask, setSubmittedTask] = useState([]);
-  const [editingTaskId, setEditingTaskId] = useState(null);
-
 
   useEffect(() => {
     setDueDate(new Date());
@@ -64,16 +67,6 @@ const Kanban = () => {
       status,
       priority,
     };
-
-     const updatedTasks = submittedtask.map(task => {
-    if (task.id === editingTaskId) {
-      return {
-        ...task,
-        status,
-      };
-    }
-    return task;
-  });
 
     setSubmittedTask((prevTask) => [...prevTask, newTask]);
 
@@ -105,23 +98,22 @@ const Kanban = () => {
       return `${diffDays} days left`;
     }
   };
-  const handleDeleteTask = (taskId) => {
-    setSubmittedTask((prevTasks) => prevTasks.filter(task => task.id !== taskId));
-  };
+  
 
-  // const handleEditTask = (taskId) => {
-  //   // Find the task with the corresponding ID
-  //   const task = submittedtask.find(task => task.id === taskId);
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "High":
+        return color.primary;
+      case "Medium":
+        return colors.secondary;
+      case "Low":
+        return colors.greenAccent[400];
+      default:
+        return colors.primary[700];
+    }
+  };
   
-  //   // If the task is found, set its initial status in the state
-  //   if (task) {
-  //     setStatus(task.status);
-  //     setEditingTaskId(taskId); // Set the ID of the task being edited
-  //     setIsFormOpen(true); // Open the modal for editing
-  //   }
-  // };
-  
-  
+
   return (
     <>
       <Header title="Todo List" subtitle="Categorizes your tasks" />
@@ -164,19 +156,6 @@ const Kanban = () => {
                 fullWidth
                 value={taskName}
                 onChange={handleTaskNameChange}
-                sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
               />
             </Box>
 
@@ -190,19 +169,6 @@ const Kanban = () => {
                 fullWidth
                 value={dueDate.toISOString().slice(0, 10)}
                 onChange={(e) => setDueDate(new Date(e.target.value))}
-                sx={{
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor:'#868dfb',
-                  },
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                  sx: {
-                    '&.Mui-focused': {
-                      color:'#868dfb',
-                    },
-                  },
-                }}
               />
             </Box>
 
@@ -215,19 +181,6 @@ const Kanban = () => {
                 fullWidth
                 value={status}
                 onChange={handleStatusChange}
-                sx={{
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor:'#868dfb',
-                  },
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                  sx: {
-                    '&.Mui-focused': {
-                      color:'#868dfb',
-                    },
-                  },
-                }}
               >
                 <MenuItem value="Not Started">Not Started</MenuItem>
                 <MenuItem value="In Progress">In Progress</MenuItem>
@@ -244,19 +197,6 @@ const Kanban = () => {
                 fullWidth
                 value={priority}
                 onChange={handlePriorityChange}
-                sx={{
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor:'#868dfb',
-                  },
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                  sx: {
-                    '&.Mui-focused': {
-                      color:'#868dfb',
-                    },
-                  },
-                }}
               >
                 <MenuItem value="High">High</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -316,15 +256,6 @@ const Kanban = () => {
                       </Button>
                     </div>
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-                  {/* <IconButton onClick={() => handleEditTask(task.id)} color="secondary">
-                    <EditIcon />
-                  </IconButton> */}
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size="small"
-                  sx={{padding:'1px'}}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
                 </CardContent>
                     </Card>
                   ))}
@@ -372,14 +303,6 @@ const Kanban = () => {
                       </Button>
                     </div>
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-                  {/* <IconButton onClick={() => handleEditTask(task.id)} color="secondary">
-                    <EditIcon />
-                  </IconButton> */}
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size="small" sx={{padding:'1px'}}> 
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
                 </CardContent>
                     </Card>
                   ))}
@@ -426,16 +349,7 @@ const Kanban = () => {
                         {task.priority}
                       </Button>
                     </div>
-                    
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-                  {/* <IconButton onClick={() => handleEditTask(task.id)} color="secondary">
-                    <EditIcon />
-                  </IconButton> */}
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size="small" sx={{padding:'1px'}}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
                 </CardContent>
 
 
