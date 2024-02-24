@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import Calendar from "../../components/calendar";
 import Resource from "../../components/resource";
 import Milestone from "../../components/milestone";
+import UpdateProjectPM from "../updateprojectPM";
 import { loadProject } from "../../Actions/projectActions";
 
 import {
@@ -15,6 +16,7 @@ import {
   BarChart,
   Timeline,
 } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -44,6 +46,7 @@ const App = () => {
   const isCalendarSelected = selectedItem === "Calendar";
   const isResourceSelected = selectedItem === "Resource";
   const isMilestoneSelected = selectedItem === "Milestone";
+  const isEditSelected = selectedItem == "Edit";
 
   return (
     <div>
@@ -57,6 +60,25 @@ const App = () => {
       <Toolbar sx={{ padding: "2px", margin: "0 -8px" }}>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <div style={{ display: "flex" }}>
+            <div
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                color: isResourceSelected ? "#6870fa" : "inherit",
+                textDecoration: isResourceSelected ? "italic" : "none",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("Edit")}
+            >
+              <EditIcon sx={{ fontSize: 16 }} />
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
+                Edit Project Details
+              </span>
+            </div>
             <div
               style={{ flex: 0.2, textAlign: "center", padding: "2px" }}
               onClick={() => handleItemClick("Task")}
@@ -84,6 +106,7 @@ const App = () => {
                 Resource
               </span>
             </div>
+
             <div
               style={{
                 flex: 0.2,
@@ -168,6 +191,7 @@ const App = () => {
       {isCalendarSelected && <Calendar />}
       {isResourceSelected && <Resource />}
       {isMilestoneSelected && <Milestone />}
+      {isEditSelected && <UpdateProjectPM />}
     </div>
   );
 };
