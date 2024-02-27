@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
-import { useDispatch } from "react-redux";
 import Calendar from "../../components/calendar";
 import Resource from "../../components/resource";
 import Milestone from "../../components/milestone";
 import UpdateProjectPM from "../updateprojectPM";
-import { loadProject } from "../../Actions/projectActions";
+import Analytic from "../../components/analytic";
+import ProjectAnalytic from "../../components/projectAnalytic";
+import ProjectInfo from "../../components/projectInfo";
+import List from "../../components/list";
 
 import {
   CheckCircleOutline,
@@ -19,25 +21,22 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 
 const App = () => {
-  const dispatch = useDispatch();
   const [selectedItem, setSelectedItem] = useState("");
 
-  const [jsonData, setJsonData] = useState(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch("./ProjectDummy.json"); // Assuming data.json is in the public folder
+  //       const data = await response.json();
+  //       setJsonData(data);
+  //       dispatch(loadProject(data));
+  //     } catch (error) {
+  //       console.error("Error reading JSON file:", error);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("./ProjectDummy.json"); // Assuming data.json is in the public folder
-        const data = await response.json();
-        setJsonData(data);
-        dispatch(loadProject(data));
-      } catch (error) {
-        console.error("Error reading JSON file:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
@@ -47,6 +46,10 @@ const App = () => {
   const isResourceSelected = selectedItem === "Resource";
   const isMilestoneSelected = selectedItem === "Milestone";
   const isEditSelected = selectedItem == "Edit";
+  const isAnalyticSelected = selectedItem === "Analytic";
+  const isProjectAnalyticSelected = selectedItem === "ProjectAnalytic";
+  const isProjectInfoSelected = selectedItem === "ProjectInfo";
+  const isListSelected = selectedItem === "List";
 
   return (
     <div>
@@ -65,11 +68,23 @@ const App = () => {
                 flex: 0.2,
                 textAlign: "center",
                 padding: "2px",
-                justifyContent: "center",
-                display: "flex",
-                alignItems: "center",
+                color: isProjectInfoSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("ProjectInfo")}
+            >
+              <CheckCircleOutline sx={{ fontSize: 16 }} />
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
+                Project Info
+              </span>
+            </div>
+
+            <div
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
                 color: isResourceSelected ? "#6870fa" : "inherit",
-                textDecoration: isResourceSelected ? "italic" : "none",
                 cursor: "pointer",
               }}
               onClick={() => handleItemClick("Edit")}
@@ -80,11 +95,19 @@ const App = () => {
               </span>
             </div>
             <div
-              style={{ flex: 0.2, textAlign: "center", padding: "2px" }}
-              onClick={() => handleItemClick("Task")}
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                color: isProjectInfoSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("ProjectInfo")}
             >
               <CheckCircleOutline sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>Task</span>
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
+                Project Info
+              </span>
             </div>
 
             <div
@@ -92,11 +115,7 @@ const App = () => {
                 flex: 0.2,
                 textAlign: "center",
                 padding: "2px",
-                justifyContent: "center",
-                display: "flex",
-                alignItems: "center",
                 color: isResourceSelected ? "#6870fa" : "inherit",
-                textDecoration: isResourceSelected ? "italic" : "none",
                 cursor: "pointer",
               }}
               onClick={() => handleItemClick("Resource")}
@@ -113,34 +132,40 @@ const App = () => {
                 textAlign: "center",
                 padding: "2px",
                 marginLeft: "-2px",
+                color: isListSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
               }}
               onClick={() => handleItemClick("List")}
             >
               <FormatListBulleted sx={{ fontSize: 16 }} />
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>List</span>
             </div>
-            <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                marginLeft: "-2px",
-              }}
+            {/* <div
+              style={{ flex: 0.2, textAlign: "center", padding: "2px", marginLeft: "-2px" }}
               onClick={() => handleItemClick("Board")}
             >
               <Dashboard sx={{ fontSize: 16 }} />
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>Board</span>
-            </div>
+            </div> */}
+            {/* <div
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                // color: isListSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("List")}
+            >
+              <Dashboard sx={{ fontSize: 16 }} />
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>Kanban</span>
+            </div> */}
             <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
                 padding: "2px",
-                justifyContent: "flex-start",
-                display: "flex",
-                alignItems: "center",
                 color: isCalendarSelected ? "#6870fa" : "inherit",
-                textDecoration: isCalendarSelected ? "italic" : "none",
                 cursor: "pointer",
               }}
               onClick={() => handleItemClick("Calendar")}
@@ -156,12 +181,14 @@ const App = () => {
                 textAlign: "center",
                 padding: "2px",
                 marginLeft: "-2px",
+                color: isAnalyticSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
               }}
-              onClick={() => handleItemClick("Analytics")}
+              onClick={() => handleItemClick("Analytic")}
             >
               <BarChart sx={{ fontSize: 16 }} />
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
-                Analytics
+                Task Analytics
               </span>
             </div>
             <div
@@ -170,11 +197,29 @@ const App = () => {
                 textAlign: "center",
                 padding: "2px",
                 marginLeft: "-2px",
-                justifyContent: "center",
-                display: "flex",
-                alignItems: "center",
+                color: isProjectAnalyticSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("ProjectAnalytic")}
+            >
+              <BarChart sx={{ fontSize: 16 }} />
+              <span
+                style={{
+                  marginLeft: "2px",
+                  fontSize: "14px",
+                  color: isResourceSelected ? "#6870fa" : "inherit",
+                }}
+              >
+                Project Analytics
+              </span>
+            </div>
+            <div
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                marginLeft: "-2px",
                 color: isMilestoneSelected ? "#6870fa" : "inherit",
-                textDecoration: isMilestoneSelected ? "italic" : "none",
                 cursor: "pointer",
               }}
               onClick={() => handleItemClick("Milestone")}
@@ -191,6 +236,11 @@ const App = () => {
       {isCalendarSelected && <Calendar />}
       {isResourceSelected && <Resource />}
       {isMilestoneSelected && <Milestone />}
+      {isAnalyticSelected && <Analytic />}
+      {isProjectAnalyticSelected && <ProjectAnalytic />}
+      {isProjectInfoSelected && <ProjectInfo />}
+      {isListSelected && <List />}
+
       {isEditSelected && <UpdateProjectPM />}
     </div>
   );
