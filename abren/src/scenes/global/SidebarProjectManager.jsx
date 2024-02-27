@@ -5,17 +5,21 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+// import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+// import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+// import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+// import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+// import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
+// import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import { profile } from "../../data/mockData";
 
-
+// const user = {
+//   firstName: "John",
+//   lastName: "Doe"
+// };
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -40,6 +44,11 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
+  // const initials = (user.firstName && user.lastName) ? `${user.firstName[0]}${user.lastName[0]}` : '';
+  const initialsArray = profile.map((teamMember) => {
+    const initials = `${teamMember.firstname[0]}${teamMember.lastname[0]}`;
+    return initials;
+  });
   return (
     <Box
       sx={{
@@ -60,7 +69,14 @@ const Sidebar = () => {
         },
       }}
     >
-      <div style={{ borderRadius: '20px', overflow: 'hidden', marginLeft: '10px' , marginTop : '10px'}}>
+         <Box
+        sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ borderRadius: '20px', overflow: 'hidden', marginLeft: '10px' , marginTop : '10px', flex: "1"}}>
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -84,7 +100,7 @@ const Sidebar = () => {
                 </Typography> */}
                 <img
                 alt="idk"
-                src={`./scenes/`}
+                src={`abren2.png`}
                 ></img>
               
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
@@ -97,13 +113,27 @@ const Sidebar = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
+                {/* <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={`./images/abren`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                /> */}
+                 <div
+          style={{
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          backgroundColor: "lightgray",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer"
+        }}
+      >
+        <span style={{ fontSize: "40px", fontWeight: "bold" ,color: colors.primary[110]}}>{initialsArray}</span>
+      </div>
               </Box>
               <Box textAlign="center">
                 <Typography
@@ -143,29 +173,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
-            <Item
-              title="Manage Team"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            
-            <Item
-              title="Contacts Information"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-         
+           
 
             <Typography
               variant="h6"
@@ -181,16 +189,14 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+              <Item
               title="Calendar"
               to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
+              icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-         
-
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -218,11 +224,12 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-       
+        */}
           </Box>
         </Menu>
       </ProSidebar>
       </div>
+      </Box>
     </Box>
   );
 };

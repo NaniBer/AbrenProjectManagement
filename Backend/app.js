@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const routes = require("./routes/adminRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const url =
   "mongodb+srv://nardosmehari22:crud@cluster0.9yh40dd.mongodb.net/test?retryWrites=true&w=majority";
@@ -16,7 +16,8 @@ app.use(
     saveUninitialized: false,
   })
 );
-app.use("/admin", routes);
+// app.use("/auth", )
+app.use("/admin", adminRoutes);
 
 // mongoose
 //   .connect(DB_CONNECTION)

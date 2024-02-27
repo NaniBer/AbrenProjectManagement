@@ -7,6 +7,7 @@ const Users = require("../Model/Users");
 
 // System Adminstartor Login
 router.post("/Login", async (req, res) => {
+  console.log("hi");
   try {
     const { username, password } = req.body;
     console.log(username, password);
@@ -19,6 +20,7 @@ router.post("/Login", async (req, res) => {
     // Compare the provided password with the hashed password
     const passwordMatch = await bcrypt.compare(password, admin.password);
     if (!passwordMatch) {
+      console.log("error");
       return res.status(401).json({ message: "Invalid credentials" });
     }
     req.session.adminId = admin._id;
@@ -53,10 +55,10 @@ router.post("/logout", async (req, res) => {
     res.status(500).json({ message: "Error logging out" });
   }
 });
-3;
+
 router.post("/addAdmin", async (req, res) => {
   try {
-    const username = "admin";
+    const username = "admin123";
     const password = "admin";
     // Check if the admin already exists
     const existingAccount = await Admin.findOne({ username });
@@ -238,7 +240,7 @@ router.put("/ResetAdmin", async (req, res) => {
 
     // Update the admin credentials to their default values
     admin.username = "admin";
-    admin.password = "admin123";
+    admin.password = "admin";
 
     // Save the updated admin document
     await admin.save();

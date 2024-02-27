@@ -1,5 +1,142 @@
 import { tokens } from "../theme";
 
+export const Team = [
+  {
+    id: 1,
+    name: "Saron Bisrat",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive",
+  },
+  {
+    id: 1,
+    name: "Romhay Yemane",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "active",
+  },
+  {
+    id: 1,
+    name: "Nazrawit Berhanu",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive",
+  },
+  {
+    id: 1,
+    name: "Nardos Dagnachew",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "active",
+  },
+  // Add more team members...
+];
+export const Task = [
+  {
+    taskList: "Task 1",
+    startDate: "2024-02-21",
+    endDate: "2024-02-28",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    subtasks: ["Subtask 1", "Subtask 2", "Subtask 3"],
+  },
+  {
+    taskList: "Task 2",
+    startDate: "2024-03-01",
+    endDate: "2024-03-07",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    teamMembers: [
+      {
+        id: 3,
+        firstname: "Alice",
+        lastname: "Smith",
+        email: "alice@example.com",
+      },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    subtasks: ["Subtask 1", "Subtask 2"],
+  },
+];
+
+export const Project = [
+  {
+    id: 1,
+    name: "Project A",
+    startDate: "2024-02-21",
+    endDate: "2024-02-28",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project B",
+    startDate: "2024-03-01",
+    endDate: "2024-03-07",
+    teamMembers: [
+      {
+        id: 3,
+        firstname: "Alice",
+        lastname: "Smith",
+        email: "alice@example.com",
+      },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 4, name: "Task 1", progress: 60 },
+      { id: 5, name: "Task 2", progress: 30 },
+      { id: 6, name: "Task 3", progress: 90 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project C",
+    startDate: "2024-03-06",
+    endDate: "2024-03-12",
+    teamMembers: [
+      {
+        id: 3,
+        firstname: "Alice",
+        lastname: "Smith",
+        email: "alice@example.com",
+      },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 4, name: "Task 1", progress: 70 },
+      { id: 5, name: "Task 2", progress: 100 },
+      { id: 6, name: "Task 3", progress: 90 },
+    ],
+  },
+];
+
+export const profile = [
+  {
+    id: 1,
+    firstname: "Saron",
+    lastname: "Bisrat",
+    email: "jonsnow@gmail.com",
+    username: "saronbisrat.kaizen",
+    role: "admin",
+    status: "inactive",
+  },
+];
+
 export const mockDataTeam = [
   {
     id: 1,
@@ -8,7 +145,7 @@ export const mockDataTeam = [
     email: "jonsnow@gmail.com",
     username: "saronbisrat.kaizen",
     role: "admin",
-    status: "inactive"
+    status: "inactive",
   },
   {
     id: 2,
@@ -17,7 +154,7 @@ export const mockDataTeam = [
     email: "jonsnow@gmail.com",
     username: "romahayyemane.kaizen",
     role: "user",
-    status: "active"
+    status: "active",
   },
   {
     id: 3,
@@ -26,7 +163,7 @@ export const mockDataTeam = [
     email: "jaimelannister@gmail.com",
     username: "nazrawitberhanu.kaizen",
     role: "user",
-    status: "inactive"
+    status: "inactive",
   },
   {
     id: 4,
@@ -35,10 +172,8 @@ export const mockDataTeam = [
     email: "jaimelannister@gmail.com",
     username: "nardosdagnachew.kaizen",
     role: "user",
-    status: "inactive"
-
-  }
-
+    status: "inactive",
+  },
 ];
 
 export const mockDataProject = [
@@ -46,13 +181,13 @@ export const mockDataProject = [
     id: 1,
     projectname: "Kaizen website",
     description: "kaizen is a tech company ",
-    projectmanager: "saronbisrat.kaizen"
+    projectmanager: "saronbisrat.kaizen",
   },
   {
     id: 2,
     projectname: "smth website",
     description: "smth is a tech company ",
-    projectmanager: "saronbisrat.kaizen"
+    projectmanager: "saronbisrat.kaizen",
   },
 ];
 
@@ -1262,3 +1397,42 @@ export const mockGeographyData = [
     value: 171135,
   },
 ];
+export const projectData = {
+  projectName: "Project 1",
+  projectOverview:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.",
+  reportDate: "February 24, 2024",
+  currentStatus:
+    "The project has successfully completed the development phase and is now entering the testing phase. Major milestones achieved include:",
+  milestones: [
+    "Completed Phase 1 development tasks",
+    "Finalized vendor contracts for Phase 2",
+    "Conducted stakeholder meeting to review progress",
+  ],
+  resourceAllocation: {
+    teamMembers: [
+      { id: 1, name: "John Doe", role: "Project Manager" },
+      { id: 2, name: "Jane Smith", role: "Developer" },
+      { id: 3, name: "Alex Johnson", role: "Designer" },
+      { id: 4, name: "Emily Brown", role: "QA Tester" },
+      { id: 5, name: "Michael Lee", role: "Business Analyst" },
+      // Add more team members as needed
+    ],
+    budget: "$100,000",
+    timeline: "6 months",
+    technology: "React, Node.js, MongoDB",
+    equipment: "High-end workstations, cloud servers",
+    training: "Team training sessions on new technologies",
+    otherResources: "External consultants for specialized tasks",
+  },
+  nextSteps: [
+    "Complete Phase 2 development tasks",
+    "Review and approve Phase 3 project plan",
+    "Prepare for upcoming project presentation",
+  ],
+  actionItems: [
+    "Schedule weekly progress meetings",
+    "Allocate additional resources for Phase 2",
+    "Address any outstanding issues reported during testing",
+  ],
+};

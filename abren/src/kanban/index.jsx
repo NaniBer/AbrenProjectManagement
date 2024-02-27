@@ -1,5 +1,19 @@
 import React, { useState } from "react";
 import Board, { moveCard } from "@asseinfo/react-kanban";
+import {
+  Box,
+  Button,
+  useTheme,
+  Modal,
+  TextField,
+  Typography,
+  MenuItem,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  IconButton,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import "@asseinfo/react-kanban/dist/styles.css";
 
 const board = {
@@ -104,7 +118,11 @@ function ControlledBoard() {
       {controlledBoard.columns.map((column) => (
         <Board.Column key={column.id} title={column.title}>
           {column.cards.map((card) => (
-            <Board.Card key={card.id} title={card.title} description={card.description} />
+            <Board.Card
+              key={card.id}
+              title={card.title}
+              description={card.description}
+            />
           ))}
         </Board.Column>
       ))}
@@ -139,7 +157,10 @@ function Kanban() {
       <UncontrolledBoard />
       <h4>Example of a controlled board</h4>
       <p>Just the card moving is implemented in this demo.</p>
-      <p>In this kind of board, you can do whatever you want. We just mirror your board state.</p>
+      <p>
+        In this kind of board, you can do whatever you want. We just mirror your
+        board state.
+      </p>
       <ControlledBoard />
     </>
   );
