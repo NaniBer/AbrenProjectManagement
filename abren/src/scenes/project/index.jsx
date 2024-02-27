@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import Calendar from "../../components/calendar";
 import Resource from "../../components/resource";
@@ -13,12 +13,11 @@ import {
   CheckCircleOutline,
   PeopleAlt,
   FormatListBulleted,
-  Dashboard,
   Event,
   BarChart,
   Timeline,
 } from "@mui/icons-material";
-import EditIcon from "@mui/icons-material/Edit";
+// import EditIcon from "@mui/icons-material/Edit";
 
 const App = () => {
   const [selectedItem, setSelectedItem] = useState("");
@@ -45,7 +44,7 @@ const App = () => {
   const isCalendarSelected = selectedItem === "Calendar";
   const isResourceSelected = selectedItem === "Resource";
   const isMilestoneSelected = selectedItem === "Milestone";
-  const isEditSelected = selectedItem == "Edit";
+  const isEditSelected = selectedItem === "Edit";
   const isAnalyticSelected = selectedItem === "Analytic";
   const isProjectAnalyticSelected = selectedItem === "ProjectAnalytic";
   const isProjectInfoSelected = selectedItem === "ProjectInfo";
