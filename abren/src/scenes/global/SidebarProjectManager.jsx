@@ -14,6 +14,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 // import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import { profile } from "../../data/mockData";
 
 // const user = {
@@ -193,6 +194,13 @@ const Sidebar = () => {
               title="Calendar"
               to="/calendar"
               icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+                    <Item
+              title="Report"
+              to="/report"
+              icon={<SummarizeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

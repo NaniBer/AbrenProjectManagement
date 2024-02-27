@@ -106,12 +106,8 @@ const Resource = () => {
 
   return (
     <Box m="20px">
-     <Header title="Resource" subtitle="Manages the resources we have" />
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        {/* <Typography variant="h4" component="h2">
-          RESOURCE
-        </Typography> */}
-
+       <Header title="Resource" subtitle="Manages the resources we have" />
         <Button
           startIcon={<AddIcon />}
           sx={{

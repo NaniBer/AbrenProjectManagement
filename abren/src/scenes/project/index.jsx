@@ -79,7 +79,7 @@ const App = () => {
               </span>
             </div>
 
-            <div
+            {/* <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
@@ -93,8 +93,8 @@ const App = () => {
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
                 Edit Project Details
               </span>
-            </div>
-            <div
+            </div> */}
+            {/* <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
@@ -108,7 +108,7 @@ const App = () => {
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
                 Project Info
               </span>
-            </div>
+            </div> */}
 
             <div
               style={{
@@ -207,7 +207,7 @@ const App = () => {
                 style={{
                   marginLeft: "2px",
                   fontSize: "14px",
-                  color: isResourceSelected ? "#6870fa" : "inherit",
+                  color: isProjectAnalyticSelected ? "#6870fa" : "inherit",
                 }}
               >
                 Project Analytics
