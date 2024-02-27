@@ -66,6 +66,7 @@ const Login = () => {
     }
 
     const formData = { username, password };
+
     if (admin) {
       fetch("/admin/Login", {
         method: "POST",
@@ -79,7 +80,7 @@ const Login = () => {
             console.log({ user: user });
             dispatch(loginSucess(user));
             // Do something with 'user' data
-            navigate("/");
+            navigate("/admin");
           });
         } else {
           // Handle non-200 status codes if needed

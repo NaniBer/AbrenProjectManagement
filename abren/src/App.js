@@ -10,7 +10,7 @@ import Topbar from "./scenes/global/Topbar";
 import SidebarProjectManager from "./scenes/global/SidebarProjectManager";
 // import SidebarAdmin from "./scenes/global/SidebarAdmin";
 import Createproject from "./scenes/createproject";
- import Createteamaccount from "./scenes/createteamaccount";
+import Createteamaccount from "./scenes/createteamaccount";
 import Calendar from "./components/calendar";
 // import Calendar from "./components/alendar";
 import Kanban from "./scenes/kanban";
@@ -30,6 +30,10 @@ import ProjectAnalytic from "./components/projectAnalytic";
 // import Analytic from "./components/analytic";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
+// import AdminLandingPage from "./pages/adminLandingPage/AdminLandingPage";
+import Adminpage from "./pages/adminpage";
+import PmLandingPage from "./pages/pmlandingpage";
+import Sidebar from "./scenes/global/Sidebar";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -38,7 +42,8 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="App">
-          <SidebarProjectManager/>
+          {/* <SidebarProjectManager /> */}
+
           <main className="content">
             <Topbar />
             <Routes>
@@ -64,24 +69,23 @@ function App() {
               <Route path="/project" element={<Project />}></Route>
               <Route path="/resource" element={<Resource />}></Route>
               <Route path="/list" element={<List />}></Route>
-              <Route path="/milestone" element={<Milestone/>}></Route>
-              <Route path="/analytic" element={<Analytic/>}></Route>
-              <Route path="/projectInfo" element={<ProjectInfo/>}></Route>
-              <Route path="/projectAnalytic" element={<ProjectAnalytic/>}></Route>
+              <Route path="/milestone" element={<Milestone />}></Route>
+              <Route path="/analytic" element={<Analytic />}></Route>
+              <Route path="/projectInfo" element={<ProjectInfo />}></Route>
+              <Route
+                path="/projectAnalytic"
+                element={<ProjectAnalytic />}
+              ></Route>
 
               {/* <Route path="/analytic" element={<Analytic/>}></Route> */}
-
-
-
-
-
-
 
               {/* <Route
                 path="/createteamaccount"
                 element={<Createteamaccount />}
               ></Route> */}
               <Route path="/login" element={<Login />} />
+              <Route path="/admin" element={<Adminpage />} />
+              <Route path="/pm" element={<PmLandingPage />} />
             </Routes>
 
             {/* <p>hello</p> */}
