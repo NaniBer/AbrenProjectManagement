@@ -10,8 +10,8 @@ const ProjectDetailsSchema = mongoose.Schema({
         ref: 'Users'
     },
     Role: {
-        Type: String,
-        Required: true
+        type: String,
+        required: true
     }
     
 

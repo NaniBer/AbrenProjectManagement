@@ -1,18 +1,27 @@
 const mongoose = require ('mongoose');
 
 const TaskDetailsScehma = new mongoose.Schema({
-    project: {
+    TasksId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Projects',
+        ref: 'Tasks',
         required: true
     },
-    TeamMembers : {
+    UserId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
         required: true
     },
-    Role: {
-        type: String,
+    ResourceId : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Resource',
+        required: true
+    },
+    ResourceNeed: {
+        type: Number,
+        required: true
+    },
+    ResourceUsed: {
+        type: Number,
         required: true
     }
     
