@@ -68,26 +68,34 @@ const Login = () => {
     const formData = { username, password };
 
     if (admin) {
-      fetch("/admin/Login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      }).then((response) => {
-        const statusCode = response.status;
-        if (statusCode === 200) {
-          response.json().then((data) => {
-            const user = data.admin;
-            console.log({ user: user });
-            dispatch(loginSucess(user));
-            // Do something with 'user' data
-            navigate("/admin");
-          });
-        } else {
-          // Handle non-200 status codes if needed
-          console.error("Request failed with status code:", statusCode);
-        }
-      });
+      formData.type = "admin";
+    } else {
+      formData.type = "user";
     }
+    fetch("/auth/Login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    }).then((response) => {
+      const statusCode = response.status;
+      if (statusCode === 200) {
+        response.json().then((data) => {
+          const user = data.user;
+          console.log({ user });
+          dispatch(loginSucess(user));
+          fetch("/Users/getProjects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: user.username }),
+          });
+          if (admin) navigate("/admin");
+          else navigate("/user");
+        });
+      } else {
+        // Handle non-200 status codes if needed
+        console.error("Request failed with status code:", statusCode);
+      }
+    });
 
     // Simulating login process
     if (username === "example@example.com" && password === "password123") {

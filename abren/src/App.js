@@ -45,9 +45,9 @@ function App() {
           {/* <SidebarProjectManager /> */}
 
           <main className="content">
-            <Topbar />
+            {/* <Topbar /> */}
             <Routes>
-              <Route path="/dashboard" element={<Dashboard />}></Route>
+              {/* <Route path="/dashboard" element={<Dashboard />}></Route>
               <Route path="/form" element={<Form />}></Route>
               <Route path="/calendar" element={<Calendar />}></Route>
               {/* <Route path="/Calendar" element={<Calendar />}></Route> */}
@@ -76,16 +76,14 @@ function App() {
                 path="/projectAnalytic"
                 element={<ProjectAnalytic />}
               ></Route>
-
               {/* <Route path="/analytic" element={<Analytic/>}></Route> */}
-
               {/* <Route
                 path="/createteamaccount"
                 element={<Createteamaccount />}
-              ></Route> */}
+              ></Route> */}{" "}
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<Adminpage />} />
-              <Route path="/pm" element={<PmLandingPage />} />
+              <Route path="/user" element={<PmLandingPage />} />
             </Routes>
 
             {/* <p>hello</p> */}

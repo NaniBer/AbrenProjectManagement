@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const adminRoutes = require("./routes/adminRoutes");
+const AdminRoutes = require("./routes/adminRoutes");
 const UserRoutes = require("./routes/UserRoutes");
+const AuthRoutes = require("./routes/authRoutes");
 
 const url =
   "mongodb+srv://nardosmehari22:crud@cluster0.9yh40dd.mongodb.net/test?retryWrites=true&w=majority";
@@ -18,8 +19,9 @@ app.use(
   })
 );
 // app.use("/auth", )
-app.use("/admin", adminRoutes);
+app.use("/admin", AdminRoutes);
 app.use("/Users", UserRoutes);
+app.use("/auth", AuthRoutes);
 
 // mongoose
 //   .connect(DB_CONNECTION)

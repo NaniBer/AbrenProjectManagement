@@ -6,26 +6,43 @@ const Projects = require("../Model/Projects");
 const Users = require("../Model/Users");
 
 router.post("/Login", async (req, res) => {
-  console.log("hi");
   try {
-    const { username, password } = req.body;
-    console.log(username, password);
-    // Check if the user exists
-    const admin = await Admin.findOne({ username });
-    if (!admin) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    const { username, password, type } = req.body;
+    console.log(username, password, type);
+    if (type == "admin") {
+      const admin = await Admin.findOne({ username });
+      if (!admin) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
 
-    // Compare the provided password with the hashed password
-    const passwordMatch = await bcrypt.compare(password, admin.password);
-    if (!passwordMatch) {
-      console.log("error");
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-    req.session.adminId = admin._id;
-    console.log(admin);
+      // Compare the provided password with the hashed password
+      const passwordMatch = await bcrypt.compare(password, admin.password);
+      if (!passwordMatch) {
+        console.log("error");
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      req.session.adminId = admin._id;
+      console.log(admin);
+      const user = admin;
 
-    res.status(200).json({ admin });
+      res.status(200).json({ user: admin });
+    } else {
+      const user = await Users.findOne({ username });
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Compare the provided password with the hashed password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        console.log("error");
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      req.session.userId = user._id;
+      console.log(user);
+
+      res.status(200).json({ user });
+    }
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in" });

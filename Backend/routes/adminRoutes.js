@@ -7,7 +7,6 @@ const Users = require("../Model/Users");
 
 // System Adminstartor Login
 router.post("/Login", async (req, res) => {
-  console.log("hi");
   try {
     const { username, password } = req.body;
     console.log(username, password);
@@ -93,7 +92,7 @@ router.post("/CreateUsers", async (req, res) => {
   try {
     const { firstName, lastName, username, password, email } = req.body;
 
-     const createdBy = req.session.adminId;
+    const createdBy = req.session.adminId;
     //const createdBy = "65842e544adaddc07c71d473";
     // Check if the user already exists
     const existingAccount = await Users.findOne({ username });
@@ -352,26 +351,23 @@ router.put("/UpdateAdmin", async (req, res) => {
 });
 
 //reset Password
-// router.put("/ResetAdmin", async (req, res) => {
-//   try {
-//     const { username, currentPassword, newPassword } = req.body;
+router.put("/ResetAdmin", async (req, res) => {
+  try {
+    //     const { username, currentPassword, newPassword } = req.body;
 
     // Find the admin user by username
     const adminUser = await Admin.findOne({ username });
 
-//     if (!adminUser) {
-//       return res.status(404).json({ message: "Admin user not found" });
-//     }
-    if (!adminUser) {
-      return res.status(404).json({ message: 'Admin user not found' });
-    }
+    //     if (!adminUser) {
+    //       return res.status(404).json({ message: 'Admin user not found' });
+    //     }
 
-    // Verify the old password
-    const isPasswordValid = await bcrypt.compare(oldPassword, adminUser.password);
+    //     // Verify the old password
+    //     const isPasswordValid = await bcrypt.compare(oldPassword, adminUser.password);
 
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid old password' });
-    }
+    //     if (!isPasswordValid) {
+    //       return res.status(401).json({ message: 'Invalid old password' });
+    //     }
 
     // Generate a new password hash
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
@@ -382,10 +378,10 @@ router.put("/UpdateAdmin", async (req, res) => {
     // Save the updated admin user
     await adminUser.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    //     res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error updating admin password:', error);
-    res.status(500).json({ message: 'Error updating admin password' });
+    console.error("Error updating admin password:", error);
+    res.status(500).json({ message: "Error updating admin password" });
   }
 });
 module.exports = router;
