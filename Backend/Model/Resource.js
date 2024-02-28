@@ -1,26 +1,38 @@
 const mongoose = require ('mongoose');
 
 const ResourceSchema = mongoose.Schema({
-    project: {
+    projectId: {
 
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        ref: 'projects',
+       // required: true,
     },
     ResourceName : {
         type: String,
         required : true
     },
     Category: {
-        enum: ['Material', 'Work', 'Cost'],
-        required: true
+        type: String,
+        required: true,
+        enum: ['Material', 'Work', 'Cost']
     },
     Quantity: {
         type: Number,
         required: true
     },
+     CostCategory: {
+        type: String,
+        required: true,
+        enum: ['per Hour', 'per Person'],
+        
+     },
      Cost: {
-         enum: ['per Hour', 'per Person'],
-         required: true
+        type: Number,
+        required: true
+     },
+     Frequency: {
+        type: Number,
+        required: true
      },
     TotalCost : {
         type: Number, 
@@ -28,3 +40,5 @@ const ResourceSchema = mongoose.Schema({
     }
    
 })
+const Resource = mongoose.model('Resource', ResourceSchema)
+module.exports= Resource

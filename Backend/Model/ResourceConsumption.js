@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const ResourceConsumptionSchema = mongoose.Schema({
-    Resource: {
+    ResourceId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Resource',
         required: true
@@ -17,9 +17,13 @@ const ResourceConsumptionSchema = mongoose.Schema({
         type: String, 
         required: true
     },
-    Task: {
+    TasksId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tasks',
+        required: true
+    },
+    BudgetConsumption: {
+        type: Number,
         required: true
     }
 

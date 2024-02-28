@@ -1,6 +1,12 @@
 const mongoose = require ('mongoose')
 
 const MilestonesSchema = mongoose.Schema({
+    ProjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Projects',
+        required: true
+
+    },
     MilestoneName: {
         type: String,
         required : true
@@ -16,5 +22,5 @@ const MilestonesSchema = mongoose.Schema({
     }
 
 })
-const Milestones = schema.model('Milestones', MilestonesSchema)
+const Milestones = mongoose.model('Milestones', MilestonesSchema)
 module.exports= Milestones;
