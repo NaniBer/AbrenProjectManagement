@@ -41,8 +41,11 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const user = useSelector((state) => state.auth.user);
+
   const [firstName, setFirstName] = useState("");
+  const user = useSelector((state) => state.auth.user);
+
+  const [projects, setProjects] = useState([]);
 
   // const initials = (user.firstName && user.lastName) ? `${user.firstName[0]}${user.lastName[0]}` : '';
   const initialsArray = profile.map((teamMember) => {
@@ -50,10 +53,15 @@ const Sidebar = () => {
     return initials;
   });
   useEffect(() => {
+    console.log(user);
     if (user) {
       setFirstName(user.firstname);
+      user.projects.forEach((project) => {
+        setProjects([...projects, project]);
+      });
     }
-  }, []);
+  }, [user]);
+
   return (
     <Box
       sx={{
@@ -195,6 +203,16 @@ const Sidebar = () => {
                   selected={selected}
                   setSelected={setSelected}
                 />
+                {projects.map((project, index) => (
+                  <Item
+                    // key={index}
+                    title={project.ProjectName}
+                    to="/project"
+                    icon={<AccountTreeOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                ))}
 
                 <Typography
                   variant="h6"

@@ -231,21 +231,13 @@ UserRouter.delete("/deleteResource/:ResourceName", async (req, res) => {
 
 //Get all involved Projects
 UserRouter.post("/getProjects", async (req, res) => {
-  console.log(req.body.username);
+  console.log(req.body.id);
   try {
-    // const projectList = await Projects.find({
-    //   ProjectManger: {
-    //     $elemMatch: {
-    //       username: req.body.username,
-    //     },
-    //   },
-    // });
     const projectList = await Projects.find({
-      "ProjectManager.username": req.body.username,
-    });
+      ProjectManager: req.body.id,
+    }).select("ProjectName ProjectDescription");
 
-    console.log(projectList);
-    res.json(projectList);
+    res.status(200).json(projectList);
   } catch (err) {
     console.error("Error retrieving Admin list:", err);
     res.status(500).json({ message: "Error rerieving admin list" });

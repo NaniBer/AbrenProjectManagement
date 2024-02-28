@@ -82,11 +82,22 @@ const Login = () => {
         response.json().then((data) => {
           const user = data.user;
           console.log({ user });
-          dispatch(loginSucess(user));
+
+          const id = user._id.toString();
+          console.log(id);
           fetch("/Users/getProjects", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: user.username }),
+            body: JSON.stringify({ id: id }),
+          }).then((response) => {
+            const statusCode = response.status;
+            if (statusCode === 200) {
+              response.json().then((data) => {
+                user.projects = data;
+                console.log(user);
+                dispatch(loginSucess(user));
+              });
+            }
           });
           if (admin) navigate("/admin");
           else navigate("/user");

@@ -22,8 +22,7 @@ router.post("/Login", async (req, res) => {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       req.session.adminId = admin._id;
-      console.log(admin);
-      const user = admin;
+      // console.log(admin);
 
       res.status(200).json({ user: admin });
     } else {
