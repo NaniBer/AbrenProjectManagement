@@ -138,7 +138,7 @@ const SidebarAdmin = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/"
+              to="/admin/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -152,14 +152,14 @@ const SidebarAdmin = () => {
             </Typography>
             <Item
               title="Create Project"
-              to="/createproject"
+              to="/admin/createproject"
               icon={<AddCardIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="View Project"
-              to="/viewproject"
+              to="/admin/viewproject"
               icon={<ViewCompactIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -174,14 +174,14 @@ const SidebarAdmin = () => {
             </Typography>
             <Item
               title="Create User"
-              to="/createteamaccount"
+              to="/admin/createteamaccount"
               icon={<PersonAddIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="View User"
-              to="/viewuser"
+              to="/admin/viewuser"
               icon={<ViewListIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -196,7 +196,7 @@ const SidebarAdmin = () => {
             </Typography>
             <Item
               title="Update and Reset"
-              to="/updateandreset"
+              to="/admin/updateandreset"
               icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}

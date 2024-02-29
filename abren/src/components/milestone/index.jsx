@@ -215,12 +215,13 @@ const Milestone = () => {
 
   return (
     <Box m="20px">
-      <Header title="Milestone" subtitle="Manages the milestones we have" />
-      <Box
+       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
       >
+      <Header title="Milestone" subtitle="Manages the milestones we have" />
+     
         <Button
           startIcon={<AddIcon />}
           sx={{

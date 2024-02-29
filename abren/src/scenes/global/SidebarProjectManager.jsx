@@ -14,6 +14,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 // import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
+import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
 import { profile } from "../../data/mockData";
 import { useSelector } from "react-redux";
 
@@ -184,7 +185,7 @@ const Sidebar = () => {
               <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                 <Item
                   title="Dashboard"
-                  to="/"
+                  to="/pm/"
                   icon={<HomeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
@@ -198,7 +199,7 @@ const Sidebar = () => {
                 </Typography>
                 <Item
                   title="Project1"
-                  to="/project"
+                  to="/pm/project"
                   icon={<AccountTreeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
@@ -207,7 +208,7 @@ const Sidebar = () => {
                   <Item
                     // key={index}
                     title={project.ProjectName}
-                    to="/project"
+                    to="/pm/project"
                     icon={<AccountTreeOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
@@ -223,15 +224,22 @@ const Sidebar = () => {
                 </Typography>
                 <Item
                   title="Kanban"
-                  to="/kanban"
+                  to="/pm/kanban"
                   icon={<PersonOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />
                 <Item
                   title="Calendar"
-                  to="/calendar"
+                  to="/pm/calendar"
                   icon={<PersonOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="Report"
+                  to="/pm/report"
+                  icon={<SummarizeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />

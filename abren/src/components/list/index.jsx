@@ -183,8 +183,8 @@ const Resource = () => {
   };
   return (
     <Box m="20px">
-      <Header title="Task List" subtitle="Manages the List of Tasks" />
       <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Header title="Task List" subtitle="Manages the List of Tasks" />
         <Button
           startIcon={<AddIcon />}
           sx={{

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import Calendar from "../../components/calendar";
 import Resource from "../../components/resource";
@@ -13,12 +13,11 @@ import {
   CheckCircleOutline,
   PeopleAlt,
   FormatListBulleted,
-  Dashboard,
   Event,
   BarChart,
   Timeline,
 } from "@mui/icons-material";
-import EditIcon from "@mui/icons-material/Edit";
+// import EditIcon from "@mui/icons-material/Edit";
 
 const App = () => {
   const [selectedItem, setSelectedItem] = useState("");
@@ -45,7 +44,7 @@ const App = () => {
   const isCalendarSelected = selectedItem === "Calendar";
   const isResourceSelected = selectedItem === "Resource";
   const isMilestoneSelected = selectedItem === "Milestone";
-  const isEditSelected = selectedItem == "Edit";
+  const isEditSelected = selectedItem === "Edit";
   const isAnalyticSelected = selectedItem === "Analytic";
   const isProjectAnalyticSelected = selectedItem === "ProjectAnalytic";
   const isProjectInfoSelected = selectedItem === "ProjectInfo";
@@ -79,7 +78,7 @@ const App = () => {
               </span>
             </div>
 
-            <div
+            {/* <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
@@ -93,8 +92,8 @@ const App = () => {
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
                 Edit Project Details
               </span>
-            </div>
-            <div
+            </div> */}
+            {/* <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
@@ -108,7 +107,7 @@ const App = () => {
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
                 Project Info
               </span>
-            </div>
+            </div> */}
 
             <div
               style={{
@@ -207,7 +206,7 @@ const App = () => {
                 style={{
                   marginLeft: "2px",
                   fontSize: "14px",
-                  color: isResourceSelected ? "#6870fa" : "inherit",
+                  color: isProjectAnalyticSelected ? "#6870fa" : "inherit",
                 }}
               >
                 Project Analytics

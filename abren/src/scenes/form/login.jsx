@@ -92,15 +92,20 @@ const Login = () => {
           }).then((response) => {
             const statusCode = response.status;
             if (statusCode === 200) {
+              //Logged in successfully
               response.json().then((data) => {
-                user.projects = data;
-                console.log(user);
-                dispatch(loginSucess(user));
+                if (!admin) {
+                  user.projects = data;
+                  console.log(user);
+                  dispatch(loginSucess(user));
+                  navigate("/pm");
+                } else {
+                  dispatch(loginSucess(user));
+                  navigate("/admin");
+                }
               });
             }
           });
-          if (admin) navigate("/admin");
-          else navigate("/user");
         });
       } else {
         // Handle non-200 status codes if needed
