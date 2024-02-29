@@ -1,48 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import Header from "../../components/Header";
+import Header from "../../../components/Header";
+import swal from "sweetalert";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    username: "",
-    password: "",
-  });
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
 
 
+  const handleFormSubmit = (values, formik) => {
+    const { firstName, lastName, username,email, password } = values;
+    console.log(firstName, lastName,username, email, password);
+    if (
+      values.firstName &&
+      values.lastName &&
+      values.email &&
+      values.username &&
+      values.password 
+    ) {
+      formik.resetForm();
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
-  };
+      // Perform your form submission logic here
+      formik.setSubmitting(false); // Set submitting to false after successful submission
   
- 
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+      // Show success SweetAlert
+      swal("User Account Created", "The new user account has been created successfully.", "success");
+    }
+  };
+  const handleFirstNameChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setFirstName(value);
   };
 
-  const handleCreateUser = (event) => {
-    event.preventDefault();
-    console.log("Account created successfully");
+  const handleLastNameChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setLastName(value);
+   };
+   const handleUsernameChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setUsername(value);
+   };
+
+
+  const handleEmailChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (event, handleChange) => {
+    handleChange(event);
+    const { value } = event.target;
+    setPassword(value);
   };
 
   return (
     <Box m="20px">
-      <Header title="CREATEE USER" subtitle="Create a New User Profile" />
+      <Header title="CREATE USER" subtitle="Create a New User Profile" />
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={formData}
+        initialValues={initialValues}
         validationSchema={checkoutSchema}
       >
         {({
@@ -50,6 +79,7 @@ const Form = () => {
           errors,
           touched,
           handleBlur,
+          handleChange,
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit}>
@@ -67,7 +97,7 @@ const Form = () => {
                 type="text"
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleFirstNameChange(event, handleChange)}
                 value={values.firstName}
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
@@ -81,19 +111,17 @@ const Form = () => {
                 InputLabelProps={{
                   sx: {
                     '&.Mui-focused': {
-                      color: '#868dfb',
+                      color:'#868dfb',
                     },
                   },
-                }}
-                
-              />
+                }}              />
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleLastNameChange(event, handleChange)}
                 value={values.lastName}
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
@@ -107,7 +135,7 @@ const Form = () => {
                 InputLabelProps={{
                   sx: {
                     '&.Mui-focused': {
-                      color: '#868dfb',
+                      color:'#868dfb',
                     },
                   },
                 }}              />
@@ -117,7 +145,7 @@ const Form = () => {
                 type="text"
                 label="Email"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleEmailChange(event, handleChange)}
                 value={values.email}
                 name="email"
                 error={!!touched.email && !!errors.email}
@@ -131,7 +159,7 @@ const Form = () => {
                 InputLabelProps={{
                   sx: {
                     '&.Mui-focused': {
-                      color: '#868dfb',
+                      color:'#868dfb',
                     },
                   },
                 }}              />
@@ -141,7 +169,7 @@ const Form = () => {
                 type="text"
                 label="Username"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handleUsernameChange(event, handleChange)}
                 value={values.username}
                 name="username"
                 error={!!touched.username && !!errors.username}
@@ -155,18 +183,17 @@ const Form = () => {
                 InputLabelProps={{
                   sx: {
                     '&.Mui-focused': {
-                      color: '#868dfb',
+                      color:'#868dfb',
                     },
                   },
-                }}  
-                 />
+                }}              />
               <TextField
                 fullWidth
                 variant="filled"
                 type="password"
                 label="Password"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(event) => handlePasswordChange(event, handleChange)}
                 value={values.password}
                 name="password"
                 error={!!touched.password && !!errors.password}
@@ -174,24 +201,24 @@ const Form = () => {
                 sx={{
                   gridColumn: "span 4" ,
                   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#868dfb',
+                    borderColor: validationErrors.taskList ? 'red' : '#868dfb',
                   },
                 }}
                 InputLabelProps={{
                   sx: {
                     '&.Mui-focused': {
-                      color: '#868dfb',
+                      color: validationErrors.taskList ? 'red' : '#868dfb',
                     },
                   },
                 }}
-                              />
+              />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button
                 type="submit"
                 color="secondary"
                 variant="contained"
-                onClick={handleCreateUser}
+                onClick={handleFormSubmit}
               >
                 Create New User Account
               </Button>
@@ -202,6 +229,7 @@ const Form = () => {
     </Box>
   );
 };
+
 const checkoutSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
@@ -214,15 +242,23 @@ const checkoutSchema = yup.object().shape({
     "Email must be in a valid format"
   )
   .required("Email is required"), 
-  password: yup
-  .string()
-  .matches(/^(?=.*[0-9])(?=.*[!@#$%^&*]).*$/,
-    "Password must contain at least one number and one special character")
-  .required("Password is required")
+   password: yup.string()
   .min(8, "Password must be at least 8 characters")
-
+  .matches(/^(?=.*[0-9])(?=.*[!@#$%^&*])/,
+    "Password must contain at least one number and one special character")
+  .required("Password is required"),
 
 });
 
+const initialValues = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  username: "",
+  password: "",
+};
 
 export default Form;
+
+
+

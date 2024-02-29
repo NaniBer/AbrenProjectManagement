@@ -2,21 +2,38 @@ import React, { useState } from 'react';
 import { Box, Button, TextField } from '@mui/material';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import Header from '../../components/Header';
+import Header from '../../../components/Header';
 import Autocomplete from '@mui/material/Autocomplete';
-import { mockDataTeam } from '../../data/mockData';
+import { mockDataTeam } from '../../../data/mockData';
+import Swal from  "sweetalert";
 
-const Form = ({ initialValues }) => {
+
+const Form = () => {
   const [selectedUser, setSelectedUser] = useState('');
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
+  const handleFormSubmit = (values, formik) => {
+    if (values.projectname && values.description && selectedUser) {
+      Swal("Successful!", "You have created a new project!", "success", {
+        button: "Yes!",
+      });
+      formik.resetForm();
+      setSelectedUser(''); // Clear the selected project manager
+
+      formik.setSubmitting(false); // Set submitting to false after successful submission
+    }
   };
+  
+
 
   const handleUserSelect = (event, value) => {
     setSelectedUser(value);
   };
 
+  // const handleCreateProject = (event) => {
+  //   event.preventDefault();
+
+   
+  // }
   const checkoutSchema = yup.object().shape({
     projectname: yup.string().required('Required'),
     description: yup.string().required('Required'),
@@ -37,7 +54,7 @@ const Form = ({ initialValues }) => {
 
   return (
     <Box m="20px">
-      <Header title="CREATE USERRRRR" subtitle="Create a New User Profile" />
+      <Header title="CREATE PROJECT" subtitle="Create a New Project" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -58,9 +75,21 @@ const Form = ({ initialValues }) => {
                 value={formik.values.projectname}
                 name="projectname"
                 error={formik.touched.projectname && !!formik.errors.projectname}
-                helperText={formik.touched.projectname && formik.errors.projectname}
+                helperText={(formik.touched.projectname && formik.errors.projectname) || 'Please enter a clear and concise name for the project you intend to create.'}
                 className="form-field"
-                sx={{ gridColumn: "span 4" }}
+                sx={{
+                  gridColumn: "span 4" ,
+                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#868dfb',
+                  },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    '&.Mui-focused': {
+                      color:'#868dfb',
+                    },
+                  },
+                }}
               />
 
               <TextField
@@ -73,10 +102,21 @@ const Form = ({ initialValues }) => {
                 value={formik.values.description}
                 name="description"
                 error={formik.touched.description && !!formik.errors.description}
-                helperText={formik.touched.description && formik.errors.description}
+                helperText={formik.touched.description && formik.errors.description || 'Please enter a detailed description for the project you intend to create.'}
                 className="form-field"
-                sx={{ gridColumn: "span 4" }}
-              />
+                sx={{
+                  gridColumn: "span 4" ,
+                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#868dfb',
+                  },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    '&.Mui-focused': {
+                      color:'#868dfb',
+                    },
+                  },
+                }}              />
               <Box gridColumn="span 4"> {/* Spanning 4 columns */}
               <Autocomplete
                 options={usernames} // Set the dropdown options to the usernames array
@@ -88,9 +128,22 @@ const Form = ({ initialValues }) => {
                     {...params}
                     label="Project Manager"
                     error={formik.touched.projectmanager && !!formik.errors.projectmanager}
-                    helperText={formik.touched.projectmanager && formik.errors.projectmanager}
+                    helperText={formik.touched.projectmanager && formik.errors.projectmanager || 'Please select the project manager for the project you intend to create.'}
                     fullWidth
                     variant="filled"
+                    sx={{
+                      gridColumn: "span 4" ,
+                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#868dfb',
+                      },
+                    }}
+                    InputLabelProps={{
+                      sx: {
+                        '&.Mui-focused': {
+                          color:'#868dfb',
+                        },
+                      },
+                    }}
                   />
                 )}
                 className="form-field"
@@ -100,8 +153,13 @@ const Form = ({ initialValues }) => {
             </Box>
 
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Create New Project
+              <Button 
+              type="submit" 
+              color="secondary" 
+              variant="contained"
+              onClick={handleFormSubmit}
+              >
+              Create New Project
               </Button>
             </Box>
           </form>
@@ -116,6 +174,12 @@ const Form = ({ initialValues }) => {
       )} */}
     </Box>
   );
+};
+
+const initialValues = {
+  projectname: '',
+  description: '',
+  projectmanager: ''
 };
 
 export default Form;

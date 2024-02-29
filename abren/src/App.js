@@ -11,7 +11,9 @@ function App() {
   return (
   
       <Routes>
-       <Route path="/*" element={<PmRoute />} />
+      <Route path="/*" element={<PmRoute />} />
+
+       <Route path="/pm/*" element={<PmRoute />} />
 
        <Route path="/login" element={<Login />} />
 

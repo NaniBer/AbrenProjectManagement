@@ -78,6 +78,14 @@ const SidebarAdmin = () => {
         },
       }}
     >
+              <Box
+        sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+    <div style={{ borderRadius: '20px', overflow: 'hidden', marginLeft: '10px' , marginTop : '10px', flex: "1"}}>
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -136,13 +144,13 @@ const SidebarAdmin = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
+            {/* <Item
               title="Dashboard"
               to="/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -212,6 +220,8 @@ const SidebarAdmin = () => {
           </Box>
         </Menu>
       </ProSidebar>
+      </div>
+      </Box>
     </Box>
   );
 };

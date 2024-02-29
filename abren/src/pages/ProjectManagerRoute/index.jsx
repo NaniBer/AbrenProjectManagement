@@ -3,16 +3,16 @@ import { Routes, Route } from "react-router-dom";
 
 import Topbar from "../../scenes/global/Topbar";
 import SidebarProjectManager from "../../scenes/global/SidebarProjectManager";
-import Calendar from "../../components/calendar";
-import Kanban from "../../scenes/kanban";
-import Project from "../../scenes/project";
-import Resource from "../../components/resource";
-import List from "../../components/list";
-import Milestone from "../../components/milestone";
-import ProjectInfo from "../../components/projectInfo";
-import Analytic from "../../components/analytic";
-import ProjectAnalytic from "../../components/projectAnalytic";
-import Report from "../../components/report";
+import Calendar from "../../scenes/projectManager/calendar";
+import Kanban from "../../scenes/projectManager/kanban";
+import Project from "../../scenes/projectManager/project";
+import Resource from "../../scenes/projectManager/resource";
+import List from "../../scenes/projectManager/list";
+import Milestone from "../../scenes/projectManager/milestone";
+import ProjectInfo from "../../scenes/projectManager/projectInfo";
+import Analytic from "../../scenes/projectManager/analytic";
+import ProjectAnalytic from "../../scenes/projectManager/projectAnalytic";
+import Report from "../../scenes/projectManager/report";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "../../theme";
 
