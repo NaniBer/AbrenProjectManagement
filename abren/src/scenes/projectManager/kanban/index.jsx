@@ -38,6 +38,7 @@ const Kanban = () => {
   const [priority, setPriority] = useState("");
   const [submittedtask, setSubmittedTask] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -65,16 +66,6 @@ const Kanban = () => {
       priority,
     };
 
-     const updatedTasks = submittedtask.map(task => {
-    if (task.id === editingTaskId) {
-      return {
-        ...task,
-        status,
-      };
-    }
-    return task;
-  });
-
     setSubmittedTask((prevTask) => [...prevTask, newTask]);
 
     setTaskName("");
@@ -85,6 +76,38 @@ const Kanban = () => {
     setIsFormOpen(false);
   };
 
+  const handleEditModalSubmit = (e) => {
+    e.preventDefault();
+
+    const updatedTasks = submittedtask.map(task => {
+      if (task.id === editingTaskId) {
+        return {
+          ...task,
+          status,
+        };
+      }
+      return task;
+    });
+
+    setSubmittedTask(updatedTasks);
+    setEditingTaskId(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleDeleteTask = (taskId) => {
+    setSubmittedTask((prevTasks) => prevTasks.filter(task => task.id !== taskId));
+  };
+
+  const handleEditTask = (taskId) => {
+    const task = submittedtask.find(task => task.id === taskId);
+  
+    if (task) {
+      setStatus(task.status);
+      setEditingTaskId(taskId);
+      setIsEditModalOpen(true);
+    }
+  };
+  
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -92,40 +115,25 @@ const Kanban = () => {
     const oneDay = 24 * 60 * 60 * 1000;
     const today = new Date();
     const due = new Date(dueDate);
-    const diffDays = Math.round((due - today) / oneDay); // Calculating difference with due date first
+    const diffDays = Math.round((due - today) / oneDay);
   
     if (diffDays < 0) {
-      // If due date has passed
       return "Overdue";
     } else if (diffDays === 0) {
-      // If due date is today
       return "Due today";
     } else {
-      // If due date is in the future
       return `${diffDays} days left`;
     }
   };
-  const handleDeleteTask = (taskId) => {
-    setSubmittedTask((prevTasks) => prevTasks.filter(task => task.id !== taskId));
-  };
-
-  const handleEditTask = (taskId) => {
-    // Find the task with the corresponding ID
-    const task = submittedtask.find(task => task.id === taskId);
-  
-    // If the task is found, set its initial status in the state
-    if (task) {
-      setStatus(task.status);
-      setEditingTaskId(taskId); // Set the ID of the task being edited
-      setIsFormOpen(true); // Open the modal for editing
-    }
-  };
-  
   
   return (
     <>
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+       <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
       <Header title="Todo List" subtitle="Categorizes your tasks" />
 
         <Button
@@ -137,8 +145,6 @@ const Kanban = () => {
           Add Task
         </Button>
       </Box>
-      </Box>
-
       <Modal open={isFormOpen} onClose={() => setIsFormOpen(false)}>
         <Box
           sx={{
@@ -182,7 +188,6 @@ const Kanban = () => {
               />
             </Box>
 
-            {/* Using a simple text field for due date */}
             <Box sx={{ mb: 2 }}>
               <TextField
                 id="dueDate"
@@ -275,6 +280,63 @@ const Kanban = () => {
         </Box>
       </Modal>
 
+      <Modal open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            maxWidth: 500,
+            width: "100%",
+            outline: "none",
+          }}
+        >
+          <Typography variant="h5" sx={{ mb: 2 }}>
+            Edit Task
+          </Typography>
+          <form onSubmit={handleEditModalSubmit}>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                id="status"
+                select
+                label="Status"
+                variant="outlined"
+                fullWidth
+                value={status}
+                onChange={handleStatusChange}
+                sx={{
+                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor:'#868dfb',
+                  },
+                }}
+                InputLabelProps={{
+                  shrink: true,
+                  sx: {
+                    '&.Mui-focused': {
+                      color:'#868dfb',
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="Not Started">Not Started</MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </TextField>
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end">
+              <Button type="submit" variant="contained">
+                Save
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Modal>
+
       <div className="container">
         <div className="d-flex">
           <div className="col">
@@ -318,8 +380,10 @@ const Kanban = () => {
                       </Button>
                     </div>
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            
+                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                    <EditIcon />
+                  </IconButton>
                   <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
                     <DeleteIcon />
                   </IconButton>
@@ -371,8 +435,10 @@ const Kanban = () => {
                       </Button>
                     </div>
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            
+                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                    <EditIcon />
+                  </IconButton>
                   <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
                     <DeleteIcon />
                   </IconButton>
@@ -425,9 +491,11 @@ const Kanban = () => {
                     </div>
                     
                   </div>
-                  <div style={{display: 'flex', justifyContent: 'flex-end'}}> 
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary"
-                 size = "small" sx={{paddingBottom: '1px'}}>
+                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
                     <DeleteIcon />
                   </IconButton>
                 </div>
@@ -441,6 +509,7 @@ const Kanban = () => {
           </div>
         </div>
       </div>
+      </Box>
     </>
   );
 };
