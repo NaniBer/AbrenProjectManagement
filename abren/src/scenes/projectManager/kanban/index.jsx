@@ -17,7 +17,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { tokens } from '../../../theme';
 import Header from '../../../components/Header';
-import { color } from "@mui/system";
 
 const TaskCategory = ({ category, tasks }) => (
   <div className="text-primary">
@@ -39,7 +38,7 @@ const Kanban = () => {
   const [submittedtask, setSubmittedTask] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
+  const [modalMode, setModalMode] = useState("add"); // Add state variable for modal mode
 
   useEffect(() => {
     setDueDate(new Date());
@@ -66,7 +65,24 @@ const Kanban = () => {
       priority,
     };
 
-    setSubmittedTask((prevTask) => [...prevTask, newTask]);
+    if (modalMode === "add") {
+      setSubmittedTask((prevTask) => [...prevTask, newTask]);
+    } else if (modalMode === "edit" && editingTaskId !== null) {
+      const updatedTasks = submittedtask.map(task => {
+        if (task.id === editingTaskId) {
+          return {
+            ...task,
+            taskName,
+            dueDate,
+            status,
+            priority,
+          };
+        }
+        return task;
+      });
+      setSubmittedTask(updatedTasks);
+      setEditingTaskId(null);
+    }
 
     setTaskName("");
     setDueDate(new Date());
@@ -74,6 +90,7 @@ const Kanban = () => {
     setPriority("");
 
     setIsFormOpen(false);
+    setModalMode("add"); // Reset modal mode to "add"
   };
 
   const handleEditModalSubmit = (e) => {
@@ -102,9 +119,13 @@ const Kanban = () => {
     const task = submittedtask.find(task => task.id === taskId);
   
     if (task) {
+      setTaskName(task.taskName);
+      setDueDate(new Date(task.dueDate));
       setStatus(task.status);
+      setPriority(task.priority);
       setEditingTaskId(taskId);
-      setIsEditModalOpen(true);
+      setIsFormOpen(true); // Open the form modal
+      setModalMode("edit"); // Set modal mode to "edit"
     }
   };
   
@@ -128,22 +149,23 @@ const Kanban = () => {
   
   return (
     <>
-    <Box m="20px">
-       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-      <Header title="Todo List" subtitle="Categorizes your tasks" />
-
-        <Button
-          startIcon={<AddIcon />}
-          variant="contained"
-          onClick={() => setIsFormOpen(true)}
-          sx={{ color: 'white', backgroundColor: colors.primary[400], fontSize: '12px', fontWeight: 'bold', padding: '10px 20px', ml: '10px', mb:'15px' }}
+      <Box m="20px">
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
         >
-          Add Task
-        </Button>
+          <Header title="Todo List" subtitle="Categorizes your tasks" />
+
+          <Button
+            startIcon={<AddIcon />}
+            variant="contained"
+            onClick={() => setIsFormOpen(true)}
+            sx={{ color: 'white', backgroundColor: colors.primary[400], fontSize: '12px', fontWeight: 'bold', padding: '10px 20px', ml: '10px', mb:'15px' }}
+          >
+            {modalMode === "add" ? "Add Task" : "Edit Task"}
+          </Button>
+        </Box>
       </Box>
       <Modal open={isFormOpen} onClose={() => setIsFormOpen(false)}>
         <Box
@@ -161,7 +183,7 @@ const Kanban = () => {
           }}
         >
           <Typography variant="h5" sx={{ mb: 2 }}>
-            Add Task
+            {modalMode === "add" ? "Add Task" : "Edit Task"}
           </Typography>
           <form onSubmit={handleSubmit}>
             <Box sx={{ mb: 2 }}>
@@ -173,18 +195,18 @@ const Kanban = () => {
                 value={taskName}
                 onChange={handleTaskNameChange}
                 sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
+                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor:'#868dfb',
+                  },
+                }}
+                InputLabelProps={{
+                  shrink: true,
+                  sx: {
+                    '&.Mui-focused': {
+                      color:'#868dfb',
                     },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
+                  },
+                }}
               />
             </Box>
 
@@ -273,64 +295,7 @@ const Kanban = () => {
 
             <Box display="flex" justifyContent="flex-end">
               <Button type="submit" variant="contained">
-                Submit
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </Modal>
-
-      <Modal open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            maxWidth: 500,
-            width: "100%",
-            outline: "none",
-          }}
-        >
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            Edit Task
-          </Typography>
-          <form onSubmit={handleEditModalSubmit}>
-            <Box sx={{ mb: 2 }}>
-              <TextField
-                id="status"
-                select
-                label="Status"
-                variant="outlined"
-                fullWidth
-                value={status}
-                onChange={handleStatusChange}
-                sx={{
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor:'#868dfb',
-                  },
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                  sx: {
-                    '&.Mui-focused': {
-                      color:'#868dfb',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="Not Started">Not Started</MenuItem>
-                <MenuItem value="In Progress">In Progress</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
-              </TextField>
-            </Box>
-
-            <Box display="flex" justifyContent="flex-end">
-              <Button type="submit" variant="contained">
-                Save
+                {modalMode === "add" ? "Submit" : "Save"}
               </Button>
             </Box>
           </form>
@@ -347,48 +312,48 @@ const Kanban = () => {
                   .filter((task) => task.status === "Not Started")
                   .map((task) => (
                     <Card key={task.id} sx={{ mt: 1 , backgroundColor: 'fffff'}}>
-                  <CardContent>
-                  <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
+                      <CardContent>
+                        <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AccessTimeIcon style={{ marginBottom: '8px',marginRight: '4px' , color: colors.greenAccent[400]}} />
-                    <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
-                    {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
-                     </Typography>         
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
-                    <Button
-                    size="small"
-                    sx={{
-                      marginTop: "8px",
-                      padding: "6px 6px",
-                      height: "20px",
-                      width: "20px",
-                    }}
-                        variant="contained"
-                        color={
-                          task.priority === "High"
-                            ? "error"
-                            : task.priority === "Medium"
-                            ? "warning"
-                            : "success"
-                        }
-                      >
-                        {task.priority}
-                      </Button>
-                    </div>
-                  </div>
-                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
-                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-                </CardContent>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <AccessTimeIcon style={{ marginBottom: '8px',marginRight: '4px' , color: colors.greenAccent[400]}} />
+                            <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
+                              {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
+                            </Typography>         
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                            <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
+                            <Button
+                              size="small"
+                              sx={{
+                                marginTop: "8px",
+                                padding: "6px 6px",
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              variant="contained"
+                              color={
+                                task.priority === "High"
+                                  ? "error"
+                                  : task.priority === "Medium"
+                                  ? "warning"
+                                  : "success"
+                              }
+                            >
+                              {task.priority}
+                            </Button>
+                          </div>
+                        </div>
+                        <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                          <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                      </CardContent>
                     </Card>
                   ))}
               </div>
@@ -402,48 +367,48 @@ const Kanban = () => {
                   .filter((task) => task.status === "In Progress")
                   .map((task) => (
                     <Card key={task.id} sx={{ mt: 1 , backgroundColor: 'fffff'}}>
-                 <CardContent>
-                  <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
+                      <CardContent>
+                        <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AccessTimeIcon style={{ marginBottom: '8px', marginRight: '4px' , color: colors.greenAccent[400]}} />
-                    <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
-                    {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
-                     </Typography>         
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
-                    <Button
-                    size="small"
-                    sx={{
-                      marginTop: "8px",
-                      padding: "6px 6px",
-                      height: "20px",
-                      width: "20px",
-                    }}
-                        variant="contained"
-                        color={
-                          task.priority === "High"
-                            ? "error"
-                            : task.priority === "Medium"
-                            ? "warning"
-                            : "success"
-                        }
-                      >
-                        {task.priority}
-                      </Button>
-                    </div>
-                  </div>
-                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
-                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-                </CardContent>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <AccessTimeIcon style={{ marginBottom: '8px', marginRight: '4px' , color: colors.greenAccent[400]}} />
+                            <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
+                              {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
+                            </Typography>         
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                            <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
+                            <Button
+                              size="small"
+                              sx={{
+                                marginTop: "8px",
+                                padding: "6px 6px",
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              variant="contained"
+                              color={
+                                task.priority === "High"
+                                  ? "error"
+                                  : task.priority === "Medium"
+                                  ? "warning"
+                                  : "success"
+                              }
+                            >
+                              {task.priority}
+                            </Button>
+                          </div>
+                        </div>
+                        <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                          <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                      </CardContent>
                     </Card>
                   ))}
               </div>
@@ -457,51 +422,48 @@ const Kanban = () => {
                   .filter((task) => task.status === "Completed")
                   .map((task) => (
                     <Card key={task.id} sx={{ mt: 1 , backgroundColor: 'fffff'}}>
-                  <CardContent>
-                  <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
+                      <CardContent>
+                        <Typography variant="body1" style={{ fontSize: '1.2rem', marginBottom: '8px'}}>{task.taskName}</Typography>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AccessTimeIcon style={{ marginBottom: '8px',marginRight: '4px' , color: colors.greenAccent[400]}} />
-                    <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
-                    {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
-                     </Typography>         
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
-                    <Button
-                    size="small"
-                    sx={{
-                      marginTop: "8px",
-                      padding: "6px 6px",
-                      height: "20px",
-                      width: "20px",
-                    }}
-                        variant="contained"
-                        color={
-                          task.priority === "High"
-                            ? "error"
-                            : task.priority === "Medium"
-                            ? "warning"
-                            : "success"
-                        }
-                      >
-                        {task.priority}
-                      </Button>
-                    </div>
-                    
-                  </div>
-                  <div style={{display: 'flex', justifyContent: "flex-end"}}>
-                  <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-                </CardContent>
-
-
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <AccessTimeIcon style={{ marginBottom: '8px',marginRight: '4px' , color: colors.greenAccent[400]}} />
+                            <Typography variant="body2" sx={{ marginBottom: '8px', fontSize: '15px', paddingLeft: '25px' }}>
+                              {calculateDaysLeft(task.dueDate)} ({new Date(task.dueDate).toISOString().slice(0, 10)})
+                            </Typography>         
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                            <Typography variant="body2" sx={{ marginRight: '8px',fontSize: '15px', color: colors.greenAccent[400] }}>Priority:</Typography>
+                            <Button
+                              size="small"
+                              sx={{
+                                marginTop: "8px",
+                                padding: "6px 6px",
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              variant="contained"
+                              color={
+                                task.priority === "High"
+                                  ? "error"
+                                  : task.priority === "Medium"
+                                  ? "warning"
+                                  : "success"
+                              }
+                            >
+                              {task.priority}
+                            </Button>
+                          </div>
+                        </div>
+                        <div style={{display: 'flex', justifyContent: "flex-end"}}>
+                          <IconButton onClick={() => handleEditTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary" size = "small" sx={{paddingBottom: '1px'}}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                      </CardContent>
                     </Card>
                   ))}
               </div>
@@ -509,7 +471,7 @@ const Kanban = () => {
           </div>
         </div>
       </div>
-      </Box>
+   
     </>
   );
 };

@@ -43,6 +43,7 @@ const Project = () => {
   const [submittedProjects, setSubmittedProjects] = useState([...mockDataProject]);
   const [validationErrors, setValidationErrors] = useState({});
   const [editingIndex, setEditingIndex] = useState(-1);
+  
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -112,11 +113,12 @@ const Project = () => {
     setStartDate(project.startDate || '');
     setEndDate(project.endDate || '');
     setBudget(project.budget || '');
-    // Set the index of the project being edited
-    setEditingIndex(index);
-    setIsFormOpen(true); // Open the modal for editing
+    // Toggle editing state
+    setEditingIndex(editingIndex === index ? -1 : index);
+    // Open the modal for editing
+    setIsFormOpen(true);
   };
-
+  
   return (
     <Box m="20px">
      <Header title="Project Info" subtitle="More information about projects" />
@@ -371,9 +373,9 @@ const Project = () => {
                 <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> Budget: </Typography>{project.budget}
                 </Typography>
                 <Box display="flex" justifyContent="flex-end">
-                  <Button color="secondary" onClick={() => handleEditProject(index)}>
-                    ADD
-                  </Button>
+                <Button color="secondary" onClick={() => handleEditProject(index)}>
+                {project.startDate && project.endDate && project.budget ? 'Edit' : 'Add'}
+                </Button>
                 </Box>
               </CardContent>
             </Card>
