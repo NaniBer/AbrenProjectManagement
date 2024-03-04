@@ -11,7 +11,7 @@ function App() {
   return (
   
       <Routes>
-      <Route path="/*" element={<PmRoute />} />
+      <Route path="/*" element={<AdminPage />} />
 
        <Route path="/pm/*" element={<PmRoute />} />
 

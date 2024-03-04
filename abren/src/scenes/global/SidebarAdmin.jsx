@@ -134,7 +134,7 @@ const SidebarAdmin = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Saron
+                  John Doe
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   System Admin

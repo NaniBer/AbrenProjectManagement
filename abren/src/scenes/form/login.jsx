@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { tokens } from "../../theme";
-import { Typography, useTheme } from "@mui/material";
+import { Typography, useTheme, Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import Logo from "../../images/abrenWhite.png";
+
 
 const Login = () => {
   const theme = useTheme();
@@ -98,9 +100,12 @@ const Login = () => {
   return (
     <div
       style={{
-        backgroundColor: "#6791AF",
+        backgroundColor: "#1F2A40",
         height: "100vh",
         paddingTop: "20px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <div
@@ -118,7 +123,7 @@ const Login = () => {
       >
         <div className="col">
           <form onSubmit={handleSubmit}>
-            <Typography
+            {/* <Typography
               variant="h5"
               style={{
                 fontFamilyStyle,
@@ -127,14 +132,20 @@ const Login = () => {
               }}
             >
               Abren
-            </Typography>
+            </Typography> */}
+            <Box display="flex" justifyContent="center" alignItems="center">
+            <img alt="idk" width="100px" height="100px" src={Logo}></img>
+
+              </Box>
             <Typography
-              variant="h2"
+              variant="h4"
               style={{
-                color: colors.primary[500],
+              color: colors.primary[500],
+              display: 'flex',
+              justifyContent: 'center'
               }}
             >
-              Log In
+              Login
             </Typography>
             <div className="mb-1">
               <label htmlFor="username" className="form-label"></label>
@@ -158,7 +169,7 @@ const Login = () => {
               <label htmlFor="password" className="form-label"></label>
               <div className="input-group">
                 <input
-                  type={passwordVisible ? "text" : "password"}
+                  // type={passwordVisible ? "text" : "password"}
                   className={`form-control ${
                     errors.password ? "is-invalid" : ""
                   }`}
@@ -204,26 +215,32 @@ const Login = () => {
                 Remember Me
               </label>
             </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
             <button
               type="submit"
               className="btn btn-primary"
               style={{
                 backgroundColor: "#213D52",
-                width: "200px",
+                width: "230px",
                 paddingBottom: "5px",
-                marginBottom: "5px",
+                marginBottom: "2px",
+                marginTop: "15px"
+               
               }}
             >
               Log In
             </button>
+            </div>
           </form>
           <div style={{ marginTop: "10px", textAlign: "center" }}>
-            <p>
-              {/* <a href="/forgot-password" style={{ color: '#213D52' }}>Forgot Password</a> */}
-            </p>
+           
             <p
               style={{
                 color: colors.primary[500],
+                fontSize: '15px'
               }}
             >
               Don't have an account?{" "}

@@ -16,6 +16,8 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import { profile } from "../../data/mockData";
+import Logo from "../../images/abren2.png";
+
 
 // const user = {
 //   firstName: "John",
@@ -99,10 +101,8 @@ const Sidebar = () => {
                 {/* <Typography variant="h3" color={colors.grey[100]}>
                   ADMINIS
                 </Typography> */}
-                <img
-                alt="idk"
-                src={`abren2.png`}
-                ></img>
+                             <img alt="idk" width="80px" height="80px" src={Logo}></img>
+
               
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />

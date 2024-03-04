@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Box , Typography , useTheme} from "@mui/material";
+import Logo from "../../images/abrenWhite.png";
+import { tokens } from "../../theme";
+
 
 
 const Form = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
     //state variables(like firstNmae,lastNmae..) are initialized using the useState hook
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -66,7 +73,8 @@ const Form = () => {
   
 //rendering the form 
   return (
-    <div style={{ backgroundColor: '#6791AF', height: '150vh', paddingTop: '20px'}}>
+    <div style={{ backgroundColor: '#1F2A40', height: '150vh', paddingTop: '20px' , justifyContent: "center",
+  }}>
     <div className="container-sm shadow rounded "
      style={{ backgroundColor: '#ffffff',
      width: '450px' ,
@@ -85,8 +93,21 @@ const Form = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-             <h2 style={fontFamilyStyle}>Abren</h2>
-             <h2>Sign Up</h2>
+             <Box display="flex" justifyContent="center" alignItems="center">
+              <img alt="idk" width="100px" height="100px" src={Logo}></img>
+            </Box>
+             {/* <h2 style={fontFamilyStyle}>Abren</h2> */}
+             <Typography
+              variant="h4"
+              style={{
+              color: colors.primary[500],
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '10px'
+              }}
+            >
+              Sign Up
+            </Typography>            
             <div className='row'>
             <div className="mb-1 col">
               <label htmlFor="firstName" className="form-label"></label>
@@ -161,7 +182,7 @@ const Form = () => {
               />
               {errors.username && <div className="invalid-feedback">{errors.username}</div>}
             </div>
-            <div className="mb-1">
+            {/* <div className="mb-1">
               <label htmlFor="role" className="form-label"></label>
               <select
                 className="form-select"
@@ -176,7 +197,7 @@ const Form = () => {
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </select>
-            </div>
+            </div> */}
             <div className="mb-3">
               <label htmlFor="password" className="form-label"></label>
               <div className="input-group">
@@ -252,6 +273,9 @@ const Form = () => {
                 />
                 {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
               </div> */}
+              <div
+              style={{display: 'flex', justifyContent: 'center'}}
+              >
               <button type="submit" className="btn btn-primary"
               style={{
                 backgroundColor: '#213D52',
@@ -261,10 +285,13 @@ const Form = () => {
             
              }}
               >Sign Up</button>
+              </div>
+              <div style={{ marginTop: "10px", textAlign: "center" }}>
              <p>
               Already have an account?{' '}
               <a href="/" style={{ color: '#213D52' }}>Login</a>
             </p>
+            </div>
             </form>
             
           )}

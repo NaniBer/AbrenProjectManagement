@@ -13,6 +13,8 @@ import ProjectInfo from "../../scenes/projectManager/projectInfo";
 import Analytic from "../../scenes/projectManager/analytic";
 import ProjectAnalytic from "../../scenes/projectManager/projectAnalytic";
 import Report from "../../scenes/projectManager/report";
+import ProjectStatus from "../../scenes/projectManager/report/projectStatusReport";
+import ProjectHealth from "../../scenes/projectManager/report/projectHealthReport";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "../../theme";
 
@@ -39,6 +41,9 @@ function PmRoute() {
               <Route path="/projectInfo" element={<ProjectInfo/>}></Route>
               <Route path="/projectAnalytic" element={<ProjectAnalytic/>}></Route>
               <Route path="/report" element={<Report/>}></Route>
+              <Route path="/projectStatusReport" element={<ProjectStatus/>}></Route>
+              <Route path="/projectHealthReport" element={<ProjectHealth/>}></Route>
+
             </Routes>
 
             {/* <p>hello</p> */}
