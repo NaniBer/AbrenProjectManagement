@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../../images/abrenWhite.png";
 
-
 const Login = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -134,15 +133,14 @@ const Login = () => {
               Abren
             </Typography> */}
             <Box display="flex" justifyContent="center" alignItems="center">
-            <img alt="idk" width="100px" height="100px" src={Logo}></img>
-
-              </Box>
+              <img alt="idk" width="100px" height="100px" src={Logo}></img>
+            </Box>
             <Typography
               variant="h4"
               style={{
-              color: colors.primary[500],
-              display: 'flex',
-              justifyContent: 'center'
+                color: colors.primary[500],
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               Login
@@ -169,7 +167,7 @@ const Login = () => {
               <label htmlFor="password" className="form-label"></label>
               <div className="input-group">
                 <input
-                  // type={passwordVisible ? "text" : "password"}
+                  type={passwordVisible ? "text" : "password"}
                   className={`form-control ${
                     errors.password ? "is-invalid" : ""
                   }`}
@@ -215,32 +213,32 @@ const Login = () => {
                 Remember Me
               </label>
             </div>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center'
-            }}>
-            <button
-              type="submit"
-              className="btn btn-primary"
+            <div
               style={{
-                backgroundColor: "#213D52",
-                width: "230px",
-                paddingBottom: "5px",
-                marginBottom: "2px",
-                marginTop: "15px"
-               
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              Log In
-            </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{
+                  backgroundColor: "#213D52",
+                  width: "230px",
+                  paddingBottom: "5px",
+                  marginBottom: "2px",
+                  marginTop: "15px",
+                }}
+              >
+                Log In
+              </button>
             </div>
           </form>
           <div style={{ marginTop: "10px", textAlign: "center" }}>
-           
             <p
               style={{
                 color: colors.primary[500],
-                fontSize: '15px'
+                fontSize: "15px",
               }}
             >
               Don't have an account?{" "}
