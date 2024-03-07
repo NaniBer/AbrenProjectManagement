@@ -17,8 +17,9 @@ import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
 import { profile } from "../../data/mockData";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -28,7 +29,10 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       style={{
         color: colors.grey[100],
       }}
-      onClick={() => setSelected(title)}
+      onClick={() => {
+        setSelected(title);
+        if (onClick) onClick();
+      }}
       icon={icon}
     >
       <Typography>{title}</Typography>
@@ -50,7 +54,7 @@ const Sidebar = () => {
 
   // const initials = (user.firstName && user.lastName) ? `${user.firstName[0]}${user.lastName[0]}` : '';
   const initialsArray = profile.map((teamMember) => {
-    const initials = `${teamMember.firstname[0]}${teamMember.lastname[0]}`;
+    const initials = `${user.firstname[0]}${user.lastname[0]}`;
     return initials;
   });
   useEffect(() => {
@@ -62,6 +66,29 @@ const Sidebar = () => {
       });
     }
   }, [user]);
+  const handleProjectSelect = async (projectId) => {
+    console.log(projectId);
+    await fetch(`Users/getProject/${projectId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        const statusCode = response.status;
+        console.log(statusCode);
+        if (statusCode === 404) {
+          throw new Error("Project not found");
+        } else if (statusCode === 403) {
+          throw new Error("Unauthorized");
+        } else if (statusCode === 500) {
+          throw new Error("Failed to fetch project");
+        } else if (statusCode == 200) return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+  };
 
   return (
     <Box
@@ -203,6 +230,7 @@ const Sidebar = () => {
                   icon={<AccountTreeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  onClick={() => console.log("gii")}
                 />
                 {projects.map((project, index) => (
                   <Item
@@ -212,6 +240,7 @@ const Sidebar = () => {
                     icon={<AccountTreeOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
+                    onClick={() => handleProjectSelect(project._id)}
                   />
                 ))}
 

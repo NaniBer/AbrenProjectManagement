@@ -11,6 +11,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   IconButton,
+  InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -27,6 +28,8 @@ const Resource = () => {
   const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [cost, setCost] = useState("");
+  const [frequency, setFrequency] = useState(0);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedResources, setSubmittedResources] = useState([]);
 
@@ -37,14 +40,6 @@ const Resource = () => {
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
     setCategory(selectedCategory);
-
-    if (selectedCategory === "work") {
-      setCost("ETB 0.00/hr");
-    } else if (selectedCategory === "material" || selectedCategory === "cost") {
-      setCost("ETB 0.00");
-    } else {
-      setCost("");
-    }
   };
 
   const handleCostChange = (e) => {
@@ -60,7 +55,44 @@ const Resource = () => {
       category,
       quantity,
       cost,
+      frequency,
     };
+    let costCategory;
+
+    if (category === "Material") {
+      costCategory = "per Item";
+    } else if (category === "Work") {
+      costCategory = "per unit of time";
+    } else if (frequency === 0) {
+      costCategory = "one-time";
+    }
+    const backendResource = {
+      ResourceName: resourceName,
+      Category: category,
+      Quantity: quantity,
+      CostCategory: costCategory,
+      Cost: cost,
+      Frequency: frequency,
+    };
+
+    fetch("/Users/addResource", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(backendResource),
+    })
+      .then((response) => {
+        const statusCode = response.status;
+        if (statusCode === 201) {
+          //Todo list created successfully
+          return response.json();
+        } else {
+          console.log(statusCode);
+          throw new Error("Failed to create resouce");
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      });
 
     // Update the submitted resources list
     setSubmittedResources((prevResources) => [...prevResources, newResource]);
@@ -70,6 +102,7 @@ const Resource = () => {
     setCategory("");
     setQuantity(0);
     setCost("");
+    setFrequency(0);
 
     console.log(newResource);
 
@@ -85,6 +118,7 @@ const Resource = () => {
     setCategory(resource.category);
     setQuantity(resource.quantity);
     setCost(resource.cost);
+    setFrequency(resource.frequency);
 
     // Remove the selected resource from the submitted resources list
     setSubmittedResources((prevResources) => {
@@ -143,6 +177,10 @@ const Resource = () => {
             <Typography variant="h5" sx={{ mb: 2 }}>
               Add Resource
             </Typography>
+            <Typography sx={{ mb: 2 }}>
+              If the resource is not rented and is for one-time use, please
+              leave the frequency field empty
+            </Typography>
             <form onSubmit={handleSubmit}>
               <Box sx={{ mb: 2 }}>
                 <TextField
@@ -191,9 +229,8 @@ const Resource = () => {
                     },
                   }}
                 >
-                  <MenuItem value="work">Work</MenuItem>
-                  <MenuItem value="material">Material</MenuItem>
-                  <MenuItem value="cost">Cost</MenuItem>
+                  <MenuItem value="Work">Work</MenuItem>
+                  <MenuItem value="Material">Material</MenuItem>
                 </TextField>
               </Box>
 
@@ -201,6 +238,7 @@ const Resource = () => {
                 <TextField
                   id="quantity"
                   label="Quantity"
+                  helperText='If the resource type is set to "Work", the quantity represents the number of hours to be Work.'
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -221,15 +259,51 @@ const Resource = () => {
                   }}
                 />
               </Box>
-
               <Box sx={{ mb: 2 }}>
                 <TextField
                   id="cost"
                   label="Cost"
                   variant="outlined"
                   fullWidth
+                  type="number"
                   value={cost}
                   onChange={handleCostChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">ETB </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {category === "Work" ? "/hr" : null}
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                      {
+                        borderColor: "#868dfb",
+                      },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      "&.Mui-focused": {
+                        color: "#868dfb",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <TextField
+                  id="frequency"
+                  label="Frequency"
+                  variant="outlined"
+                  fullWidth
+                  helperText="If left at 0, it will be considered a one-time occurrence."
+                  type="number"
+                  value={frequency}
+                  onChange={(e) => setFrequency(Number(e.target.value))}
                   sx={{
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
