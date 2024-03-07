@@ -8,7 +8,7 @@ const Users = require("../Model/Users");
 router.post("/Login", async (req, res) => {
   try {
     const { username, password, type } = req.body;
-    console.log(username, password, type);
+
     if (type == "admin") {
       const admin = await Admin.findOne({ username });
       if (!admin) {
@@ -38,7 +38,7 @@ router.post("/Login", async (req, res) => {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       req.session.userId = user._id;
-      console.log(user);
+      // console.log(user);
 
       res.status(200).json({ user });
     }

@@ -76,20 +76,62 @@ UserRouter.get("/ProjectProgress/:ProjectName", async (req, res) => {
 
 UserRouter.post("/addTodolist", async (req, res) => {
   try {
-    const { TodoName, Date, TodoDescribtion, Status } = req.body;
+    const { TodoName, Date, Priority, Status } = req.body;
 
-    const loggedInUserId = req.session.UserId;
+    const loggedInUserId = req.session.userId;
 
     const todo = new Todo({
       TodoName,
       Date,
-      TodoDescribtion,
+      Priority,
       Status,
       UserId: loggedInUserId,
     });
-    await todo.save();
 
-    res.json({ success: true, todo });
+    await todo.save();
+    res.status(201).json({ success: true, todo });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+//View All Todo
+UserRouter.get("/view", async (req, res) => {
+  try {
+    const loggedInUserId = req.session.userId;
+
+    // Retrieve all todos where UserId matches the logged-in user's ID
+    const todos = await Todo.find({ UserId: loggedInUserId });
+
+    res.status(200).json({ success: true, todos });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete Todo
+UserRouter.delete("/delete/:taskId", async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    // Check if the todo exists
+    const todo = await Todo.findById(taskId);
+    if (!todo) {
+      return res.status(404).json({ success: false, error: "Todo not found" });
+    }
+
+    // Check if the todo belongs to the logged-in user
+    if (todo.UserId !== req.session.userId) {
+      return res.status(403).json({ success: false, error: "Unauthorized" });
+    }
+
+    // Delete the todo
+    await Todo.findByIdAndDelete(taskId);
+    res
+      .status(200)
+      .json({ success: true, message: "Todo deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -108,16 +150,16 @@ UserRouter.post("/addResource", async (req, res) => {
       CostCategory,
       Cost,
       Frequency,
-      TotalCost,
     } = req.body;
 
-    const validCategories = ["Material", "Work", "Cost"];
+    const validCategories = ["Material", "Work"];
     if (!validCategories.includes(Category)) {
       return res
         .status(400)
         .json({ success: false, error: "Invalid Category" });
     }
-    const validCostOptions = ["per Hour", "per Person"];
+    console.log(CostCategory);
+    const validCostOptions = ["per unit of time", "per Item", "one-time"];
     if (!validCostOptions.includes(CostCategory)) {
       return res.status(400).json({ success: false, error: "Invalid Cost" });
     }
@@ -130,12 +172,18 @@ UserRouter.post("/addResource", async (req, res) => {
       CostCategory,
       Cost,
       Frequency,
-      TotalCost,
     });
+    if (resource.Frequency == 0) {
+      resource.TotalCost = resource.Quantity * resource.Cost;
+    } else {
+      resource.TotalCost =
+        resource.Quantity * resource.Cost * resource.Frequency;
+    }
+    console.log(resource);
 
-    await resource.save();
+    // await resource.save();
 
-    res.json({ success: true, resource });
+    res.status(201).json({ success: true, resource });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -231,7 +279,6 @@ UserRouter.delete("/deleteResource/:ResourceName", async (req, res) => {
 
 //Get all involved Projects
 UserRouter.post("/getProjects", async (req, res) => {
-  console.log(req.body.id);
   try {
     const projectList = await Projects.find({
       ProjectManager: req.body.id,
@@ -241,6 +288,29 @@ UserRouter.post("/getProjects", async (req, res) => {
   } catch (err) {
     console.error("Error retrieving Admin list:", err);
     res.status(500).json({ message: "Error rerieving admin list" });
+  }
+});
+
+// Get information of the project
+UserRouter.get("/getProject/:projectId", async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
+    console.log(projectId);
+    const project = await Projects.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Check if the logged-in user is authorized to view this project
+    if (project.ProjectManager !== req.session.userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    console.log(project);
+    res.status(200).json("hi");
+  } catch (err) {
+    console.error("Error retrieving project:", err);
+    res.status(500).json({ message: "Error retrieving project" });
   }
 });
 
