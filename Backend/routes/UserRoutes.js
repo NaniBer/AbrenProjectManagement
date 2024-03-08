@@ -1,4 +1,6 @@
 const express = require("express");
+const mongoose = require("mongoose");
+
 const UserRouter = express.Router();
 // const BudgetPlan = require('../Model/BudgetPlan');
 const Milestones = require("../Model/Milestones");
@@ -152,13 +154,21 @@ UserRouter.post("/addResource", async (req, res) => {
       Frequency,
     } = req.body;
 
+    // Check if the project exists
+    const project = await Projects.findById(projectId);
+    if (!project) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Project not found" });
+    }
+
     const validCategories = ["Material", "Work"];
     if (!validCategories.includes(Category)) {
       return res
         .status(400)
         .json({ success: false, error: "Invalid Category" });
     }
-    console.log(CostCategory);
+
     const validCostOptions = ["per unit of time", "per Item", "one-time"];
     if (!validCostOptions.includes(CostCategory)) {
       return res.status(400).json({ success: false, error: "Invalid Cost" });
@@ -173,15 +183,17 @@ UserRouter.post("/addResource", async (req, res) => {
       Cost,
       Frequency,
     });
-    if (resource.Frequency == 0) {
+
+    if (resource.Frequency === 0) {
       resource.TotalCost = resource.Quantity * resource.Cost;
     } else {
       resource.TotalCost =
         resource.Quantity * resource.Cost * resource.Frequency;
     }
+
     console.log(resource);
 
-    // await resource.save();
+    await resource.save();
 
     res.status(201).json({ success: true, resource });
   } catch (error) {
@@ -191,32 +203,54 @@ UserRouter.post("/addResource", async (req, res) => {
 });
 
 //Update resource
-UserRouter.put("/updateResource/:ResourceName", async (req, res) => {
+UserRouter.put("/updateResource/:id", async (req, res) => {
   try {
-    const { ResourceName } = req.params;
-    const { Category, Quantity, CostCategory, Cost, Frequency, TotalCost } =
+    const resourceId = req.params.id;
+    if (!resourceId) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid resource ID" });
+    }
+
+    const { ResourceName, Category, Quantity, CostCategory, Cost, Frequency } =
       req.body;
 
-    const existingResource = await Resource.findOne({
-      ResourceName: ResourceName,
-    });
+    const existingResource = await Resource.findById(resourceId);
 
     if (!existingResource) {
       return res
         .status(404)
         .json({ success: false, error: "Resource not found" });
     }
-    existingResource.Category = Category || existingResource.Category;
-    existingResource.Quantity = Quantity || existingResource.Quantity;
-    existingResource.CostCategory =
-      CostCategory || existingResource.CostCategory;
-    existingResource.Cost = Cost || existingResource.Cost;
-    existingResource.Frequency = Frequency || existingResource.Frequency;
-    existingResource.TotalCost = TotalCost || existingResource.TotalCost;
+
+    existingResource.ResourceName = ResourceName;
+    existingResource.Category = Category;
+    existingResource.Quantity = Quantity;
+    existingResource.CostCategory = CostCategory;
+    existingResource.Cost = Cost;
+    existingResource.Frequency = Frequency;
+
+    // Calculate TotalCost based on Frequency
+    if (Frequency === 0) {
+      existingResource.TotalCost = Quantity * Cost;
+    } else {
+      existingResource.TotalCost = Quantity * Cost * Frequency;
+    }
 
     await existingResource.save();
-
-    res.json({ success: true, updatedResource: existingResource });
+    console.log("Resource Edited");
+    res.status(200).json({ success: true, updatedResource: existingResource });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+//Test route
+UserRouter.get("/project/:id", async (req, res) => {
+  try {
+    const resources = await Resource.find({ projectId: req.params.id });
+    console.log(resources);
+    res.json(resources);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -246,21 +280,18 @@ UserRouter.put("deleteResource/:ResourceName", async (req, res) => {
   }
 });
 //Delete a certain Resource
-
-UserRouter.delete("/deleteResource/:ResourceName", async (req, res) => {
+UserRouter.delete("/deleteResource/:id", async (req, res) => {
   try {
-    const { ResourceName } = req.params;
-    const filter = { ResourceName };
-
-    const result = await Resource.deleteOne(filter);
+    const resourceId = req.params.id;
+    const result = await Resource.deleteOne({ _id: resourceId });
 
     if (result.deletedCount === 0) {
       return res.status(404).json({
         success: false,
-        error: "No record found for the given attribute",
+        error: "No record found for the given ID",
       });
     }
-
+    console.log("Deleted resource");
     res.json({ success: true, deletedCount: result.deletedCount });
   } catch (error) {
     console.error(error);
@@ -292,22 +323,47 @@ UserRouter.post("/getProjects", async (req, res) => {
 });
 
 // Get information of the project
-UserRouter.get("/getProject/:projectId", async (req, res) => {
+UserRouter.post("/getProject/:projectId", async (req, res) => {
   try {
     const projectId = req.params.projectId;
-    console.log(projectId);
-    const project = await Projects.findById(projectId);
+    const objectId = new mongoose.Types.ObjectId(projectId);
+    const project = await Projects.aggregate([
+      { $match: { _id: objectId } },
+      {
+        $lookup: {
+          from: "Milestones", // Name of the Milestones collection
+          localField: "_id",
+          foreignField: "projectId",
+          as: "milestones",
+        },
+      },
+      {
+        $lookup: {
+          from: "resources",
+          localField: "_id",
+          foreignField: "projectId",
+          as: "resources",
+        },
+      },
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "_id",
+          foreignField: "projectId",
+          as: "tasks",
+        },
+      },
+    ]);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-
     // Check if the logged-in user is authorized to view this project
-    if (project.ProjectManager !== req.session.userId) {
+    if (project[0].ProjectManager.toString() !== req.session.userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
-    console.log(project);
-    res.status(200).json("hi");
+
+    res.status(200).json(project[0]);
   } catch (err) {
     console.error("Error retrieving project:", err);
     res.status(500).json({ message: "Error retrieving project" });

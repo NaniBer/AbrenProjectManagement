@@ -17,5 +17,11 @@
   "bugs": {
     "url": "https://github.com/NaniBer/AbrenProjectManagement/issues"
   },
-  "homepage": "https://github.com/NaniBer/AbrenProjectManagement#readme"
+  "homepage": "https://github.com/NaniBer/AbrenProjectManagement#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0",
+    "mongoose": "^8.2.1"
+  }
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminPage from "./pages/adminpage";
+import AdminPage from "./pages/adminPage";
 import PmRoute from "./pages/ProjectManagerRoute";
 import Form from "./scenes/form/form";
 import Login from "./scenes/form/login";
@@ -10,7 +10,9 @@ import Login from "./scenes/form/login";
 function App() {
   return (
     <Routes>
-      {/* <Route path="/*" element={<PmRoute />} /> */}
+      <Route path="/*" element={<AdminPage />} />
+
+      <Route path="/pm/*" element={<PmRoute />} />
 
       <Route path="/login" element={<Login />} />
 

@@ -15,24 +15,35 @@ app.use(
   session({
     secret: "your-secret-key",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 30 * 60 * 1000, // Session expiration time in milliseconds
+      // secure: true,
+      // sameSite: 'none',
+    },
   })
 );
-// app.use("/auth", )
+app.use((req, res, next) => {
+  if (req.session && req.session.userId) {
+    // Check session expiration time
+    const currentTime = new Date().getTime();
+    const sessionExpirationTime =
+      req.session.cookie.maxAge + req.session.cookie.expires.getTime();
+    if (currentTime > sessionExpirationTime) {
+      // Session has expired, destroy session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error destroying expired session:", err);
+        }
+      });
+    }
+  }
+  next();
+});
+
 app.use("/admin", AdminRoutes);
 app.use("/Users", UserRoutes);
 app.use("/auth", AuthRoutes);
-
-// mongoose
-//   .connect(DB_CONNECTION)
-//   .then(() => {
-//     console.log("Connected to MongoDB");
-//     // Continue with your code here
-//   })
-//   .catch((error) => {
-//     console.error("Error connecting to MongoDB:", error);
-//   });
-//establish the connection
 
 mongoose
   .connect(url)

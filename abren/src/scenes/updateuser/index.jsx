@@ -17,20 +17,6 @@ const Form = () => {
     password: "",
   });
 
-  // Simulate fetching user data and pre-fill the form fields
-  useEffect(() => {
-    // Dummy data to pre-fill the form fields
-    const dummyData = {
-      firstName: "John",
-      lastName: "Doe",
-      email: "johndoe@example.com",
-      username: "johndoe123",
-      password: "password123",
-    };
-
-    setFormData(dummyData);
-  }, []);
-
   const handleFormSubmit = (values) => {
     console.log(values);
   };
@@ -50,7 +36,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="CREATE USER" subtitle="Create a New User Profile" />
+      <Header title="CREATEE USER" subtitle="Create a New User Profile" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -78,7 +64,20 @@ const Form = () => {
                 name="firstName"
                 error={!!touched.firstName && !!errors.firstName}
                 helperText={touched.firstName && errors.firstName}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#868dfb",
+                    },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    "&.Mui-focused": {
+                      color: "#868dfb",
+                    },
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -91,7 +90,20 @@ const Form = () => {
                 name="lastName"
                 error={!!touched.lastName && !!errors.lastName}
                 helperText={touched.lastName && errors.lastName}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#868dfb",
+                    },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    "&.Mui-focused": {
+                      color: "#868dfb",
+                    },
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -104,7 +116,20 @@ const Form = () => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 4" }}
+                sx={{
+                  gridColumn: "span 4",
+                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#868dfb",
+                    },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    "&.Mui-focused": {
+                      color: "#868dfb",
+                    },
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -117,7 +142,20 @@ const Form = () => {
                 name="username"
                 error={!!touched.username && !!errors.username}
                 helperText={touched.username && errors.username}
-                sx={{ gridColumn: "span 4" }}
+                sx={{
+                  gridColumn: "span 4",
+                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#868dfb",
+                    },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    "&.Mui-focused": {
+                      color: "#868dfb",
+                    },
+                  },
+                }}
               />
               <TextField
                 fullWidth
@@ -130,7 +168,20 @@ const Form = () => {
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 4" }}
+                sx={{
+                  gridColumn: "span 4",
+                  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#868dfb",
+                    },
+                }}
+                InputLabelProps={{
+                  sx: {
+                    "&.Mui-focused": {
+                      color: "#868dfb",
+                    },
+                  },
+                }}
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
@@ -149,13 +200,26 @@ const Form = () => {
     </Box>
   );
 };
-
 const checkoutSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  CreatedBy: yup.string().required("required"),
+  username: yup.string().required("required"),
+  email: yup
+    .string()
+    .email("Invalid email")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "Email must be in a valid format"
+    )
+    .required("Email is required"),
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*[0-9])(?=.*[!@#$%^&*]).*$/,
+      "Password must contain at least one number and one special character"
+    )
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
 });
 
 export default Form;

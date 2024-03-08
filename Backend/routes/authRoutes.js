@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const bcrypt = require("bcrypt");
 const Admin = require("../Model/admin");
 const Projects = require("../Model/Projects");
@@ -38,7 +39,6 @@ router.post("/Login", async (req, res) => {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       req.session.userId = user._id;
-      // console.log(user);
 
       res.status(200).json({ user });
     }

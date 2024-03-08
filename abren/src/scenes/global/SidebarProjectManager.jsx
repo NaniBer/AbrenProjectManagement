@@ -16,9 +16,9 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
 import { profile } from "../../data/mockData";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-
+import Logo from "../../images/abren2.png";
+import { useSelector, useDispatch } from "react-redux";
+import { loadProject } from "../../Actions/projectActions";
 const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -31,7 +31,9 @@ const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
       }}
       onClick={() => {
         setSelected(title);
-        if (onClick) onClick();
+        if (onClick) {
+          onClick();
+        }
       }}
       icon={icon}
     >
@@ -44,6 +46,7 @@ const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const dispatch = useDispatch();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
@@ -68,8 +71,8 @@ const Sidebar = () => {
   }, [user]);
   const handleProjectSelect = async (projectId) => {
     console.log(projectId);
-    await fetch(`Users/getProject/${projectId}`, {
-      method: "GET",
+    await fetch(`/Users/getProject/${projectId}`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -86,6 +89,7 @@ const Sidebar = () => {
         } else if (statusCode == 200) return response.json();
       })
       .then((data) => {
+        dispatch(loadProject(data));
         console.log(data);
       });
   };
@@ -147,7 +151,7 @@ const Sidebar = () => {
                     {/* <Typography variant="h3" color={colors.grey[100]}>
                   ADMINIS
                 </Typography> */}
-                    <img alt="idk" src={`abren2.png`}></img>
+                    <img alt="idk" width="80px" height="80px" src={Logo}></img>
 
                     <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                       <MenuOutlinedIcon />
@@ -167,7 +171,7 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`./images/abren`}
+                  src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
                     <div
@@ -230,11 +234,11 @@ const Sidebar = () => {
                   icon={<AccountTreeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
-                  onClick={() => console.log("gii")}
+                  onClick={() => console.log("hii")}
                 />
                 {projects.map((project, index) => (
                   <Item
-                    // key={index}
+                    key={index}
                     title={project.ProjectName}
                     to="/pm/project"
                     icon={<AccountTreeOutlinedIcon />}
