@@ -12,14 +12,19 @@ import {
   AccordionDetails,
   IconButton,
   Grid,
-  } from "@mui/material";
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import * as yup from "yup"; // Import yup for validation
 import { tokens } from "../../../theme";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addMilestone,
+  editMilestone,
+  deleteMilestone,
+} from "../../../Actions/projectActions";
 import Header from "../../../components/Header";
 
 const MAX_DESCRIPTION_LENGTH = 100;
@@ -55,7 +60,8 @@ const Milestone = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const project = useSelector((state) => state.project.project);
-  console.log(project);
+  console.log(project.resources);
+  const dispatch = useDispatch();
 
   const [milestoneName, setMilestoneName] = useState("");
   const [description, setDescription] = useState("");
@@ -71,9 +77,10 @@ const Milestone = () => {
   const [errors, setErrors] = useState({}); // State variable to hold validation errors
 
   useEffect(() => {
-    if (project && project.Resources) {
-      const resources = Object.keys(project.Resources);
-      console.log(resources);
+    if (project && project.resources) {
+      const resources = project.resources;
+      // const resourceNames = resources.map((resource) => resource.ResourceName);
+      // console.log(resourceNames);
       setProjectResources(resources);
     }
   }, [project]);
@@ -215,13 +222,9 @@ const Milestone = () => {
 
   return (
     <Box m="20px">
-       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-      <Header title="Milestone" subtitle="Manages the milestones we have" />
-     
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="Milestone" subtitle="Manages the milestones we have" />
+
         <Button
           startIcon={<AddIcon />}
           sx={{
@@ -251,238 +254,245 @@ const Milestone = () => {
               maxWidth: 700,
               width: "100%",
               outline: "none",
-              height: '80%',
-              overflow: 'auto',
+              height: "80%",
+              overflow: "auto",
             }}
           >
             <Typography variant="h5" sx={{ mb: 2 }}>
               Add Milestone
             </Typography>
             <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="milestoneName"
-                  label="Milestone Name"
-                  variant="outlined"
-                  fullWidth
-                  value={milestoneName}
-                  onChange={handleMilestoneNameChange}
-                  error={!!errors.milestoneName} // Set error prop based on whether there's an error for this field
-                  helperText={errors.milestoneName} // Display error message for this field
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                />
-              </Box>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="milestoneName"
+                      label="Milestone Name"
+                      variant="outlined"
+                      fullWidth
+                      value={milestoneName}
+                      onChange={handleMilestoneNameChange}
+                      error={!!errors.milestoneName} // Set error prop based on whether there's an error for this field
+                      helperText={errors.milestoneName} // Display error message for this field
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
 
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="milestoneDescription"
-                  label="Milestone Description"
-                  variant="outlined"
-                  multiline
-                  rows={4.5}
-                  fullWidth
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  error={!!errors.description}
-                  helperText={errors.description}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                />
-              </Box>
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="status"
-                  select
-                  label="Status"
-                  variant="outlined"
-                  fullWidth
-                  value={status}
-                  onChange={handleStatusChange}
-                  error={!!errors.status}
-                  helperText={errors.status}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem value="Not Started">Not Started</MenuItem>
-                  <MenuItem value="In Progress">In Progress</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
-                </TextField>
-              </Box>
-             </Grid>
-             <Grid item xs={6}>
-
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="priority"
-                  select
-                  label="Priority"
-                  variant="outlined"
-                  fullWidth
-                  value={priority}
-                  onChange={handlePriorityChange}
-                  error={!!errors.priority}
-                  helperText={errors.priority}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem value="High">High</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="Low">Low</MenuItem>
-                </TextField>
-              </Box>
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="allocatedBudget"
-                  label="Allocated Budget"
-                  variant="outlined"
-                  fullWidth
-                  value={budget}
-                  onChange={handleBudgetChange}
-                  error={!!errors.budget}
-                  helperText={errors.budget}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                  
-                />
-              </Box>
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="resource"
-                  select
-                  label="Resource"
-                  variant="outlined"
-                  fullWidth
-                  value={resources}
-                  onChange={handleResourceChange}
-                  // error={!!errors.resources}
-                  // helperText={errors.resources}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                >
-                  {projectResources.map((resource) => (
-                    <MenuItem key={resource} value={resource}>
-                      {resource}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Box>
-              
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  id="resourceQuantity"
-                  label="Resource Quantity"
-                  variant="outlined"
-                  fullWidth
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  error={!!errors.quantity}
-                  helperText={errors.quantity}
-                  sx={{
-                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor:'#868dfb',
-                    },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                    sx: {
-                      '&.Mui-focused': {
-                        color:'#868dfb',
-                      },
-                    },
-                  }}
-                />
-              </Box>
-              </Grid>
-              <Grid item xs={12}>
-
-             <Box display="flex" justifyContent="space-between">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    startIcon={<AddIcon />}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </Button>
-                </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="milestoneDescription"
+                      label="Milestone Description"
+                      variant="outlined"
+                      multiline
+                      rows={4.5}
+                      fullWidth
+                      value={description}
+                      onChange={handleDescriptionChange}
+                      error={!!errors.description}
+                      helperText={errors.description}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="status"
+                      select
+                      label="Status"
+                      variant="outlined"
+                      fullWidth
+                      value={status}
+                      onChange={handleStatusChange}
+                      error={!!errors.status}
+                      helperText={errors.status}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="Not Started">Not Started</MenuItem>
+                      <MenuItem value="In Progress">In Progress</MenuItem>
+                      <MenuItem value="Completed">Completed</MenuItem>
+                    </TextField>
+                  </Box>
                 </Grid>
-            </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="priority"
+                      select
+                      label="Priority"
+                      variant="outlined"
+                      fullWidth
+                      value={priority}
+                      onChange={handlePriorityChange}
+                      error={!!errors.priority}
+                      helperText={errors.priority}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="High">High</MenuItem>
+                      <MenuItem value="Medium">Medium</MenuItem>
+                      <MenuItem value="Low">Low</MenuItem>
+                    </TextField>
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="allocatedBudget"
+                      label="Allocated Budget"
+                      variant="outlined"
+                      fullWidth
+                      value={budget}
+                      onChange={handleBudgetChange}
+                      error={!!errors.budget}
+                      helperText={errors.budget}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="resource"
+                      select
+                      label="Resource"
+                      variant="outlined"
+                      fullWidth
+                      value={resources}
+                      onChange={handleResourceChange}
+                      // error={!!errors.resources}
+                      // helperText={errors.resources}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    >
+                      {projectResources.map((resource) => (
+                        <MenuItem
+                          key={resource._id}
+                          value={resource.ResourceName}
+                        >
+                          {resource.ResourceName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <TextField
+                      id="resourceQuantity"
+                      label="Resource Quantity"
+                      variant="outlined"
+                      fullWidth
+                      value={quantity}
+                      onChange={handleQuantityChange}
+                      error={!!errors.quantity}
+                      helperText={errors.quantity}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    />
+                  </Box>
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display="flex" justifyContent="space-between">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      startIcon={<AddIcon />}
+                    >
+                      Add
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
             </form>
           </Box>
         </Modal>
@@ -537,16 +547,16 @@ const Milestone = () => {
                     color={colors.greenAccent[400]}
                     sx={{
                       mt: 1,
-                      wordWrap: 'break-word',
-                      overflowWrap: 'break-word',
-                      hyphens: 'auto',
-                      maxHeight: '4.5em',
-                      display: '-webkit-box',
+                      wordWrap: "break-word",
+                      overflowWrap: "break-word",
+                      hyphens: "auto",
+                      maxHeight: "4.5em",
+                      display: "-webkit-box",
                       WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
+                      WebkitBoxOrient: "vertical",
                     }}
                   >
-                      {truncateDescription(milestone.description)}
+                    {truncateDescription(milestone.description)}
                   </Typography>
                 </Typography>
                 <Typography variant="body1" gutterBottom>

@@ -19,3 +19,15 @@ export const deleteResource = (id) => ({
   type: "DELETE_RESOURCE",
   payload: id,
 });
+export const addMilestone = (newMilestone) => ({
+  type: "ADD_MILESTONE",
+  payload: newMilestone,
+});
+export const deleteMilestone = (id) => ({
+  type: "DELETE_MILESTONE",
+  payload: id,
+});
+export const editMilestone = (updatedMilestone) => ({
+  type: "EDIT_RESOURCE",
+  payload: updatedMilestone,
+});
