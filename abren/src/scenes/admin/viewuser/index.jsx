@@ -32,7 +32,7 @@ const Team = () => {
       if (row.id === rowId) {
         return {
           ...row,
-          status: row.status === "inactive" ? "active" : "inactive",
+          status: row.status === "Inactive" ? "Active" : "Inactive",
         };
       }
       return row;
@@ -102,12 +102,6 @@ const Team = () => {
       flex: 1.5,
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      flex: 1,
-      cellClassName: 'name-column--cell',
-    },
-    {
       field: 'actions',
       headerName: 'Actions',
       flex: 1,
@@ -118,9 +112,15 @@ const Team = () => {
           onClick={() => handleDisable(row.id)}
           disabled={false}
         >
-          {row.status === 'active' ? 'Disable' : 'Enable'}
+          {row.status === 'Active' ? 'Disable' : 'Enable'}
         </Button>
       ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 1,
+      cellClassName: 'name-column--cell',
     },
     {
       field: 'update',
@@ -163,6 +163,7 @@ const Team = () => {
         },
         "& .MuiCheckbox-root": {
           color: `${colors.greenAccent[200]} !important`,
+          borderRadius: '90%', // Make the checkboxes round
         },
       }}
       >

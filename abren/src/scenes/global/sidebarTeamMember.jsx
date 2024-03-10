@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
-// import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import AddCardIcon from "@mui/icons-material/AddCard";
-// import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-// import LogoutIcon from "@mui/icons-material/Logout";
-import ViewListIcon from "@mui/icons-material/ViewList";
-import ViewCompactIcon from "@mui/icons-material/ViewCompact";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+// import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import { profile } from "../../data/mockData";
 import Logo from "../../images/abren2.png";
-// import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-// import { logoutSucess } from "../../Actions/authActions";
 
+
+// const user = {
+//   firstName: "John",
+//   lastName: "Doe"
+// };
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -36,28 +36,17 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const SidebarAdmin = () => {
+const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-//   const handleLogout = () => {
-//     console.log("logout");
-//     fetch("/admin/Logout", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//     }).then((response) => {
-//       const statusCode = response.status;
-//       if (statusCode == 200) {
-//         dispatch(logoutSucess());
-//         navigate("/login");
-//       }
-//     });
-//   };
-
+  // const initials = (user.firstName && user.lastName) ? `${user.firstName[0]}${user.lastName[0]}` : '';
+  const initialsArray = profile.map((teamMember) => {
+    const initials = `${teamMember.firstname[0]}${teamMember.lastname[0]}`;
+    return initials;
+  });
   return (
     <Box
       sx={{
@@ -78,14 +67,14 @@ const SidebarAdmin = () => {
         },
       }}
     >
-              <Box
+         <Box
         sx={{
         height: "100vh",
         display: "flex",
         flexDirection: "column",
       }}
     >
-    <div style={{ borderRadius: '20px', overflow: 'hidden', marginLeft: '10px' , marginTop : '10px', flex: "1"}}>
+      <div style={{ borderRadius: '20px', overflow: 'hidden', marginLeft: '10px' , marginTop : '10px', flex: "1"}}>
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -107,8 +96,9 @@ const SidebarAdmin = () => {
                 {/* <Typography variant="h3" color={colors.grey[100]}>
                   ADMINIS
                 </Typography> */}
-                <img alt="idk" width="80px" height="80px" src={Logo}></img>
+                             <img alt="idk" width="80px" height="80px" src={Logo}></img>
 
+              
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
@@ -119,13 +109,27 @@ const SidebarAdmin = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
+              {/* <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
                   src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                /> */}
+                 <div
+          style={{
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          backgroundColor: "lightgray",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer"
+        }}
+      >
+        <span style={{ fontSize: "40px", fontWeight: "bold" ,color: colors.primary[110]}}>{initialsArray}</span>
+      </div>
               </Box>
               <Box textAlign="center">
                 <Typography
@@ -137,20 +141,24 @@ const SidebarAdmin = () => {
                   John Doe
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  System Admin
+                  Team Member
                 </Typography>
               </Box>
             </Box>
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            {/* <Item
+            <Item
               title="Dashboard"
-              to="/"
+              to="/dashboardTeamMember"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
+
+          
+           
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -158,65 +166,65 @@ const SidebarAdmin = () => {
             >
               Project
             </Typography>
-            <Item
-              title="Create Project"
-              to="/createproject"
-              icon={<AddCardIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="View Project"
-              to="/viewproject"
-              icon={<ViewCompactIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              User
-            </Typography>
             <Item
-              title="Create User"
-              to="/createteamaccount"
-              icon={<PersonAddIcon />}
+              title="View Assigned Project"
+              to="/viewAssignedProject"
+              icon={<AccountTreeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="View User"
-              to="/viewuser"
-              icon={<ViewListIcon />}
+              title="View Assigned Task"
+              to="/viewAssignedTask"
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-
+              {/* <Item
+              title="Task Progress"
+              to="/updateProgressTask"
+              icon={<DonutLargeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            /> */}
+                <Item
+              title="Kanban"
+              to="/kanban"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+  
             {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Account
-            </Typography> */}
-            {/* <Item
-              title="Update and Reset"
-              to="/updateandreset"
-              icon={<RestartAltIcon />}
+              Charts
+            </Typography>
+            <Item
+              title="Bar Chart"
+              to="/bar"
+              icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
-            <div >
-              {/* <Item
-                title="Log Out"
-                icon={<LogoutIcon />}
-                // selected={selected}
-                setSelected={setSelected}
-              /> */}
-            </div>
+            />
+            <Item
+              title="Pie Chart"
+              to="/pie"
+              icon={<PieChartOutlineOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Line Chart"
+              to="/line"
+              icon={<TimelineOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+        */}
           </Box>
         </Menu>
       </ProSidebar>
@@ -226,4 +234,4 @@ const SidebarAdmin = () => {
   );
 };
 
-export default SidebarAdmin;
+export default Sidebar;
