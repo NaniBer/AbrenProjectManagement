@@ -10,10 +10,8 @@ import {
   useTheme,
 } from '@mui/material';
 import { tokens } from '../../../theme';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import ExpandMore icon
-import { PieChart, Pie, Tooltip, Legend } from 'recharts'; // Import Recharts components
-import { BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
-
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 const Resource = () => {
   const theme = useTheme();
@@ -52,11 +50,70 @@ const Resource = () => {
 
   // Dummy data for budget performance
   const budgetPerformanceData = [
-    { category: 'Labor', plannedAmount: 50000, actualAmount: 52000, costOverrun: 2000 },
-    { category: 'Materials', plannedAmount: 20000, actualAmount: 25000, costOverrun: 5000 },
+    { category: 'Work', plannedAmount: 50000, actualAmount: 52000, costOverrun: 2000 },
+    { category: 'Material', plannedAmount: 20000, actualAmount: 25000, costOverrun: 5000 },
     { category: 'Equipment', plannedAmount: 10000, actualAmount: 11000, costOverrun: 1000 },
     { category: 'Miscellaneous', plannedAmount: 5000, actualAmount: 6000, costOverrun: 1000 },
   ];
+
+  // Dummy project resource data
+  const projectResources = [
+    {
+      resourceName: 'Software Developer',
+      category: 'Work',
+      cost: 5000, // per month
+      quantity: 3,
+    },
+    {
+      resourceName: 'Graphic Designer',
+      category: 'Material',
+      cost: 4000, // per month
+      quantity: 2,
+    },
+    {
+      resourceName: 'Server Hosting',
+      category: 'Cost',
+      cost: 1000, // per month
+      quantity: 2,
+    },
+    {
+      resourceName: 'Software Licenses',
+      category: 'Material',
+      cost: 2000, // per year
+      quantity: 1,
+    },
+  ];
+
+  // Aggregate the resources by category and calculate total cost
+  const resourceCategories = {};
+  projectResources.forEach(resource => {
+    const { category, cost, quantity } = resource;
+    if (!resourceCategories[category]) {
+      resourceCategories[category] = 0;
+    }
+    resourceCategories[category] += cost * quantity;
+  });
+
+  // Map categories to respective colors
+  const categoryColors = {
+    Work: colors.blueAccent[400],
+    Material: colors.greenAccent[400],
+    Cost: colors.redAccent[400],
+  };
+
+  // Convert aggregated data to array
+  const adjustedResourceData = Object.entries(resourceCategories).map(([category, cost]) => ({
+    category,
+    cost,
+    fill: categoryColors[category],
+  }));
+
+  // Adjusting legend items to match the correct categories
+  const legendItems = Object.keys(categoryColors).map(category => ({
+    value: category,
+    type: 'square',
+    color: categoryColors[category],
+  }));
 
   return (
     <Accordion sx={{ backgroundColor: colors.primary[400], borderRadius: '15px', marginTop: '40px' }}>
@@ -113,25 +170,20 @@ const Resource = () => {
                 </Typography>
 
                 {/* Display Schedule Performance */}
-                {/* <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Schedule Performance</Typography> */}
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
                       <CardContent>
                         <Typography variant="h6" sx={{ mb: 2 }}>Schedule Performance</Typography>
-                        <PieChart width={400} height={300}>
-                  <Pie
-                    dataKey="value"
-                    data={schedulePerformanceData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    label
-                  />
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
+                        <BarChart width={400} height={300} data={schedulePerformanceData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="milestone" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="actualDate" fill={colors.blueAccent[400]} name="Actual Date" />
+                          <Bar dataKey="plannedDate" fill={colors.greenAccent[400]} name="Planned Date" />
+                        </BarChart>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -140,7 +192,6 @@ const Resource = () => {
                     <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
                       <CardContent>
                         <Typography variant="h6" sx={{ mb: 2 }}>Budget Performance</Typography>
-                        {/* <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Budget Performance</Typography> */}
                         <BarChart width={400} height={300} data={budgetPerformanceData}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="category" />
@@ -155,6 +206,22 @@ const Resource = () => {
                     </Card>
                   </Grid>
                 </Grid>
+
+                {/* Display Resource Management */}
+                <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Resource Management</Typography>
+                <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Resource Cost by Category</Typography>
+                    <BarChart width={400} height={300} data={adjustedResourceData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="category" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend payload={legendItems} />
+                      <Bar dataKey="cost" fill={colors.blueAccent[400]} />
+                    </BarChart>
+                  </CardContent>
+                </Card>
               </CardContent>
             </AccordionDetails>
           </Accordion>

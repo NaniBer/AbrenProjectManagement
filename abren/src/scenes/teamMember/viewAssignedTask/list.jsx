@@ -6,26 +6,27 @@ import CheckIcon from '@mui/icons-material/Check';
 import { tokens } from '../../../theme';
 import { Box, Button, useTheme, Modal, Typography, Checkbox } from '@mui/material';
 import swal from 'sweetalert';
+import { assignedTask } from '../../../data/mockData';
 
 function TaskList() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const dummyTaskData = {
-    name: 'Task 1',
-    startDate: '2024-03-09',
-    endDate: '2024-03-12',
-    project: 'Project X',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
-    subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
-  };
+  // const assignedTask = {
+  //   name: 'Task 1',
+  //   startDate: '2024-03-09',
+  //   endDate: '2024-03-12',
+  //   project: 'Project X',
+  //   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
+  //   subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+  // };
 
   const [showRecent, setShowRecent] = useState(false);
   const [showToday, setShowToday] = useState(false);
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [subtaskChecked, setSubtaskChecked] = useState(Array(dummyTaskData.subtasks?.length ?? 0).fill(false));
+  const [subtaskChecked, setSubtaskChecked] = useState(Array(assignedTask.subtasks?.length ?? 0).fill(false));
 
   useEffect(() => {
     // Calculate categories based on dates
@@ -343,19 +344,19 @@ function TaskList() {
     {selectedRowData && (
       <>
         <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Task Name: </Typography>{dummyTaskData.name}
+          <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Task Name: </Typography>{assignedTask.name}
         </Typography>
         <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
           <AccessTimeIcon color="secondary" />
-          <Typography variant="body1" component="span" sx={{ color: colors.greenAccent[400], paddingLeft: '10px' }}>{calculateDueDate(dummyTaskData.startDate, dummyTaskData.endDate)}</Typography>
+          <Typography variant="body1" component="span" sx={{ color: colors.greenAccent[400], paddingLeft: '10px' }}>{calculateDueDate(assignedTask.startDate, assignedTask.endDate)}</Typography>
         </Typography>
         <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}> Description:</Typography> {dummyTaskData.description}
+          <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}> Description:</Typography> {assignedTask.description}
         </Typography>
         <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
           <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Subtasks:</Typography>
         </Typography>
-        {dummyTaskData.subtasks && dummyTaskData.subtasks.map((subtask, index) => (
+        {assignedTask.subtasks && assignedTask.subtasks.map((subtask, index) => (
           <Box key={index} display="flex" alignItems="center" gutterBottom sx={{ paddingBottom: '10px' }}>
             <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
             <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Topbar from "../../scenes/global/Topbar";
+import TopbarTM from "../../scenes/global/TopbarTM";
 import SidebarTeamMember from "../../scenes/global/sidebarTeamMember";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "../../theme";
@@ -11,6 +11,7 @@ import ViewAssignedTask from "../../scenes/teamMember/viewAssignedTask";
 import ViewAssignedProject from "../../scenes/teamMember/viewAssignedProject";
 import Kanban from "../../scenes/teamMember/kanban";
 import Dashboard from "../../scenes/teamMember/dashboardTeamMember";
+import Update  from "../../scenes/teamMember/updateandreset";
 
 
 
@@ -27,13 +28,15 @@ function PmRoute() {
           {/* <AdminPage/> */}
           <SidebarTeamMember/>
           <main className="content">
-            <Topbar />
+            <TopbarTM />
             <Routes>
               <Route path="/dashboardTeamMember" element={<Dashboard />}></Route>
               <Route path="/updateProgressTask" element={<UpdateProgressTask />}></Route>
               <Route  path="/viewAssignedTask" element={<ViewAssignedTask />}/><Route/>
               <Route  path="/viewAssignedProject" element={<ViewAssignedProject />}/><Route/>
               <Route  path="/kanban" element={<Kanban />}/><Route/>
+              <Route  path="/updateandreset" element={<Update />}/><Route/>
+
 
 
             </Routes>

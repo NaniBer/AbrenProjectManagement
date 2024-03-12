@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem, Checkbox, Button, Modal } from '@mui/material';
-import { FaEllipsisV, FaCheck } from 'react-icons/fa';
+import { Box, Grid, Card, CardContent, Typography, Checkbox, Button, Modal } from '@mui/material';
+import {FaCheck} from 'react-icons/fa';
 import { tokens } from '../../../theme';
 import { useTheme } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import swal from 'sweetalert';
+// import updatedTasks from "../../../data/mockData";
 
 function TaskList() {
   const theme = useTheme();
@@ -193,29 +194,7 @@ function TaskList() {
                       </Typography>
                     </Box>
                     <Typography variant="caption" sx={{color: colors.greenAccent[400]}}>{task.date}</Typography>
-                  </CardContent>
-                  <IconButton
-                    aria-label="more"
-                    aria-controls="task-menu"
-                    aria-haspopup="true"
-                    onClick={(event) => handleMenuOpen(event, task.id)}
-                    size="small"
-                    sx={{ position: 'absolute', top: 0, right: 0 }}
-                  >
-                    <FaEllipsisV />
-                  </IconButton>
-                  <Menu
-                    id="task-menu"
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl && selectedTaskId === task.id)}
-                    onClose={handleMenuClose}
-                  >
-                    {kanbanColumns.map(col => (
-                      <MenuItem key={col.id} onClick={() => moveTask(col.id)}>
-                        Move to {col.title}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+                  </CardContent>             
                 </Card>
               ))}
             </Box>

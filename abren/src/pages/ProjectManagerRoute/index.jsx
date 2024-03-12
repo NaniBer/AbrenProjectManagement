@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Topbar from "../../scenes/global/Topbar";
+import TopbarAdmin from "../../scenes/global/TopbarAdmin";
 import SidebarProjectManager from "../../scenes/global/SidebarProjectManager";
 import Calendar from "../../scenes/projectManager/calendar";
 import Kanban from "../../scenes/projectManager/kanban";
@@ -28,7 +28,7 @@ function PmRoute() {
           {/* <AdminPage/> */}
           <SidebarProjectManager/>
           <main className="content">
-            <Topbar />
+            <TopbarAdmin />
             <Routes>
               {/* <Route path="/dashboard" element={<Dashboard />}></Route> */}
               <Route path="/calendar" element={<Calendar />}></Route>

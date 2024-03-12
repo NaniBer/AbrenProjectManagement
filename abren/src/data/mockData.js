@@ -179,23 +179,7 @@ export const mockDataProject = [
     projectmanager: "saronbisrat.kaizen",
     status: "active",
   },
-  {
-    id: 2,
-    projectname: "Something website",
-    description: "smth is a tech company  ",
-    projectmanager: "saronbisrat.kaizen",
-    status: "inactive",
 
-  },
-  {
-    id: 3,
-    projectname: "Hello World Website",
-    description: 
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    projectmanager: "helloworld.hello",
-    status: "inactive",
-
-  },
 ];
 
 
@@ -315,35 +299,42 @@ export const scheduleStatusData = [
 export const DashboardTMdata = [
   {
     id: "1",
-    taskName: "Task 1",
-    dueDate: new Date("2024-03-31"),
+    taskName: "Conduct user research to understand the target audience's needs and preferences.",
+    dueDate: new Date("2024-03-13"),
     status: "Not Started",
     priority: "High",
   },
   {
     id: "2",
-    taskName: "Task 2",
-    dueDate: new Date("2024-04-10"),
+    taskName: "Develop a content strategy and create engaging content for the website.",
+    dueDate: new Date("2024-03-12"),
     status: "In Progress",
     priority: "Medium",
   },
   {
     id: "3",
-    taskName: "Task 3",
+    taskName: "Develop backend infrastructure and manage the database for the website.",
     dueDate: new Date("2024-04-15"),
     status: "Completed",
     priority: "Low",
   },
   {
     id: "4",
-    taskName: "Task 4",
-    dueDate: new Date("2024-03-10"),
+    taskName: "Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    dueDate: new Date("2024-03-15"),
     status: "Not Started",
     priority: "Low",
   },
   {
     id: "5",
-    taskName: "Task 5",
+    taskName: "Optimize the website for search engines to improve visibility and organic traffic",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "6",
+    taskName: "Do the UI of the new e-learning dashboard",
     dueDate: new Date("2024-03-10"),
     status: "Not Started",
     priority: "High",
@@ -353,8 +344,8 @@ export const DashboardTMdata = [
 export const dummyProjectData = [
   {
     name: 'Project 1',
-    startDate: '2024-03-09',
-    endDate: '2024-03-12',
+    startDate: '2024-03-12',
+    endDate: '2024-03-13',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
     tasks: ['Task1', 'Task2', 'Task3'],
@@ -362,7 +353,7 @@ export const dummyProjectData = [
   {
     name: 'Project 2',
     startDate: '2024-03-15',
-    endDate: '2024-03-20',
+    endDate: '2024-03-14',
     description:
       'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Ut scelerisque auctor nibh vitae vestibulum.',
     tasks: ['TaskA', 'TaskB', 'TaskC'],
@@ -382,5 +373,114 @@ export const dummyProjectData = [
     description:
       'Donec posuere nisi et neque ullamcorper scelerisque. Fusce at augue massa. Nullam vel viverra elit. Vivamus dignissim hendrerit pulvinar. Integer venenatis vehicula ultrices.',
     tasks: ['TaskX', 'TaskY', 'TaskZ'],
+  },
+];
+
+
+export const updatedTasks = [
+  { 
+    id: 1,
+     taskName: 'Task 1', 
+     date: '2024-03-04', 
+     project: 'Project A', 
+     completed: false 
+    },
+  { 
+    id: 2, 
+    taskName: 'Task 2', 
+    date: '2024-03-08', 
+    project: 'Project B',
+     completed: false
+   },
+  { 
+    id: 3, 
+    taskName: 'Task 3', 
+    date: '2024-03-09', 
+    project: 'Project C', 
+    completed: false },
+  { 
+    id: 4, 
+    taskName: 'Task 4', 
+    date: '2024-03-09', 
+    project: 'Project D', 
+    completed: true 
+  },
+
+];
+
+export const dummyTaskData = {
+  name: 'Task 1',
+  startDate: '2024-03-09',
+  endDate: '2024-03-12',
+  project: 'Project X',
+  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
+  subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+};
+
+
+export const assignedTask = [
+  {
+  taskName: 'Task 1',
+  startDate: '2024-03-09',
+  endDate: '2024-03-13',
+  project: 'Project X',
+
+  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
+  subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+  },
+  {
+    taskName: 'Task 2',
+    startDate: '2024-03-09',
+    endDate: '2024-03-12',
+    project: 'Project X',
+  
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
+    subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+    }
+];
+
+
+export const PMtodolost = [
+  {
+    id: "1",
+    taskName: " user research",
+    dueDate: new Date("2024-03-13"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "2",
+    taskName: "Develop a content strategy and create engaging content for the website.",
+    dueDate: new Date("2024-03-12"),
+    status: "In Progress",
+    priority: "Medium",
+  },
+  {
+    id: "3",
+    taskName: "Develop backend infrastructure and manage the database for the website.",
+    dueDate: new Date("2024-04-15"),
+    status: "Completed",
+    priority: "Low",
+  },
+  {
+    id: "4",
+    taskName: "Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    dueDate: new Date("2024-03-15"),
+    status: "Not Started",
+    priority: "Low",
+  },
+  {
+    id: "5",
+    taskName: "Optimize the website for search engines to improve visibility and organic traffic",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "6",
+    taskName: "Do the UI of the new e-learning dashboard",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
   },
 ];

@@ -12,7 +12,7 @@ function App() {
   return (
   
       <Routes>
-      <Route path="/*" element={<TmRoute />} />
+      <Route path="/*" element={<PmRoute />} />
 
        <Route path="/pm/*" element={<PmRoute />} />
 
