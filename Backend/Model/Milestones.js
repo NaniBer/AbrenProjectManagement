@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const MilestonesSchema = mongoose.Schema({
-  ProjectId: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Projects",
     required: true,
@@ -14,10 +14,20 @@ const MilestonesSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  ResourceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Resource",
+    required: true,
+  },
+  ResourceQuantity: {
+    type: Number,
+    required: true,
+  },
   AllocatedBudget: {
     type: Number,
     required: true,
   },
+
   Priority: {
     type: String,
     required: true,

@@ -89,6 +89,25 @@ const projectReducer = (state = initialState, action) => {
           milestones: [...state.project.milestones, newMilestone],
         },
       };
+    case "EDIT_MILESTONE":
+      const updatedMilestone = action.payload;
+      console.log(updatedMilestone);
+      // Find the index of the resource in the project resources array
+      const milestoneIndex = state.project.milestones.findIndex(
+        (milestone) => milestone._id === updatedMilestone._id
+      );
+      // Update the resource details in the state
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          resources: [
+            ...state.project.resources.slice(0, milestoneIndex),
+            updatedMilestone,
+            ...state.project.resources.slice(milestoneIndex + 1),
+          ],
+        },
+      };
 
     default:
       return state;

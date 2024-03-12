@@ -230,6 +230,15 @@ router.get("/getUsernames", async (req, res) => {
     res.status(500).json({ message: "Error rerieving admin list" });
   }
 });
+router.get("/test", async (req, res) => {
+  try {
+    const users = await Users.find();
+    res.json(users);
+  } catch (err) {
+    console.error("Error retrieving Admin list:", err);
+    res.status(500).json({ message: "Error rerieving admin list" });
+  }
+});
 
 //Reset Admin
 router.put("/ResetAdmin", async (req, res) => {

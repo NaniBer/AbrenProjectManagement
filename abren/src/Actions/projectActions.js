@@ -28,6 +28,6 @@ export const deleteMilestone = (id) => ({
   payload: id,
 });
 export const editMilestone = (updatedMilestone) => ({
-  type: "EDIT_RESOURCE",
+  type: "EDIT_MILESTONE",
   payload: updatedMilestone,
 });

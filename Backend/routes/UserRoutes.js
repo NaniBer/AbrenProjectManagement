@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 
 const UserRouter = express.Router();
 // const BudgetPlan = require('../Model/BudgetPlan');
-const Milestones = require("../Model/Milestones");
 // const ProjectDetails = require('../Model/ProjectDetails');
 const Projects = require("../Model/Projects");
 const Resource = require("../Model/Resource");
+const Milestones = require("../Model/Milestones");
 // const ResourceConsumption = require('../Model/ResourceConsumption');
 // const TaskDetails = require('../Model/TaskDetails');
 const Tasks = require("../Model/Tasks");
 const Todo = require("../Model/Todo");
-// const Users = require('../Model/Users');
+const Users = require("../Model/Users");
 
 //project Manager
 //assign tasks for team members
@@ -245,12 +245,60 @@ UserRouter.put("/updateResource/:id", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+UserRouter.get("/activeUsers", async (req, res) => {
+  try {
+    const currentUserID = req.session.userId;
+    // const currentUserID = "65ddc5ae6daf913004c5aa42";
+
+    // Find all active users excluding the current user
+    const activeUsers = await Users.find({
+      disabled: false,
+      _id: { $ne: currentUserID },
+    });
+
+    res.json(activeUsers);
+  } catch (error) {
+    console.error("Error retrieving active users:", error);
+    res.status(500).json({ message: "Error retrieving active users" });
+  }
+});
+
+UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
+  try {
+    const { Budget, teamMembers, StartDate, EndDate } = req.body;
+    const projectId = req.params.projectId;
+    const teamMemberIds = teamMembers.map((member) => member.id);
+    // Find the project by ID
+    const project = await Projects.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Update project details
+    project.Budget = Budget;
+    project.TeamMembers = teamMemberIds;
+    project.StartDate = StartDate;
+    project.EndDate = EndDate;
+
+    // Save the updated project
+    const updatedProject = await project.save();
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    console.error("Error adding project details:", error);
+    res.status(500).json({ message: "Error adding project details" });
+  }
+});
+
 //Test route
 UserRouter.get("/project/:id", async (req, res) => {
   try {
-    const resources = await Resource.find({ projectId: req.params.id });
-    console.log(resources);
-    res.json(resources);
+    const projectList = await Projects.find({
+      ProjectManager: req.body.id,
+    });
+    projectList.name = "hii";
+    res.json(projectList);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -306,7 +354,7 @@ UserRouter.delete("/deleteResource/:id", async (req, res) => {
 
 //Update progress on the assigned value
 
-//Upload and share files and documents
+//Upload and sare files and documents
 
 //Get all involved Projects
 UserRouter.post("/getProjects", async (req, res) => {
@@ -331,7 +379,7 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
       { $match: { _id: objectId } },
       {
         $lookup: {
-          from: "Milestones", // Name of the Milestones collection
+          from: "milestones", // Name of the Milestones collection
           localField: "_id",
           foreignField: "projectId",
           as: "milestones",
@@ -353,15 +401,45 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
           as: "tasks",
         },
       },
+      {
+        $lookup: {
+          from: "users", // Assuming user details are stored in the "users" collection
+          localField: "ProjectManager", // Assuming ProjectManager field stores user ObjectId
+          foreignField: "_id",
+          as: "projectManagerDetails",
+        },
+      },
+      {
+        $addFields: {
+          projectManager: {
+            $arrayElemAt: ["$projectManagerDetails", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "ProjectDetails",
+          localField: "_id",
+          foreignField: "projectId",
+          as: "projectDetails",
+        },
+      },
+      {
+        $project: {
+          projectManagerDetails: 0, // Exclude projectManagerDetails array from final result
+        },
+      },
     ]);
 
-    if (!project) {
+    if (!project || project.length === 0) {
       return res.status(404).json({ message: "Project not found" });
     }
+
     // Check if the logged-in user is authorized to view this project
     if (project[0].ProjectManager.toString() !== req.session.userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
+    console.log(project[0]);
 
     res.status(200).json(project[0]);
   } catch (err) {
@@ -371,5 +449,126 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
 });
 
 //Add Milestone
+
+UserRouter.post("/addMilestone", async (req, res) => {
+  try {
+    const {
+      projectId,
+      MilestoneName,
+      MilestoneDescription,
+      ResourceId,
+      ResourceQuantity,
+      AllocatedBudget,
+      Priority,
+      Status,
+    } = req.body;
+
+    // Check if the project exists
+    const project = await Projects.findById(projectId);
+    console.log(
+      projectId,
+      MilestoneName,
+      MilestoneDescription,
+      ResourceId,
+      ResourceQuantity,
+      AllocatedBudget,
+      Priority,
+      Status
+    );
+    if (!project) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Project not found" });
+    }
+    const milestone = new Milestones({
+      projectId,
+      MilestoneName,
+      MilestoneDescription,
+      ResourceId,
+      ResourceQuantity,
+      AllocatedBudget,
+      Priority,
+      Status,
+    });
+
+    console.log(milestone);
+
+    await milestone.save();
+    console.log("New milestone added");
+
+    res.status(201).json({ success: true, milestone });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+//Update Milestone
+UserRouter.put("/updateMilestone/:id", async (req, res) => {
+  try {
+    console.log("Editing");
+    const milestoneId = req.params.id;
+    if (!milestoneId) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid Milestone ID" });
+    }
+
+    const {
+      MilestoneName,
+      MilestoneDescription,
+      ResourceId,
+      ResourceQuantity,
+      AllocatedBudget,
+      Priority,
+      Status,
+    } = req.body;
+
+    const existingMilestone = await Milestones.findById(milestoneId);
+
+    if (!existingMilestone) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Milestone not found" });
+    }
+
+    existingMilestone.MilestoneName = MilestoneName;
+    existingMilestone.MilestoneDescription = MilestoneDescription;
+    existingMilestone.ResourceId = ResourceId;
+    existingMilestone.AllocatedBudget = AllocatedBudget;
+    existingMilestone.ResourceQuantity = ResourceQuantity;
+    existingMilestone.Priority = Priority;
+    existingMilestone.Status = Status;
+
+    await existingMilestone.save();
+    console.log("Milestone Edited");
+    res
+      .status(200)
+      .json({ success: true, updatedMilestone: existingMilestone });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+//Delete a certain Milestone
+UserRouter.delete("/deleteMilestone/:id", async (req, res) => {
+  try {
+    const milestoneId = req.params.id;
+    const result = await Milestones.deleteOne({ _id: milestoneId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No record found for the given ID",
+      });
+    }
+    console.log("Deleted Milestone");
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 module.exports = UserRouter;

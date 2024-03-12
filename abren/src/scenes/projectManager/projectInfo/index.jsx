@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,39 +11,44 @@ import {
   Avatar,
   Grid,
   Tooltip,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { mockDataProject } from '../../../data/mockData';
-import * as Yup from 'yup';
-import { tokens } from '../../../theme';
-import Header from '../../../components/Header';
-
-
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import Autocomplete from "@mui/material/Autocomplete";
+import { mockDataProject, mockDataTeam } from "../../../data/mockData";
+import * as Yup from "yup";
+import { tokens } from "../../../theme";
+import Header from "../../../components/Header";
+import { useSelector } from "react-redux";
 
 const MAX_BUDGET_LENGTH = 10; // Assuming a maximum of 10 characters for the budget
 const validationSchema = Yup.object().shape({
-  startDate: Yup.date().required('Start Date is required'),
-  endDate: Yup.date()
-    .required('End Date is required')
-    .min(Yup.ref('startDate'), 'End Date must be after Start Date'),
-   budget: Yup
-    .number()
+  StartDate: Yup.date().required("Start Date is required"),
+  EndDate: Yup.date()
+    .required("End Date is required")
+    .min(Yup.ref("StartDate"), "End Date must be after Start Date"),
+  Budget: Yup.number()
     .positive("Budget must be a positive number")
     .required("Budget is required"),
+  teamMembers: Yup.array()
+    .required("Team Members are required")
+    .min(1, "Please select at least one team member"),
 });
 
 const Project = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const project = useSelector((state) => state.project.project);
+  console.log(project);
 
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [budget, setBudget] = useState('');
+  const [StartDate, setStartDate] = useState("");
+  const [EndDate, setEndDate] = useState("");
+  const [Budget, setBudget] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [submittedProjects, setSubmittedProjects] = useState([...mockDataProject]);
+  const [submittedProjects, setSubmittedProjects] = useState(project);
   const [validationErrors, setValidationErrors] = useState({});
   const [editingIndex, setEditingIndex] = useState(-1);
-  
+  const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]);
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -58,9 +63,10 @@ const Project = () => {
   };
 
   const handleCancel = () => {
-    setStartDate('');
-    setEndDate('');
-    setBudget('');
+    setStartDate("");
+    setEndDate("");
+    setBudget("");
+    setSelectedTeamMembers([]);
     setValidationErrors({});
     setIsFormOpen(false);
     setEditingIndex(-1);
@@ -71,31 +77,54 @@ const Project = () => {
     try {
       await validationSchema.validate(
         {
-          startDate,
-          endDate,
-          budget,
+          StartDate,
+          EndDate,
+          Budget,
+          teamMembers: selectedTeamMembers, // Include selected team members in validation
         },
         { abortEarly: false }
       );
 
       const newProject = {
-        ...submittedProjects[editingIndex],
-        startDate,
-        endDate,
-        budget,
+        ...submittedProjects,
+        StartDate,
+        EndDate,
+        Budget,
+        teamMembers: selectedTeamMembers,
       };
+      console.log(newProject);
 
-      const updatedProjects = [...submittedProjects];
-      updatedProjects[editingIndex] = newProject;
-      setSubmittedProjects(updatedProjects);
+      setSubmittedProjects(newProject);
+      try {
+        const response = await fetch(
+          `/Users/addProjectDetails/${newProject._id}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newProject),
+          }
+        );
 
-      // Reset form fields and state
-      setStartDate('');
-      setEndDate('');
-      setBudget('');
+        if (!response.ok) {
+          throw new Error("Failed to add project details");
+        }
+
+        const result = await response.json();
+        console.log(result); // Assuming the server responds with some data
+      } catch (error) {
+        console.error("Error adding project details:", error.message);
+      }
+
+      // Reset form fields, state, and selected team members
+      setStartDate("");
+      setEndDate("");
+      setBudget("");
       setValidationErrors({});
       setIsFormOpen(false);
       setEditingIndex(-1);
+      setSelectedTeamMembers([]); // Clear selected team members
     } catch (error) {
       console.error(error);
       // Handle validation errors here
@@ -108,40 +137,67 @@ const Project = () => {
   };
 
   const handleEditProject = (index) => {
-    const project = submittedProjects[index];
+    const project = submittedProjects;
     // Populate form fields with project data
-    setStartDate(project.startDate || '');
-    setEndDate(project.endDate || '');
-    setBudget(project.budget || '');
+    setStartDate(project.StartDate || "");
+    setEndDate(project.EndDate || "");
+    setBudget(project.Budget || "");
+
+    //Get active users
+    fetch("/Users/activeUsers")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to retrieve active users");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Handle the retrieved active users data
+
+        const activeUsers = data.map((user) => ({
+          _id: user._id,
+          name: `${user.firstname} ${user.lastname}`,
+        }));
+
+        // Set selectedTeamMembers with the extracted data
+        setActiveUsers(activeUsers);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
+    setSelectedTeamMembers(project.teamMembers);
     // Toggle editing state
     setEditingIndex(editingIndex === index ? -1 : index);
     // Open the modal for editing
     setIsFormOpen(true);
   };
-  
+
   return (
     <Box m="20px">
-     <Header title="Project Info" subtitle="More information about projects" />
+      <Header title="Project Info" subtitle="More information about projects" />
 
       <Modal open={isFormOpen} onClose={handleCancel}>
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            bgcolor: 'background.paper',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
             maxWidth: 800,
-            height: '70%',
-            width: '100%',
-            outline: 'none',
-            overflow: 'auto',
+            height: "70%",
+            width: "100%",
+            outline: "none",
+            overflow: "auto",
+            backgroundColor: colors.primary[400],
+            borderRadius: "10px",
           }}
         >
           <Typography variant="h5" sx={{ mb: 2 }}>
-            {editingIndex !== -1 ? 'Update Project' : 'Add Project'}
+            {editingIndex !== -1 ? "Update Project" : "Add Project"}
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
@@ -152,23 +208,24 @@ const Project = () => {
                     label="Project Name"
                     variant="outlined"
                     fullWidth
-                    value={submittedProjects[editingIndex]?.projectname || ''}
+                    value={submittedProjects.ProjectName || ""}
                     InputProps={{
                       readOnly: true,
                     }}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
                 <Box sx={{ mb: 2 }}>
@@ -177,23 +234,24 @@ const Project = () => {
                     label="Description"
                     variant="outlined"
                     fullWidth
-                    value={submittedProjects[editingIndex]?.description || ''}
+                    value={submittedProjects.ProjectDescription || ""}
                     InputProps={{
                       readOnly: true,
                     }}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
                 <Box sx={{ mb: 2 }}>
@@ -202,109 +260,155 @@ const Project = () => {
                     label="Project Manager"
                     variant="outlined"
                     fullWidth
-                    value={submittedProjects[editingIndex]?.projectmanager || ''}
+                    value={submittedProjects.projectManager.username || ""}
                     InputProps={{
                       readOnly: true,
                     }}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
               </Grid>
               <Grid item xs={6}>
                 <Box sx={{ mb: 2 }}>
-
+                  <Autocomplete
+                    multiple
+                    id="teamMembers"
+                    options={activeUsers
+                      .filter(
+                        (user) =>
+                          !selectedTeamMembers.find(
+                            (selectedUser) => selectedUser.id === user._id
+                          )
+                      )
+                      .map((user) => ({
+                        id: user._id,
+                        name: user.name,
+                      }))}
+                    value={selectedTeamMembers}
+                    onChange={(event, value) => setSelectedTeamMembers(value)}
+                    getOptionLabel={(option) => option.name}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="Team Members"
+                        fullWidth
+                        error={!!validationErrors.teamMembers}
+                        helperText={validationErrors.teamMembers}
+                      />
+                    )}
+                    sx={{
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
+                        },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: "#868dfb",
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+                <Box sx={{ mb: 2 }}>
                   <TextField
-                    id="startDate"
+                    id="StartDate"
                     label="Start Date"
                     type="date"
                     variant="outlined"
                     fullWidth
-                    value={startDate}
+                    value={StartDate}
                     onChange={handleStartDateChange}
-                    error={!!validationErrors.startDate}
-                    helperText={validationErrors.startDate}
+                    error={!!validationErrors.StartDate}
+                    helperText={validationErrors.StartDate}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
                 <Box sx={{ mb: 2 }}>
                   <TextField
-                    id="endDate"
+                    id="EndDate"
                     label="End Date"
                     type="date"
                     variant="outlined"
                     fullWidth
-                    value={endDate}
+                    value={EndDate}
                     onChange={handleEndDateChange}
-                    error={!!validationErrors.endDate}
-                    helperText={validationErrors.endDate}
+                    error={!!validationErrors.EndDate}
+                    helperText={validationErrors.EndDate}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
                 <Box sx={{ mb: 2 }}>
                   <TextField
-                    id="budget"
+                    id="Budget"
                     label="Budget"
                     variant="outlined"
-                    placeholder='0 ETB'
+                    placeholder="0 ETB"
                     fullWidth
-                    value={budget}
+                    value={Budget}
                     onChange={handleBudgetChange}
-                    error={!!validationErrors.budget}
-                    helperText={validationErrors.budget}
+                    error={!!validationErrors.Budget}
+                    helperText={validationErrors.Budget}
                     sx={{
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor:'#868dfb',
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
                         },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          '&.Mui-focused': {
-                            color: validationErrors.endDate ? 'red' : '#868dfb',
-                          },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
                         },
-                      }}
+                      },
+                    }}
                   />
                 </Box>
-                </Grid>
-                <Grid item xs={12}>
-
+              </Grid>
+              <Grid item xs={12}>
                 <Box display="flex" justifyContent="space-between">
                   <Button
                     variant="contained"
@@ -312,7 +416,7 @@ const Project = () => {
                     type="submit"
                     startIcon={<AddIcon />}
                   >
-                    {editingIndex !== -1 ? 'Save' : 'Add'}
+                    {editingIndex !== -1 ? "Save" : "Add"}
                   </Button>
                   <Button
                     variant="contained"
@@ -329,58 +433,137 @@ const Project = () => {
       </Modal>
 
       <Grid container spacing={2}>
-        {submittedProjects.map((project, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ marginTop: '20px',backgroundColor: colors.primary[400], borderRadius: '15px' }}>
-              <CardContent sx={{ textAlign: 'left' }}>
-                <Typography variant="h4" sx={{ mb: 1 }} color={colors.primary[110]}>
-                  {project.projectname}
-                </Typography>
-                <Typography variant="body1" sx={{mt:4, mb: 1 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} >  Description:  </Typography> {project.description}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-
-
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>
+        <Grid item xs={12}>
+          <Card
+            sx={{
+              marginTop: "20px",
+              backgroundColor: colors.primary[400],
+              borderRadius: "15px",
+            }}
+          >
+            <CardContent sx={{ textAlign: "left" }}>
+              <Typography
+                variant="h4"
+                sx={{ mb: 1 }}
+                color={colors.primary[110]}
+              >
+                {submittedProjects.ProjectName}
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 4, mb: 1 }}>
+                <Typography component="span" color={colors.greenAccent[400]}>
+                  {" "}
+                  Description:{" "}
+                </Typography>{" "}
+                {submittedProjects.ProjectDescription}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                  <Typography
+                    component="span"
+                    color={colors.greenAccent[400]}
+                    sx={{ mr: 1 }}
+                  >
                     Project Manager:
-                </Typography>
-                <Tooltip title={project.projectmanager} arrow>
+                  </Typography>
+                  <Tooltip
+                    title={submittedProjects.projectManager.username}
+                    arrow
+                  >
                     <Avatar
-                    sx={{
+                      sx={{
                         bgcolor: colors.primary[110],
-                        height: '30px',
-                        width: '30px',
+                        height: "30px",
+                        width: "30px",
                         mr: 1,
-                        cursor: 'pointer', // Add cursor pointer for indicating tooltip
-                    }}
+                        cursor: "pointer", // Add cursor pointer for indicating tooltip
+                      }}
                     >
-                    {project.projectmanager.charAt(0)}
+                      {submittedProjects.projectManager.username.charAt(0)}
                     </Avatar>
-                </Tooltip>
+                  </Tooltip>
                 </Box>
-
-
+              </Typography>
+              <Box display="flex" alignItems="center" mt={2}>
+                <Typography
+                  variant="body1"
+                  sx={{ mr: 1, marginBottom: 2 }}
+                  color={colors.greenAccent[400]}
+                >
+                  Team Members:
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Start Date: </Typography>{project.startDate}
+                {submittedProjects.teamMembers &&
+                  submittedProjects.teamMembers.map((member) => (
+                    <Tooltip
+                      key={member.id}
+                      title={member.name}
+                      placement="top"
+                    >
+                      <Avatar
+                        key={member.id}
+                        sx={{
+                          bgcolor: colors.primary[110],
+                          height: "30px",
+                          width: "30px",
+                          mr: 1,
+                          mb: 2,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {member.name
+                          .split(" ")
+                          .map((word) => word.charAt(0))
+                          .join("")}
+                      </Avatar>
+                    </Tooltip>
+                  ))}
+              </Box>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Typography
+                  component="span"
+                  color={colors.greenAccent[400]}
+                  sx={{ mr: 1 }}
+                >
+                  Start Date:{" "}
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> End Date: </Typography> {project.endDate}
+                {submittedProjects?.StartDate}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Typography
+                  component="span"
+                  color={colors.greenAccent[400]}
+                  sx={{ mr: 1 }}
+                >
+                  {" "}
+                  End Date:{" "}
+                </Typography>{" "}
+                {submittedProjects.EndDate}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Typography
+                  component="span"
+                  color={colors.greenAccent[400]}
+                  sx={{ mr: 1 }}
+                >
+                  {" "}
+                  Budget:{" "}
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> Budget: </Typography>{project.budget}
-                </Typography>
-                <Box display="flex" justifyContent="flex-end">
-                <Button color="secondary" onClick={() => handleEditProject(index)}>
-                {project.startDate && project.endDate && project.budget ? 'Edit' : 'Add'}
+                {submittedProjects.Budget}
+              </Typography>
+              <Box display="flex" justifyContent="flex-end">
+                <Button
+                  color="secondary"
+                  onClick={() => handleEditProject(0)} // Pass index 0 for editing the single project
+                >
+                  {submittedProjects?.StartDate &&
+                  submittedProjects.EndDate &&
+                  submittedProjects.Budget
+                    ? "Edit"
+                    : "Add"}
                 </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </Box>
   );

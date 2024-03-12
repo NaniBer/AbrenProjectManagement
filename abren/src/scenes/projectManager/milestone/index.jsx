@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,6 +12,7 @@ import {
   IconButton,
   Grid,
 } from "@mui/material";
+import swal from "sweetalert";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,6 +26,7 @@ import {
   deleteMilestone,
 } from "../../../Actions/projectActions";
 import Header from "../../../components/Header";
+import { useState, useEffect } from "react";
 
 const MAX_DESCRIPTION_LENGTH = 100;
 
@@ -45,6 +46,7 @@ const schema = yup.object().shape({
     .number()
     .positive("Budget must be a positive number")
     .required("Budget is required"),
+
   // resources: yup
   //   .array()
   //   .of(yup.string())
@@ -60,20 +62,24 @@ const Milestone = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const project = useSelector((state) => state.project.project);
-  console.log(project.resources);
-  const dispatch = useDispatch();
+  const milestones = useSelector((state) => state.project.project.milestones);
 
-  const [milestoneName, setMilestoneName] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
-  const [priority, setPriority] = useState("");
-  const [budget, setBudget] = useState(0);
+  const dispatch = useDispatch();
+  const [MilestoneName, setMilestoneName] = useState("");
+  const [MilestoneDescription, setMilestoneDescription] = useState("");
+  const [Status, setStatus] = useState("");
+  const [Priority, setPriority] = useState("");
+  const [AllocatedBudget, setAllocatedBudget] = useState(0);
   const [resources, setResources] = useState([]);
-  const [quantity, setQuantity] = useState(0);
+  const [ResourceQuantity, setResourceQuantity] = useState(0);
+  const [edit, setEdit] = useState(false);
+  const [editedMilestone, seteditedMilestone] = useState();
+
   const [projectResources, setProjectResources] = useState([]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedMilestones, setSubmittedMilestones] = useState([]);
+
   const [errors, setErrors] = useState({}); // State variable to hold validation errors
 
   useEffect(() => {
@@ -82,14 +88,17 @@ const Milestone = () => {
       // const resourceNames = resources.map((resource) => resource.ResourceName);
       // console.log(resourceNames);
       setProjectResources(resources);
+      if (milestones) {
+        setSubmittedMilestones(milestones);
+      }
     }
-  }, [project]);
+  }, [milestones]);
 
   const handleMilestoneNameChange = (e) => {
     setMilestoneName(e.target.value);
   };
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
+  const handleMilestoneDescriptionChange = (e) => {
+    setMilestoneDescription(e.target.value);
   };
 
   const handleStatusChange = (e) => {
@@ -98,81 +107,154 @@ const Milestone = () => {
   const handlePriorityChange = (e) => {
     setPriority(e.target.value);
   };
-  const handleBudgetChange = (e) => {
-    setBudget(e.target.value);
+  const handleAllocatedBudgetChange = (e) => {
+    setAllocatedBudget(e.target.value);
   };
   const handleResourceChange = (e) => {
+    console.log(e.target.value);
     setResources([...resources, e.target.value]);
   };
-  const handleQuantityChange = (e) => {
-    setQuantity(e.target.value);
+  const handleResourceQuantityChange = (e) => {
+    setResourceQuantity(e.target.value);
+  };
+  const getResourceIdByName = (resourceName) => {
+    const resource = projectResources.find(
+      (resource) => projectResources.ResourceName === resourceName
+    );
+    return resource ? resource._id : null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      // Validate form data
-      await schema.validate(
-        {
-          milestoneName,
-          description,
-          status,
-          priority,
-          budget,
-          resources,
-          quantity,
-        },
-        { abortEarly: false }
-      );
-
-      // const handleCancel = () => {
-      // setMilestoneName("");
-      // setDescription("");
-      // setStatus("");
-      // setPriority("");
-      // setBudget(0);
-      // setResources([]);
-      // setQuantity(0);
-      // setIsFormOpen(false);
-      // };
-
-      // Create a new Milestone object
-      const newMilestone = {
-        milestoneName,
-        description,
-        status,
-        priority,
-        budget,
-        resources,
-        quantity,
-      };
-
-      // Update the submitted milestones list
-      setSubmittedMilestones((prevMilestones) => [
-        ...prevMilestones,
-        newMilestone,
-      ]);
-
-      // Clear the form fields
-      setMilestoneName("");
-      setDescription("");
-      setStatus("");
-      setPriority("");
-      setBudget(0);
-      setResources([]);
-      setQuantity(0);
-
-      setIsFormOpen(false); // Close the form after submission
-    } catch (error) {
-      // Handle validation errors
-      console.error("Validation Error:", error.errors);
-      // Update error state to display error messages
-      const validationErrors = {};
-      error.inner.forEach((err) => {
-        validationErrors[err.path] = err.message;
+    const backendMilestone = {
+      MilestoneName,
+      MilestoneDescription,
+      ResourceQuantity,
+      AllocatedBudget,
+      Priority,
+      Status,
+    };
+    backendMilestone.projectId = project._id;
+    backendMilestone.ResourceId = resources;
+    console.log(backendMilestone);
+    const isDuplicate = submittedMilestones.some(
+      (milestone) => milestone.MilestoneName === MilestoneName
+    );
+    if (isDuplicate) {
+      // Close loading modal
+      swal.close();
+      // Show error message for duplicate name
+      swal("Error!", "Milestone name already exists", "error");
+    } else {
+      // Show loading modal
+      swal({
+        title: "Please wait...",
+        text: edit ? "Updating Milestone" : "Adding Milestone",
+        buttons: false,
+        closeOnEsc: false,
+        closeOnClickOutside: false,
+        icon: "info",
       });
-      setErrors(validationErrors);
+
+      if (edit) {
+        // Editing an existing Milestone
+        const resourceId = getResourceIdByName(backendMilestone.ResourceName);
+        console.log(resourceId);
+        backendMilestone.ResourceId = resourceId;
+
+        try {
+          console.log(backendMilestone);
+          const response = await fetch(
+            `/Users/updateMilestone/${editedMilestone._id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(backendMilestone),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data);
+
+          // Clear the form fields
+          setMilestoneName("");
+          setMilestoneDescription("");
+          setResources([]);
+          setStatus("");
+          setResourceQuantity(0);
+          setAllocatedBudget(0);
+          setPriority("");
+          setIsFormOpen(false);
+
+          // Update submitted resources
+          setSubmittedMilestones((prevMilestones) => [
+            ...prevMilestones,
+            backendMilestone,
+          ]);
+
+          dispatch(editMilestone(data.updatedMilestone));
+
+          // Close loading modal
+          swal.close();
+
+          // Show success message
+          swal("Success!", "Milestone updated successfully", "success");
+        } catch (error) {
+          console.error("Error updating Milestone:", error);
+          // Close loading modal
+          swal.close();
+        }
+      } else {
+        // Creating a new Milestone
+        try {
+          const response = await fetch("/Users/addMilestone", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(backendMilestone),
+          });
+
+          if (response.status === 201) {
+            const data = await response.json();
+            console.log(data.milestone);
+            backendMilestone._id = data.milestone._id;
+
+            // Update submitted milestones
+            setSubmittedMilestones((prevMilestones) => [
+              ...prevMilestones,
+              backendMilestone,
+            ]);
+            dispatch(addMilestone(data.milestone));
+
+            // Clear the form fields
+            setMilestoneName("");
+            setMilestoneDescription("");
+            setStatus("");
+            setResources([]);
+            setResourceQuantity(0);
+            setAllocatedBudget(0);
+            setPriority("");
+            setIsFormOpen(false);
+
+            // Close loading modal
+            swal.close();
+
+            // Show success message
+            swal("Success!", "Milestone added successfully", "success");
+          } else {
+            throw new Error("Failed to create Milestone");
+          }
+        } catch (error) {
+          console.error("Error creating Milestone:", error);
+          // Close loading modal
+          swal.close();
+        }
+      }
     }
   };
 
@@ -181,14 +263,22 @@ const Milestone = () => {
     const milestone = submittedMilestones[index];
 
     // Set the form fields with the values from the selected milestone
-    setMilestoneName(milestone.milestoneName);
-    setDescription(milestone.description);
-    setStatus(milestone.status);
-    setPriority(milestone.priority);
-    setBudget(milestone.budget);
-    setResources(milestone.resources);
-    setQuantity(milestone.quantity);
+    setMilestoneName(milestone.MilestoneName);
+    setMilestoneDescription(milestone.MilestoneDescription);
+    setStatus(milestone.Status);
+    setPriority(milestone.Priority);
+    setAllocatedBudget(milestone.AllocatedBudget);
 
+    setResourceQuantity(milestone.ResourceQuantity);
+    const foundResource = projectResources.find(
+      (resource) => resource._id === milestone.ResourceId
+    );
+
+    // Set the selected resource name
+    if (foundResource) {
+      setResources(foundResource.ResourceName);
+      console.log(foundResource.ResourceName);
+    }
     // Remove the selected milestones from the submitted milestoness list
     setSubmittedMilestones((prevMilestones) => {
       const updatedMilestones = [...prevMilestones];
@@ -196,26 +286,88 @@ const Milestone = () => {
       return updatedMilestones;
     });
 
-    // Open the form for editing the milestones
+    // Open the form for editing the milestone
+
     setIsFormOpen(true);
+    seteditedMilestone(milestone);
+    setEdit(true);
   };
 
   const handleDeleteMilestone = (index) => {
-    setSubmittedMilestones((prevMilestones) => {
-      const updatedMilestones = [...prevMilestones];
-      updatedMilestones.splice(index, 1);
-      return updatedMilestones;
+    // Show loading modal
+    swal({
+      title: "Please wait...",
+      text: "Deleting Milestone",
+      buttons: false,
+      closeOnEsc: false,
+      closeOnClickOutside: false,
+      icon: "info",
+    });
+    swal({
+      title: "Are you sure?",
+      text: `You are about to delete the Milestone labeled ${submittedMilestones[index].MilestoneName}`,
+      icon: "warning",
+      buttons: ["Cancel", "Delete"],
+      dangerMode: true,
+    }).then((confirmed) => {
+      if (confirmed) {
+        setSubmittedMilestones((prevMilestones) => {
+          const updatedMilestones = [...prevMilestones];
+          const milestoneId = updatedMilestones[index]._id;
+          const performMilestoneDeletion = async () => {
+            try {
+              const response = await fetch(
+                `/Users/deleteMilestone/${milestoneId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              // Milestone successfully deleted, update state and display success message
+              const data = await response.json();
+              dispatch(deleteMilestone(milestoneId));
+
+              // Close loading modal
+              swal.close();
+
+              swal("Deleted!", "The Milestone has been deleted.", "success");
+
+              // Remove the milestone from the updated milestones list
+              updatedMilestones.splice(index, 1);
+              return updatedMilestones;
+            } catch (error) {
+              console.error("Error deleting Milestone:", error);
+              // Handle error if necessary
+              swal.close(); // Close loading modal
+              return prevMilestones; // Return the previous state in case of error
+            }
+          };
+
+          performMilestoneDeletion();
+
+          // Return the previous state before the resource is actually deleted
+          return prevMilestones;
+        });
+      } else {
+        // Close loading modal if user cancels deletion
+        swal.close();
+      }
     });
   };
 
   const handleCancel = () => {
     setMilestoneName("");
-    setDescription("");
+    setMilestoneDescription("");
     setStatus("");
     setPriority("");
-    setBudget(0);
+    setAllocatedBudget(0);
     setResources([]);
-    setQuantity(0);
+    setResourceQuantity(0);
     setIsFormOpen(false);
     setErrors({}); // Reset errors to clear any validation errors
   };
@@ -270,7 +422,7 @@ const Milestone = () => {
                       label="Milestone Name"
                       variant="outlined"
                       fullWidth
-                      value={milestoneName}
+                      value={MilestoneName}
                       onChange={handleMilestoneNameChange}
                       error={!!errors.milestoneName} // Set error prop based on whether there's an error for this field
                       helperText={errors.milestoneName} // Display error message for this field
@@ -299,8 +451,8 @@ const Milestone = () => {
                       multiline
                       rows={4.5}
                       fullWidth
-                      value={description}
-                      onChange={handleDescriptionChange}
+                      value={MilestoneDescription}
+                      onChange={handleMilestoneDescriptionChange}
                       error={!!errors.description}
                       helperText={errors.description}
                       sx={{
@@ -326,7 +478,7 @@ const Milestone = () => {
                       label="Status"
                       variant="outlined"
                       fullWidth
-                      value={status}
+                      value={Status}
                       onChange={handleStatusChange}
                       error={!!errors.status}
                       helperText={errors.status}
@@ -359,7 +511,7 @@ const Milestone = () => {
                       label="Priority"
                       variant="outlined"
                       fullWidth
-                      value={priority}
+                      value={Priority}
                       onChange={handlePriorityChange}
                       error={!!errors.priority}
                       helperText={errors.priority}
@@ -389,8 +541,8 @@ const Milestone = () => {
                       label="Allocated Budget"
                       variant="outlined"
                       fullWidth
-                      value={budget}
-                      onChange={handleBudgetChange}
+                      value={AllocatedBudget}
+                      onChange={handleAllocatedBudgetChange}
                       error={!!errors.budget}
                       helperText={errors.budget}
                       sx={{
@@ -436,10 +588,7 @@ const Milestone = () => {
                       }}
                     >
                       {projectResources.map((resource) => (
-                        <MenuItem
-                          key={resource._id}
-                          value={resource.ResourceName}
-                        >
+                        <MenuItem key={resource._id} value={resource._id}>
                           {resource.ResourceName}
                         </MenuItem>
                       ))}
@@ -452,8 +601,8 @@ const Milestone = () => {
                       label="Resource Quantity"
                       variant="outlined"
                       fullWidth
-                      value={quantity}
-                      onChange={handleQuantityChange}
+                      value={ResourceQuantity}
+                      onChange={handleResourceQuantityChange}
                       error={!!errors.quantity}
                       helperText={errors.quantity}
                       sx={{
@@ -526,7 +675,7 @@ const Milestone = () => {
                     component="span"
                     color={colors.greenAccent[400]}
                   >
-                    {milestone.milestoneName}
+                    {milestone.MilestoneName}
                   </Typography>
                 </Typography>
               </AccordionSummary>
@@ -556,7 +705,7 @@ const Milestone = () => {
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    {truncateDescription(milestone.description)}
+                    {truncateDescription(milestone.MilestoneDescription)}
                   </Typography>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -583,7 +732,7 @@ const Milestone = () => {
                         : "success"
                     }
                   >
-                    {milestone.priority}
+                    {milestone.Priority}
                   </Button>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -593,7 +742,7 @@ const Milestone = () => {
                     component="span"
                     color={colors.greenAccent[400]}
                   >
-                    {milestone.budget}
+                    {milestone.AllocatedBudget}
                   </Typography>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -613,7 +762,7 @@ const Milestone = () => {
                     component="span"
                     color={colors.greenAccent[400]}
                   >
-                    {milestone.quantity}
+                    {milestone.ResourceQuantity}
                   </Typography>
                 </Typography>
                 <Box
