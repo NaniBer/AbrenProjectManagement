@@ -30,6 +30,7 @@ function PmRoute() {
           <main className="content">
             <TopbarTM />
             <Routes>
+              <Route path="/" element={<Dashboard />} />
               <Route path="/dashboardTeamMember" element={<Dashboard />}></Route>
               <Route path="/updateProgressTask" element={<UpdateProgressTask />}></Route>
               <Route  path="/viewAssignedTask" element={<ViewAssignedTask />}/><Route/>

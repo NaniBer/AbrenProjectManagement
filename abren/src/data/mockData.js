@@ -72,7 +72,7 @@ export const Project = [
     id: 1,
     name: "Project A",
     startDate: "2024-02-21",
-    endDate: "2024-02-28",
+    endDate: "2024-03-10",
     teamMembers: [
       { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
       { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
@@ -83,46 +83,7 @@ export const Project = [
       { id: 3, name: "Task 3", progress: 100 },
     ],
   },
-  {
-    id: 2,
-    name: "Project B",
-    startDate: "2024-03-01",
-    endDate: "2024-03-07",
-    teamMembers: [
-      {
-        id: 3,
-        firstname: "Alice",
-        lastname: "Smith",
-        email: "alice@example.com",
-      },
-      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
-    ],
-    tasks: [
-      { id: 4, name: "Task 1", progress: 60 },
-      { id: 5, name: "Task 2", progress: 30 },
-      { id: 6, name: "Task 3", progress: 90 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Project C",
-    startDate: "2024-03-06",
-    endDate: "2024-03-12",
-    teamMembers: [
-      {
-        id: 3,
-        firstname: "Alice",
-        lastname: "Smith",
-        email: "alice@example.com",
-      },
-      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
-    ],
-    tasks: [
-      { id: 4, name: "Task 1", progress: 70 },
-      { id: 5, name: "Task 2", progress: 100 },
-      { id: 6, name: "Task 3", progress: 90 },
-    ],
-  },
+  
 ];
 
 export const profile = [
@@ -341,6 +302,27 @@ export const DashboardTMdata = [
   },
 ];
 
+export const mockUpdatedDataProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: '2024-03-12',
+    endDate: '2024-03-13',
+  },
+  {
+    id: 1,
+    projectname: "New website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: '2024-03-12',
+    endDate: '2024-03-12',
+  },
+
+];
 export const dummyProjectData = [
   {
     name: 'Project 1',
@@ -431,7 +413,7 @@ export const assignedTask = [
   {
     taskName: 'Task 2',
     startDate: '2024-03-09',
-    endDate: '2024-03-12',
+    endDate: '2024-03-14',
     project: 'Project X',
   
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
@@ -443,42 +425,42 @@ export const assignedTask = [
 export const PMtodolost = [
   {
     id: "1",
-    taskName: " user research",
+    taskName: " PM user research",
     dueDate: new Date("2024-03-13"),
     status: "Not Started",
     priority: "High",
   },
   {
     id: "2",
-    taskName: "Develop a content strategy and create engaging content for the website.",
+    taskName: " PM Develop a content strategy and create engaging content for the website.",
     dueDate: new Date("2024-03-12"),
     status: "In Progress",
     priority: "Medium",
   },
   {
     id: "3",
-    taskName: "Develop backend infrastructure and manage the database for the website.",
+    taskName: " PM Develop backend infrastructure and manage the database for the website.",
     dueDate: new Date("2024-04-15"),
     status: "Completed",
     priority: "Low",
   },
   {
     id: "4",
-    taskName: "Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    taskName: "PM Conduct thorough testing to ensure the website's functionality, usability, and performance.",
     dueDate: new Date("2024-03-15"),
     status: "Not Started",
     priority: "Low",
   },
   {
     id: "5",
-    taskName: "Optimize the website for search engines to improve visibility and organic traffic",
+    taskName: "PM Optimize the website for search engines to improve visibility and organic traffic",
     dueDate: new Date("2024-03-10"),
     status: "Not Started",
     priority: "High",
   },
   {
     id: "6",
-    taskName: "Do the UI of the new e-learning dashboard",
+    taskName: "PM Do the UI of the new e-learning dashboard",
     dueDate: new Date("2024-03-10"),
     status: "Not Started",
     priority: "High",

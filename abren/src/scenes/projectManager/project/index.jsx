@@ -159,7 +159,8 @@ const App = () => {
               <Dashboard sx={{ fontSize: 16 }} />
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>Kanban</span>
             </div> */}
-            <div
+           
+            {/* <div
               style={{
                 flex: 0.2,
                 textAlign: "center",
@@ -173,7 +174,7 @@ const App = () => {
               <span style={{ marginLeft: "2px", fontSize: "14px" }}>
                 Calendar
               </span>
-            </div>
+            </div> */}
             <div
               style={{
                 flex: 0.2,

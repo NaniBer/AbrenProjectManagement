@@ -1,10 +1,11 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import TopbarAdmin from "../../scenes/global/TopbarAdmin";
+import TopbarPM from "../../scenes/global/TopbarPM";
 import SidebarProjectManager from "../../scenes/global/SidebarProjectManager";
+import DashboardPM from "../../scenes/projectManager/dashboard-PM";
 import Calendar from "../../scenes/projectManager/calendar";
-import Kanban from "../../scenes/projectManager/kanban";
+import Kanban from "../../scenes/projectManager/kanbanPM";
 import Project from "../../scenes/projectManager/project";
 import Resource from "../../scenes/projectManager/resource";
 import List from "../../scenes/projectManager/list";
@@ -15,6 +16,7 @@ import ProjectAnalytic from "../../scenes/projectManager/projectAnalytic";
 import Report from "../../scenes/projectManager/report";
 import ProjectStatus from "../../scenes/projectManager/report/projectStatusReport";
 import ProjectHealth from "../../scenes/projectManager/report/projectHealthReport";
+import Update  from "../../scenes/teamMember/updateandreset";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "../../theme";
 
@@ -28,11 +30,12 @@ function PmRoute() {
           {/* <AdminPage/> */}
           <SidebarProjectManager/>
           <main className="content">
-            <TopbarAdmin />
+            <TopbarPM />
             <Routes>
-              {/* <Route path="/dashboard" element={<Dashboard />}></Route> */}
+              <Route path="/" element={<DashboardPM />}></Route>
+              <Route path="/dashboard-PM" element={<DashboardPM />}></Route>
               <Route path="/calendar" element={<Calendar />}></Route>
-              <Route path="/kanban" element={<Kanban />}></Route>
+              <Route path="/kanbanPM" element={<Kanban />}></Route>
               <Route path="/project" element={<Project />}></Route>
               <Route path="/resource" element={<Resource />}></Route>
               <Route path="/list" element={<List />}></Route>
@@ -43,6 +46,7 @@ function PmRoute() {
               <Route path="/report" element={<Report/>}></Route>
               <Route path="/projectStatusReport" element={<ProjectStatus/>}></Route>
               <Route path="/projectHealthReport" element={<ProjectHealth/>}></Route>
+              <Route path="/updateandreset" element={<Update/>}></Route>
 
             </Routes>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Box,
   Button,
@@ -17,11 +17,28 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } f
 import { PieChart, Pie } from "recharts";
 import { DashboardTMdata } from '../../../data/mockData';
 import { dummyProjectData } from '../../../data/mockData';
-
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const chartRef = useRef();
+
+  const handleDownloadPdf = (chartType) => {
+    const chartNode = chartType === "line" ? document.querySelector(".recharts-wrapper") : chartRef.current;
+  
+    html2canvas(chartNode, { scrollY: -window.scrollY })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+        pdf.save(`${chartType}_${new Date().toISOString().split("T")[0]}.pdf`);
+        
+      });
+  };
+  
 
   // Transform data to count tasks for each status category on each date
   const taskStatusData = DashboardTMdata.reduce((acc, task) => {
@@ -50,8 +67,8 @@ const Dashboard = () => {
     return acc;
   }, {});
 
-// Define a function to map priorities to colors
-const getPriorityColor = (priority) => {
+  // Define a function to map priorities to colors
+  const getPriorityColor = (priority) => {
     switch (priority.toLowerCase()) {
       case 'high':
         return '#FF5733'; // Red
@@ -63,14 +80,13 @@ const getPriorityColor = (priority) => {
         return '#000000'; // Default color
     }
   };
-  
+
   // Use the function to set the fill color in your data
   const dataPie = Object.keys(priorityCounts).map((priority) => ({
     name: priority,
     value: priorityCounts[priority],
     fill: getPriorityColor(priority),
   }));
-  
 
   // Prepare data for the BarChart
   const data = [
@@ -86,7 +102,7 @@ const getPriorityColor = (priority) => {
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 
         <Box>
-          <Button
+          {/* <Button
             sx={{
               backgroundColor: colors.blueAccent[700],
               color: colors.grey[100],
@@ -97,7 +113,7 @@ const getPriorityColor = (priority) => {
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
@@ -174,7 +190,7 @@ const getPriorityColor = (priority) => {
           borderRadius="20px"
 
         >
-         <StatBox
+          <StatBox
             title={numProjects}
             subtitle="Assigned Projects"
             icon={
@@ -186,73 +202,89 @@ const getPriorityColor = (priority) => {
         </Box>
 
         {/* Recharts Bar Chart */}
-        <Box 
-        gridColumn="span 8"
-        gridRow="span 2"
-        backgroundColor={colors.primary[400]}
-        borderRadius='15px'
+        <Box
+          gridColumn="span 8"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          borderRadius='15px'
         >
-        <Box 
-        mb={4}
-        mt={2}
-        mr={2}
-        ml={2}
-        p="0 30px"
-        
-        >
-            <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.primary[110] }}>
-            Task Status Overview
-            </Typography>
-        </Box>
-        <ResponsiveContainer width="100%" height={230}>
-                <LineChart data={chartData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="Not Started" name="Not Started" stroke={colors.redAccent[400]} />
-                <Line type="monotone" dataKey="In Progress" name="In Progress" stroke={colors.blueAccent[400]} />
-                <Line type="monotone" dataKey="Completed" name="Completed" stroke={colors.greenAccent[400]} />
-                </LineChart>
-                </ResponsiveContainer>
-         </Box>
-
-
-        {/* Line Chart: Task Completion Trends Over Time */}
-        <Box 
-            gridColumn="span 4"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-            borderRadius='15px'        >
-          <Box 
-          mb={4}
-         
+          <Box
+            mb={4}
+            mt={2}
+            mr={2}
+            ml={2}
+            p="0 30px"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
           >
-            <Typography variant="h5" 
-            sx={{ 
-                fontWeight: "bold",
-                color: colors.primary[110] ,
-                marginTop: '10px',
-                marginLeft: '10px'}}>
-              Task Completion Trends Over Time
+            <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.primary[110] }}>
+              Task Status Overview
             </Typography>
+            <Button onClick={() => handleDownloadPdf("line")} variant="" color="primary">
+              <DownloadOutlinedIcon />
+              {/* Download Line Chart as PDF */}
+            </Button>
           </Box>
           <ResponsiveContainer width="100%" height={230}>
-        <PieChart>
-          <Pie
-            data={dataPie}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            fill={colors.grey[500]}
-            label={({ name, value }) => `${name}: ${value}`}
-          />
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+            <LineChart data={chartData}>
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="Not Started" name="Not Started" stroke={colors.redAccent[400]} />
+              <Line type="monotone" dataKey="In Progress" name="In Progress" stroke={colors.blueAccent[400]} />
+              <Line type="monotone" dataKey="Completed" name="Completed" stroke={colors.greenAccent[400]} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Box>
+
+
+        {/* Pie Chart: Task Completion Trends Over Time */}
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          borderRadius='15px'
+          height='300px'
+          mb="1"
+        >
+          <Box
+            mb={1}
+            mt={1}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            pl={2}
+            pr={2}
+          >
+            <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.primary[110] }}>
+            Task Priority Overview
+            </Typography>
+            <Button onClick={() => handleDownloadPdf("pie")} variant="" color="primary">
+              <DownloadOutlinedIcon />
+              {/* Download Pie Chart as PDF */}
+            </Button>
+          </Box>
+
+          <Box ref={chartRef}>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={dataPie}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill={colors.grey[500]}
+                  label={({ name, value }) => `${name}: ${value}`}
+                />
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Box>
         </Box>
       </Box>
     </Box>

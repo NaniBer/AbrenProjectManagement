@@ -29,13 +29,21 @@ const Resource = () => {
         const endDate = new Date(resource.endDate);
         const differenceInTime = endDate.getTime() - today.getTime();
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-        return differenceInDays > 0 ? differenceInDays : 0;
+    
+        if (differenceInDays < 0) {
+          return `Overdue by ${Math.abs(differenceInDays)} ${Math.abs(differenceInDays) === 1 ? 'day' : 'days'}`;
+        } else if (differenceInDays === 0) {
+          return 'Due today';
+        } else {
+          return `${differenceInDays} ${differenceInDays === 1 ? 'day' : 'days'} left`;
+        }
       });
       setDaysLeft(daysLeftArray);
-    };
+   
+     };
 
     calculateDaysLeft();
-  }, [Task]);
+  }, []);
 
   // Dummy function to update progress data
   const updateProgressData = () => {
@@ -81,7 +89,7 @@ const Resource = () => {
                 <Box display="flex" alignItems="center" mt={2}>
                   <AccessTimeIcon color="secondary" />
                   <Typography variant="body1" sx={{ ml: 1 }}>
-                    {daysLeft[index]} {daysLeft[index] === 1 ? 'day' : 'days'} left
+                    {daysLeft[index]} 
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mt={2}>

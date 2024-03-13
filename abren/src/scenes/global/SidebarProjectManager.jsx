@@ -185,7 +185,7 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Kanban"
-              to="/kanban"
+              to="/kanbanPM"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

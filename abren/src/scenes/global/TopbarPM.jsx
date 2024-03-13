@@ -11,7 +11,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { DashboardTMdata, assignedTask, dummyProjectData } from "../../data/mockData"; // Import your dummy data
+import { PMtodolost, assignedTask, mockUpdatedDataProject } from "../../data/mockData"; // Import your dummy data
 
 const Topbar = () => {
   const theme = useTheme();
@@ -20,7 +20,7 @@ const Topbar = () => {
   const [notificationTasks, setNotificationTasks] = useState([]);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [anchorElProfile, setAnchorElProfile] = useState(null);
-  const [tasks, setTasks] = useState(DashboardTMdata);
+  const [tasks, setTasks] = useState(PMtodolost);
   
   useEffect(() => {
     const today = new Date();
@@ -41,10 +41,10 @@ const Topbar = () => {
 
   useEffect(() => {
     const today = new Date();
-    const nearingDeadlineProjects = dummyProjectData.filter(project => new Date(project.endDate) <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)); // Within a week
+    const nearingDeadlineProjects = mockUpdatedDataProject.filter(project => new Date(project.endDate) <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)); // Within a week
     const notificationProjects = nearingDeadlineProjects.map(project => ({
       type: "project",
-      name: project.name,
+      name: project.projectname,
       daysLeft: Math.ceil((new Date(project.endDate) - today) / (1000 * 60 * 60 * 24)), // Calculate days left
       // isUrgent: project.priority === "High" // Check if project is high priority
     }));
@@ -84,6 +84,7 @@ const Topbar = () => {
     // Close the notification menu
     setAnchorElNotification(null);
   };
+  
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -141,13 +142,13 @@ const Topbar = () => {
       >
         {notificationTasks.map((task, index) => (
           <Box key={index}>
-           <MenuItem
+          <MenuItem
             onClick={() => handleCloseNotificationMenu(index)}
             component={Link}
-            to={task.type === "project" ? "/viewAssignedProject" : task.type === "assignedTask" ? "/viewAssignedTask" : "/kanban"}  sx={{ whiteSpace: 'normal' }}
+            to={task.type === "project" ? "/projectInfo" : task.type === "assignedTask" ? "/list" : "/kanbanPM"}
+            sx={{ whiteSpace: 'normal' }}
           >  
-    {/* <MenuItem onClick={handleCloseNotificationMenu} component={Link} to={task.type === "project" ? "/viewAssignedProject" : task.type === "assignedTask" ? "/viewAssignedTask" : "/kanban"} sx={{ whiteSpace: 'normal' }}> */}
-              <ListItemIcon>
+            <ListItemIcon>
                 <span style={{ fontSize: "26px", color: task.isUrgent ? 'red' : (task.type === "project" ? colors.primary[110] : colors.greenAccent[500]) }}>&#8226;</span>
               </ListItemIcon>
               <Box sx={{ flex: 1, ml: -1 }}>
@@ -158,11 +159,15 @@ const Topbar = () => {
                     ? "Due Today"
                     : task.daysLeft === 1
                       ? "1 day left"
-                      : `${task.daysLeft} days left`
+                      : task.daysLeft < 0  
+                        ? `${Math.abs(task.daysLeft)} days overdue`
+                        : `${task.daysLeft} days left`
                   : task.daysLeft === 0
                     ? "Due Today"
-                    : `${task.daysLeft}  `
-                    }
+                    : task.daysLeft === 1  // Adjusted condition to display "1 day left"
+                      ? "1 day left"
+                      : `${task.daysLeft}  `
+                 }
                </div>
               </Box>
             </MenuItem>

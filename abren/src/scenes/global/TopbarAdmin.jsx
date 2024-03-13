@@ -1,30 +1,73 @@
-import React, { useState } from "react";
-import { Box, IconButton, useTheme, Menu, MenuItem ,ListItemIcon } from "@mui/material";
-import { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-// import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { Link } from "react-router-dom";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp"
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElProfile, setAnchorElProfile] = useState(null);
+  const [anchorElNotification, setAnchorElNotification] = useState(null);
+  const [projects, setProjects] = useState([
+    {
+      id: 1,
+      projectname: "Kaizen website",
+      description: "kaizen is a tech company ",
+      projectmanager: "saronbisrat.kaizen",
+      status: "active",
+      startDate: '2024-03-14',
+    },
+    {
+      id: 2,
+      projectname: "New website",
+      description: "kaizen is a tech company ",
+      projectmanager: "saronbisrat.kaizen",
+      status: "active",
+      startDate: '2024-03-18',
+    },
+  ]);
+  const [notificationCount, setNotificationCount] = useState(0);
 
-  const handleProfileIconClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  useEffect(() => {
+    const calculateNotificationCount = () => {
+      // Calculate notification count based on project assignment to a project manager
+      const projectsWithNotification = projects.filter(project => project.projectmanager !== "" && isNotificationRequired(project.startDate));
+      setNotificationCount(projectsWithNotification.length);
+    };
+
+    calculateNotificationCount();
+  }, [projects]);
+
+  const isNotificationRequired = (startDate) => {
+    const today = new Date();
+    const projectStartDate = new Date(startDate);
+    // Calculate the difference in milliseconds between today and the project start date
+    const differenceInTime = projectStartDate.getTime() - today.getTime();
+    // Calculate the difference in days
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+    // If the project start date is within the next 7 days, return true for notification requirement
+    return differenceInDays <= 7 && differenceInDays >= 0;
   };
 
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
+  const handleProfileIconClick = (event) => {
+    setAnchorElProfile(event.currentTarget);
+  };
+
+  const handleCloseProfileMenu = () => {
+    setAnchorElProfile(null);
+  };
+
+  const handleNotificationIconClick = (event) => {
+    setAnchorElNotification(event.currentTarget);
   };
 
   return (
@@ -33,14 +76,14 @@ const Topbar = () => {
       <Box
         display="flex"
         backgroundColor={colors.primary[400]}
-        borderRadius="20px" // Increase the border radius to make it rounder
-        width="500px" // Adjust the width of the search bar
-        sx={{ margin: "auto" }} // Center the search bar horizontally
+        borderRadius="20px"
+        width="500px"
+        sx={{ margin: "auto" }}
       >
         <InputBase
           sx={{ ml: 2, flex: 1 }}
           placeholder="Search"
-          inputProps={{ style: { borderRadius: "20px" } }} // Round the input field
+          inputProps={{ style: { borderRadius: "20px" } }}
         />
         <IconButton type="button" sx={{ p: 1 }}>
           <SearchIcon />
@@ -56,12 +99,11 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton>
-          <NotificationsOutlinedIcon />
+        <IconButton onClick={handleNotificationIconClick}>
+          <Badge badgeContent={notificationCount} color="error">
+            <NotificationsOutlinedIcon />
+          </Badge>
         </IconButton>
-        {/* <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton> */}
         <IconButton onClick={handleProfileIconClick}>
           <PersonOutlinedIcon />
         </IconButton>
@@ -69,47 +111,71 @@ const Topbar = () => {
 
       {/* Profile Menu */}
       <Menu
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleCloseMenu}
-  
->
-  <MenuItem
-    component={Link}
-    to="/updateandreset"
-    onClick={handleCloseMenu}
-    
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      color: colors.grey[100], // Set the text color
-      '&:hover': {
-        backgroundColor: colors.primary[200], // Change background color on hover
-      },
-    }}
-  >
-    <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
-      <PersonOutlineIcon fontSize="small" />
-    </ListItemIcon>
-    Profile
-  </MenuItem>
-  <MenuItem
-    onClick={handleCloseMenu}
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      color: colors.grey[100], // Set the text color
-      '&:hover': {
-        backgroundColor: colors.primary[200], // Change background color on hover
-      },
-    }}
-  >
-    <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
-      <ExitToAppIcon fontSize="small" />
-    </ListItemIcon>
-    Logout
-  </MenuItem>
-</Menu>
+        anchorEl={anchorElProfile}
+        open={Boolean(anchorElProfile)}
+        onClose={handleCloseProfileMenu}
+      >
+        <MenuItem
+          component={Link}
+          to="/updateandreset"
+          onClick={handleCloseProfileMenu}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: colors.grey[100],
+            '&:hover': {
+              backgroundColor: colors.primary[200],
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+            <PersonOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem
+          onClick={handleCloseProfileMenu}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: colors.grey[100],
+            '&:hover': {
+              backgroundColor: colors.primary[200],
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+            <ExitToAppIcon fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
+
+      {/* Notification Menu */}
+      <Menu
+        anchorEl={anchorElNotification}
+        open={Boolean(anchorElNotification)}
+        onClose={() => setAnchorElNotification(null)}
+      >
+        {projects.map((project, index) => (
+          <MenuItem
+            key={index}
+            component={Link}
+            to="/viewproject"
+            onClick={() => {
+              // Decrease notification count when menu item is clicked
+              setNotificationCount(prevCount => prevCount - 1);
+              setAnchorElNotification(null);
+            }}
+            sx={{ whiteSpace: 'normal' }}
+          >
+            <ListItemIcon>
+              <span style={{ fontSize: "26px", color: colors.primary[110] }}>&#8226;</span>
+            </ListItemIcon>
+            <Typography>{project.projectname}</Typography>
+          </MenuItem>
+        ))}
+      </Menu>
     </Box>
   );
 };
