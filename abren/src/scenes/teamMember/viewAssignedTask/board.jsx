@@ -5,7 +5,6 @@ import { tokens } from '../../../theme';
 import { useTheme } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import swal from 'sweetalert';
-// import updatedTasks from "../../../data/mockData";
 
 function TaskList() {
   const theme = useTheme();
@@ -16,28 +15,39 @@ function TaskList() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [subtaskChecked, setSubtaskChecked] = useState([]);
+  const [taskProgress, setTaskProgress] = useState(0);
 
   const dummyTaskData = [
     {
-      id:1,
+      id: 1,
       name: 'Task 1',
       startDate: '2024-03-09',
       endDate: '2024-03-12',
       project: 'Project X',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
-      subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+      subtasks: [
+        { name: "Subtask 1", status: "Not completed" },
+        { name: "Subtask 2", status: "Not completed" },
+        { name: "Subtask 3", status: "Not completed" }
+      ],
     },
     {
-      id:2,
+      id: 2,
       name: 'Task 2',
       startDate: '2024-03-13',
       endDate: '2024-03-14',
       project: 'Project Y',
       description: 'Nullam non bibendum lectus. Donec ac ultricies libero. Sed eget dapibus odio.',
-      subtasks: ['Subtask A', 'Subtask B', 'Subtask C'],
+      subtasks: [
+        { name: "Subtask A", status: "Not completed" },
+        { name: "Subtask B", status: "Not completed" },
+        { name: "Subtask C", status: "Not completed" },
+        { name: "Subtask D", status: " completed" }
+
+      ],
     },
     {
-      id:3,
+      id: 3,
       name: 'Task 3',
       startDate: '2024-03-19',
       endDate: '2024-03-25',
@@ -45,7 +55,7 @@ function TaskList() {
       description: 'Fusce auctor elit at magna feugiat, nec lacinia mi tempus. Fusce nec ex id magna gravida ultrices.',
     },
     {
-      id:4,
+      id: 4,
       name: 'Task 4',
       startDate: '2024-03-14',
       endDate: '2024-03-15',
@@ -53,7 +63,7 @@ function TaskList() {
       description: 'Quisque vestibulum magna et libero ultricies, quis porttitor eros gravida.',
     },
     {
-      id:5,
+      id: 5,
       name: 'Task 5',
       startDate: '2024-03-15',
       endDate: '2024-03-15',
@@ -61,7 +71,7 @@ function TaskList() {
       description: 'Vestibulum consequat nisl et fermentum luctus. Fusce sit amet semper mauris.',
     },
     {
-      id:6,
+      id: 6,
       name: 'Task 6',
       startDate: '2024-03-18',
       endDate: '2024-03-20',
@@ -74,11 +84,11 @@ function TaskList() {
     // Calculate categories based on dates
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Remove time from today's date
-  
+
     const updatedTasks = dummyTaskData.map(task => {
       const taskDate = new Date(task.endDate);
       taskDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to compare only the date part
-  
+
       if (taskDate.getTime() === today.getTime()) {
         return { ...task, category: 'today' };
       } else if (taskDate > today) {
@@ -87,10 +97,9 @@ function TaskList() {
         return { ...task, category: 'assigned' }; // Assign all tasks with end dates before today to the 'assigned' category
       }
     });
-  
+
     setTasks(updatedTasks);
   }, []);
-  
 
   function calculateDueDate(startDate, endDate) {
     const formattedStartDate = new Date(startDate);
@@ -173,13 +182,25 @@ function TaskList() {
 
   const handleTaskClick = (task) => {
     setSelectedRowData(task);
-    setSubtaskChecked(task.subtasks ? Array(task.subtasks.length).fill(false) : []);
+    if (task.subtasks) {
+      setSubtaskChecked(Array(task.subtasks.length).fill(false));
+      calculateProgress(Array(task.subtasks.length).fill(false));
+    }
   };
+  
 
   const handleCheckboxChange = (index) => {
     const updatedChecked = [...subtaskChecked];
     updatedChecked[index] = !updatedChecked[index];
     setSubtaskChecked(updatedChecked);
+    calculateProgress(updatedChecked);
+  };
+
+  const calculateProgress = (checkedArray) => {
+    const completedCount = checkedArray.filter(item => item).length;
+    const totalCount = checkedArray.length;
+    const progress = (completedCount / totalCount) * 100;
+    setTaskProgress(progress);
   };
 
   const kanbanColumns = [
@@ -193,29 +214,29 @@ function TaskList() {
       <Grid container spacing={3}>
         {kanbanColumns.map(column => (
           <Grid item xs={12} md={4} key={column.id}>
-            <Box p={2} bgcolor={colors.primary[100]} borderRadius={4} sx={{backgroundColor: colors.blueAccent[300]}}>
-              <Typography variant="h3" gutterBottom style={{color: colors.grey[900]}}>{column.title}</Typography>
+            <Box p={2} bgcolor={colors.primary[100]} borderRadius={4} sx={{ backgroundColor: colors.blueAccent[300] }}>
+              <Typography variant="h3" gutterBottom style={{ color: colors.grey[900] }}>{column.title}</Typography>
               {tasks.filter(task => task.category === column.id).map(task => (
                 <Card key={task.id} variant="outlined" sx={{ marginBottom: 2 }}>
                   <CardContent sx={{ position: 'relative' }}>
-                    <Box sx={{display: 'flex' , justifyContent: 'space-between' , alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Checkbox
                         checked={task.completed}
                         onChange={() => toggleTaskCompletion(task.id)}
                         sx={{
-                            position: 'absolute',
-                            marginBottom: '10px',
-                            marginLeft: '-10px',
-                            '& .MuiIconButton-root': {
-                                borderRadius: '50%',
-                            },
-                            '& .MuiSvgIcon-root': {
-                                width: '1em',
-                                height: '1em',
-                            },
-                            '&.Mui-checked .MuiSvgIcon-root': {
-                                color: colors.greenAccent[500],
-                            },
+                          position: 'absolute',
+                          marginBottom: '10px',
+                          marginLeft: '-10px',
+                          '& .MuiIconButton-root': {
+                            borderRadius: '50%',
+                          },
+                          '& .MuiSvgIcon-root': {
+                            width: '1em',
+                            height: '1em',
+                          },
+                          '&.Mui-checked .MuiSvgIcon-root': {
+                            color: colors.greenAccent[500],
+                          },
                         }}
                       />
                       <Typography
@@ -226,8 +247,8 @@ function TaskList() {
                         {task.name}
                       </Typography>
                     </Box>
-                    <Typography variant="caption" sx={{color: colors.greenAccent[400]}}>{task.endDate}</Typography>
-                  </CardContent>             
+                    <Typography variant="caption" sx={{ color: colors.greenAccent[400] }}>{task.endDate}</Typography>
+                  </CardContent>
                 </Card>
               ))}
             </Box>
@@ -252,28 +273,31 @@ function TaskList() {
                 <Typography variant="body1" component="span" sx={{ color: colors.greenAccent[400], paddingLeft: '10px', paddingBottom: '15px' }}>{calculateDueDate(selectedRowData.startDate, selectedRowData.endDate)}</Typography>
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                <Typography variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '15px',  }}> Description:</Typography> {selectedRowData.description}
+                <Typography variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '15px' }}> Description:</Typography> {selectedRowData.description}
               </Typography>
-              
-              {selectedRowData.subtasks && selectedRowData.subtasks.length > 0 && (
-              <>
-                <Typography variant="subtitle1" gutterBottom>
-                  <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400], paddingBottom: '10px' }}>
-                    Subtasks:
-                  </Typography>
-                </Typography>
-                {selectedRowData.subtasks.map((subtask, index) => (
-                  <Box key={index} display="flex" alignItems="center" gutterBottom>
-                    <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
-                    <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
-                      {subtask}
-                    </Typography>
-                  </Box>
-                ))}
-              </>
-            )}
 
-              {!selectedRowData.subtasks && (
+              {selectedRowData.subtasks && selectedRowData.subtasks.length > 0 && (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>
+                    <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400], paddingBottom: '10px' }}>
+                      Subtasks:
+                    </Typography>
+                  </Typography>
+                  {selectedRowData.subtasks.map((subtask, index) => (
+                    <Box key={index} display="flex" alignItems="center" gutterBottom>
+                      <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
+                      <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
+                        {subtask.name}
+                      </Typography>
+                    </Box>
+                  ))}
+                  <Typography variant="body2" gutterBottom style={{ color: colors.greenAccent[400], paddingTop: '15px' }}>
+                    Progress: {taskProgress.toFixed(0)}%
+                  </Typography>
+                </>
+              )}
+
+            {!selectedRowData.subtasks && (
                 <Box sx={{ width: '95%' }}>
                   <Typography id="progress-slider" variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '20px' }} gutterBottom>
                     Progress:
@@ -292,7 +316,6 @@ function TaskList() {
                 startIcon={<FaCheck />}
                 onClick={() => toggleTaskCompletion(selectedRowData.id)}
                 sx={{ position: 'absolute', bottom: '20px', right: '20px' }}
-                // marginTop= '20px'
               >
                 Mark as Completed
               </Button>

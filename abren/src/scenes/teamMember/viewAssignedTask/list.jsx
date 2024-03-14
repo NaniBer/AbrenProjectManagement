@@ -14,25 +14,35 @@ function TaskList() {
 
   const dummyTaskData = [
     {
-      id:1,
+      id: 1,
       name: 'Task 1',
       startDate: '2024-03-09',
       endDate: '2024-03-12',
       project: 'Project X',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
-      subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+      subtasks: [
+        { name: "Subtask 1", status: "Not completed" },
+        { name: "Subtask 2", status: "Not completed" },
+        { name: "Subtask 3", status: "Not completed" }
+      ],
     },
     {
-      id:2,
+      id: 2,
       name: 'Task 2',
       startDate: '2024-03-13',
       endDate: '2024-03-14',
       project: 'Project Y',
       description: 'Nullam non bibendum lectus. Donec ac ultricies libero. Sed eget dapibus odio.',
-      subtasks: ['Subtask A', 'Subtask B', 'Subtask C'],
+      subtasks: [
+        { name: "Subtask A", status: "Not completed" },
+        { name: "Subtask B", status: "Not completed" },
+        { name: "Subtask C", status: "Not completed" },
+        { name: "Subtask D", status: " completed" }
+
+      ],
     },
     {
-      id:3,
+      id: 3,
       name: 'Task 3',
       startDate: '2024-03-19',
       endDate: '2024-03-25',
@@ -40,7 +50,7 @@ function TaskList() {
       description: 'Fusce auctor elit at magna feugiat, nec lacinia mi tempus. Fusce nec ex id magna gravida ultrices.',
     },
     {
-      id:4,
+      id: 4,
       name: 'Task 4',
       startDate: '2024-03-14',
       endDate: '2024-03-15',
@@ -48,7 +58,7 @@ function TaskList() {
       description: 'Quisque vestibulum magna et libero ultricies, quis porttitor eros gravida.',
     },
     {
-      id:5,
+      id: 5,
       name: 'Task 5',
       startDate: '2024-03-15',
       endDate: '2024-03-15',
@@ -56,7 +66,7 @@ function TaskList() {
       description: 'Vestibulum consequat nisl et fermentum luctus. Fusce sit amet semper mauris.',
     },
     {
-      id:6,
+      id: 6,
       name: 'Task 6',
       startDate: '2024-03-18',
       endDate: '2024-03-20',
@@ -70,7 +80,8 @@ function TaskList() {
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [subtaskChecked, setSubtaskChecked] = useState(Array(assignedTask.subtasks?.length ?? 0).fill(false));
+  const [subtaskChecked, setSubtaskChecked] = useState([]);
+  const [taskProgress, setTaskProgress] = useState(0);
 
   useEffect(() => {
     // Calculate categories based on dates
@@ -117,6 +128,21 @@ function TaskList() {
     setSelectedRowData(null);
   };
 
+  const calculateProgress = (checkedArray) => {
+    const completedCount = checkedArray.filter(item => item).length;
+    const totalCount = checkedArray.length;
+    const progress = (completedCount / totalCount) * 100;
+    setTaskProgress(progress);
+  };
+  
+  const handleTaskClick = (task) => {
+    setSelectedRowData(task);
+    if (task.subtasks) {
+      setSubtaskChecked(Array(task.subtasks.length).fill(false));
+      calculateProgress(Array(task.subtasks.length).fill(false));
+    }
+  };
+
   function calculateDueDate(startDate, endDate) {
     const formattedStartDate = new Date(startDate);
     const formattedEndDate = new Date(endDate);
@@ -143,7 +169,9 @@ function TaskList() {
     const updatedChecked = [...subtaskChecked];
     updatedChecked[index] = !updatedChecked[index];
     setSubtaskChecked(updatedChecked);
+    calculateProgress(updatedChecked); // Call calculateProgress function with updated array
   };
+  
 
   const handleCheckboxClick = (event, row) => {
     if (event && event.stopPropagation) {
@@ -376,17 +404,26 @@ function TaskList() {
               <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
                 <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}> Description:</Typography> {selectedRowData.description}
               </Typography>
-              <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-                <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Subtasks:</Typography>
-              </Typography>
-              {selectedRowData.subtasks && selectedRowData.subtasks.map((subtask, index) => (
-                <Box key={index} display="flex" alignItems="center" gutterBottom sx={{ paddingBottom: '10px' }}>
-                  <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
-                  <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
-                    {subtask}
+              {selectedRowData.subtasks && selectedRowData.subtasks.length > 0 && (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>
+                    <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400], paddingBottom: '10px' }}>
+                      Subtasks:
+                    </Typography>
                   </Typography>
-                </Box>
-              ))}
+                  {selectedRowData.subtasks.map((subtask, index) => (
+                    <Box key={index} display="flex" alignItems="center" gutterBottom>
+                      <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
+                      <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
+                        {subtask.name}
+                      </Typography>
+                    </Box>
+                  ))}
+                  <Typography variant="body2" gutterBottom style={{ color: colors.greenAccent[400], paddingTop: '15px' }}>
+                    Progress: {taskProgress.toFixed(0)}%
+                  </Typography>
+                </>
+              )}
                {!selectedRowData.subtasks && (
                 <Box sx={{ width: '95%' }}>
                   <Typography id="progress-slider" variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '20px' }} gutterBottom>

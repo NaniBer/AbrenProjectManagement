@@ -15,6 +15,9 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+
+  const loggedInUser = "John Doe";
+
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [projects, setProjects] = useState([
@@ -75,19 +78,28 @@ const Topbar = () => {
       {/* SEARCH BAR */}
       <Box
         display="flex"
-        backgroundColor={colors.primary[400]}
+        // backgroundColor={colors.primary[400]}
         borderRadius="20px"
-        width="500px"
+        alignContent="center"
+        alignItems="center"
+        // width="500px"
         sx={{ margin: "auto" }}
       >
-        <InputBase
+        {/* Welcome message for the logged-in user */}
+      <Box display="flex" alignItems="center">
+        <Typography variant="h3" component="span" mr={1}>
+          Welcome, <Typography component="span" variant="h3" sx={{color:colors.greenAccent[400]}}>{loggedInUser}</Typography>
+        </Typography>
+      </Box>
+
+        {/* <InputBase
           sx={{ ml: 2, flex: 1 }}
           placeholder="Search"
           inputProps={{ style: { borderRadius: "20px" } }}
         />
         <IconButton type="button" sx={{ p: 1 }}>
           <SearchIcon />
-        </IconButton>
+        </IconButton> */}
       </Box>
 
       {/* ICONS */}

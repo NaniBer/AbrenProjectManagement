@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon } from "@mui/material";
+import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon, Typography } from "@mui/material";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
@@ -22,6 +22,8 @@ const Topbar = () => {
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [tasks, setTasks] = useState(DashboardTMdata);
   
+  const loggedInUser = "John Doe";
+
   useEffect(() => {
     const today = new Date();
     const nearingDeadlineTasks = tasks.filter(task => {
@@ -90,19 +92,16 @@ const Topbar = () => {
       {/* SEARCH BAR */}
       <Box
         display="flex"
-        backgroundColor={colors.primary[400]}
+        // backgroundColor={colors.primary[400]}
         borderRadius="20px" // Increase the border radius to make it rounder
-        width="500px" // Adjust the width of the search bar
+        // width="500px" // Adjust the width of the search bar
         sx={{ margin: "auto" }} // Center the search bar horizontally
       >
-        <InputBase
-          sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
-          inputProps={{ style: { borderRadius: "20px" } }} // Round the input field
-        />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
+         <Box display="flex" alignItems="center">
+        <Typography variant="h3" component="span" mr={1}>
+          Welcome, <Typography component="span" variant="h3" sx={{color:colors.greenAccent[400]}}>{loggedInUser}</Typography>
+        </Typography>
+      </Box>
       </Box>
 
       {/* ICONS */}
