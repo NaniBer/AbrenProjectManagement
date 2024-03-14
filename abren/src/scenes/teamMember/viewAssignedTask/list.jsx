@@ -4,7 +4,7 @@ import { FaAngleDown } from 'react-icons/fa';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckIcon from '@mui/icons-material/Check';
 import { tokens } from '../../../theme';
-import { Box, Button, useTheme, Modal, Typography, Checkbox } from '@mui/material';
+import { Box, Button, useTheme, Modal, Typography, Checkbox , Slider} from '@mui/material';
 import swal from 'sweetalert';
 import { assignedTask } from '../../../data/mockData';
 
@@ -12,14 +12,58 @@ function TaskList() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // const assignedTask = {
-  //   name: 'Task 1',
-  //   startDate: '2024-03-09',
-  //   endDate: '2024-03-12',
-  //   project: 'Project X',
-  //   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
-  //   subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
-  // };
+  const dummyTaskData = [
+    {
+      id:1,
+      name: 'Task 1',
+      startDate: '2024-03-09',
+      endDate: '2024-03-12',
+      project: 'Project X',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.',
+      subtasks: ['Subtask 1', 'Subtask 2', 'Subtask 3'],
+    },
+    {
+      id:2,
+      name: 'Task 2',
+      startDate: '2024-03-13',
+      endDate: '2024-03-14',
+      project: 'Project Y',
+      description: 'Nullam non bibendum lectus. Donec ac ultricies libero. Sed eget dapibus odio.',
+      subtasks: ['Subtask A', 'Subtask B', 'Subtask C'],
+    },
+    {
+      id:3,
+      name: 'Task 3',
+      startDate: '2024-03-19',
+      endDate: '2024-03-25',
+      project: 'Project Z',
+      description: 'Fusce auctor elit at magna feugiat, nec lacinia mi tempus. Fusce nec ex id magna gravida ultrices.',
+    },
+    {
+      id:4,
+      name: 'Task 4',
+      startDate: '2024-03-14',
+      endDate: '2024-03-15',
+      project: 'Project W',
+      description: 'Quisque vestibulum magna et libero ultricies, quis porttitor eros gravida.',
+    },
+    {
+      id:5,
+      name: 'Task 5',
+      startDate: '2024-03-15',
+      endDate: '2024-03-15',
+      project: 'Project V',
+      description: 'Vestibulum consequat nisl et fermentum luctus. Fusce sit amet semper mauris.',
+    },
+    {
+      id:6,
+      name: 'Task 6',
+      startDate: '2024-03-18',
+      endDate: '2024-03-20',
+      project: 'Project U',
+      description: 'Etiam malesuada felis at purus suscipit, in convallis ex fringilla.',
+    },
+  ];
 
   const [showRecent, setShowRecent] = useState(false);
   const [showToday, setShowToday] = useState(false);
@@ -32,29 +76,17 @@ function TaskList() {
     // Calculate categories based on dates
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Remove time from today's date
-    const upcomingLimit = new Date(today); // Date for considering tasks as upcoming (e.g., tasks after today)
-    upcomingLimit.setDate(upcomingLimit.getDate() + 1); // Consider tasks after today as upcoming
   
-    const updatedTasks = [
-      { id: 1, name: 'Task 1', date: '2024-03-04', project: 'Project A', completed: false },
-      { id: 2, name: 'Task 2', date: '2024-03-08', project: 'Project B', completed: false },
-      { id: 3, name: 'Task 3', date: '2024-03-09', project: 'Project C', completed: false },
-      { id: 4, name: 'Task 4', date: '2024-03-09', project: 'Project D', completed: false },
-      { id: 5, name: 'Task 5', date: '2024-03-10', project: 'Project E', completed: false },
-      { id: 6, name: 'Task 6', date: '2024-03-05', project: 'Project F', completed: false },
-      { id: 7, name: 'Task 7', date: '2024-03-15', project: 'Project G', completed: false },
-
-    ].map(task => {
-      const taskDate = new Date(task.date);
+    const updatedTasks = dummyTaskData.map(task => {
+      const taskDate = new Date(task.endDate);
       taskDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to compare only the date part
+  
       if (taskDate.getTime() === today.getTime()) {
         return { ...task, category: 'today' };
-      } else if (taskDate > today && taskDate <= upcomingLimit) {
+      } else if (taskDate > today) {
         return { ...task, category: 'upcoming' };
       } else if (taskDate < today) {
-        return { ...task, category: 'recent' };
-      } else {
-        return { ...task, category: 'overdue' };
+        return { ...task, category: 'recent' }; // Assign all tasks with end dates before today to the 'assigned' category
       }
     });
   
@@ -64,8 +96,6 @@ function TaskList() {
   const toggleRecent = () => setShowRecent(!showRecent);
   const toggleToday = () => setShowToday(!showToday);
   const toggleUpcoming = () => setShowUpcoming(!showUpcoming);
-
-
 
   const allTasks = tasks.map((task) => ({
     ...task,
@@ -109,13 +139,11 @@ function TaskList() {
     }
   }
 
-
   const handleCheckboxChange = (index) => {
     const updatedChecked = [...subtaskChecked];
     updatedChecked[index] = !updatedChecked[index];
     setSubtaskChecked(updatedChecked);
   };
-
 
   const handleCheckboxClick = (event, row) => {
     if (event && event.stopPropagation) {
@@ -147,7 +175,6 @@ function TaskList() {
     });
   };
   
-  
   const handleMarkAsCompleted = () => {
     swal({
       title: "Task Completed?",
@@ -166,10 +193,6 @@ function TaskList() {
       }
     });
   };
-  
-  
-  
-  
 
   return (
     <Box>
@@ -321,67 +344,79 @@ function TaskList() {
         </div>
       </div>
       <Modal open={selectedRowData !== null} onClose={handleCloseModal}>
-  <Box
-    sx={{
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: colors.primary[400],
-      borderRadius: '20px',
-      boxShadow: 24,
-      p: 4,
-      maxWidth: 600,
-      height: '80%',
-      width: '100%',
-      outline: 'none',
-      overflow: 'auto',
-    }}
-  >
-    <Typography variant="h2" sx={{ color: colors.primary[110], paddingBottom: '15px' }} gutterBottom>
-      Task Details
-    </Typography>
-    {selectedRowData && (
-      <>
-        <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Task Name: </Typography>{assignedTask.name}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <AccessTimeIcon color="secondary" />
-          <Typography variant="body1" component="span" sx={{ color: colors.greenAccent[400], paddingLeft: '10px' }}>{calculateDueDate(assignedTask.startDate, assignedTask.endDate)}</Typography>
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}> Description:</Typography> {assignedTask.description}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
-          <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Subtasks:</Typography>
-        </Typography>
-        {assignedTask.subtasks && assignedTask.subtasks.map((subtask, index) => (
-          <Box key={index} display="flex" alignItems="center" gutterBottom sx={{ paddingBottom: '10px' }}>
-            <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
-            <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
-              {subtask}
-            </Typography>
-          </Box>
-        ))}
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<CheckIcon />}
-          onClick={handleMarkAsCompleted}
+        <Box
           sx={{
             position: 'absolute',
-            bottom: '20px',
-            right: '20px',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: colors.primary[400],
+            borderRadius: '20px',
+            boxShadow: 24,
+            p: 4,
+            maxWidth: 600,
+            height: '80%',
+            width: '100%',
+            outline: 'none',
+            overflow: 'auto',
           }}
         >
-          Mark as Completed
-        </Button>
-      </>
-    )}
-  </Box>
-</Modal>
-
+          <Typography variant="h2" sx={{ color: colors.primary[110], paddingBottom: '15px' }} gutterBottom>
+            Task Details
+          </Typography>
+          {selectedRowData && (
+            <>
+              <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
+                <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Task Name: </Typography>{selectedRowData.name}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
+                <AccessTimeIcon color="secondary" />
+                <Typography variant="body1" component="span" sx={{ color: colors.greenAccent[400], paddingLeft: '10px' }}>{calculateDueDate(selectedRowData.startDate, selectedRowData.endDate)}</Typography>
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
+                <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}> Description:</Typography> {selectedRowData.description}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom sx={{ paddingBottom: '10px' }}>
+                <Typography variant="h5" component="span" sx={{ color: colors.greenAccent[400] }}>Subtasks:</Typography>
+              </Typography>
+              {selectedRowData.subtasks && selectedRowData.subtasks.map((subtask, index) => (
+                <Box key={index} display="flex" alignItems="center" gutterBottom sx={{ paddingBottom: '10px' }}>
+                  <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
+                  <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
+                    {subtask}
+                  </Typography>
+                </Box>
+              ))}
+               {!selectedRowData.subtasks && (
+                <Box sx={{ width: '95%' }}>
+                  <Typography id="progress-slider" variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '20px' }} gutterBottom>
+                    Progress:
+                  </Typography>
+                  <Slider
+                    aria-labelledby="progress-slider"
+                    valueLabelDisplay="auto"
+                    // value={50} // Set your progress value here
+                    sx={{ color: colors.primary[110] }}
+                  />
+                </Box>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<CheckIcon />}
+                onClick={handleMarkAsCompleted}
+                sx={{
+                  position: 'absolute',
+                  bottom: '20px',
+                  right: '20px',
+                }}
+              >
+                Mark as Completed
+              </Button>
+            </>
+          )}
+        </Box>
+      </Modal>
     </Box>
   );
 }
