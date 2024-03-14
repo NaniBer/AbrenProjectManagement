@@ -39,7 +39,7 @@ const ProjectSchema = mongoose.Schema({
     type: String,
     //   required : true
   },
-  TeamMembers: [
+  teamMembers: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",

@@ -1,39 +1,56 @@
-const mongoose = require ('mongoose');
-const { schema } = require('./admin');
+const mongoose = require("mongoose");
+const { schema } = require("./admin");
 const TasksSchema = mongoose.Schema({
-    milestone : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Milestones',
-      //  required: true
-    },
-    TaskName : {
+  milestone: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Milestones",
+    //  required: true
+  },
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "projects",
+    // required: true,
+  },
+  TaskName: {
+    type: String,
+    required: true,
+  },
+  StartDate: {
+    type: Date,
+    required: true,
+  },
+  EndDate: {
+    type: Date,
+    required: true,
+  },
+  TaskDescription: {
+    type: String,
+    // required: true
+  },
+  viewed: {
+    type: Boolean,
+    //required: true
+  },
+  assignedTo: [
+    {
+      _id: {
         type: String,
-        required: true
-    },
-    StartDate : {
-        type: Date, 
-        required : true
-    },
-    EndDate: {
-        type: Date,
-        required: true
-    },
-    TaskDescription : {
+        required: true,
+      },
+      name: {
         type: String,
-       // required: true
+        required: true,
+      },
     },
-    viewed: {
-        type: Boolean,
-        //required: true
+  ],
+  status: {
+    type: Number,
+  },
+  subTasks: [
+    {
+      type: String,
     },
-    assignedTo: {
-         type: [String], 
-         required: true
-     }, 
-     status: {
-        type: Number,
-     }
-
-})
-const Tasks = mongoose.model('Tasks', TasksSchema)
+  ],
+});
+const Tasks = mongoose.model("Tasks", TasksSchema);
 module.exports = Tasks;

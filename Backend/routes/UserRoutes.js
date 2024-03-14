@@ -17,8 +17,15 @@ const Users = require("../Model/Users");
 //assign tasks for team members
 UserRouter.post("/TaskAssign", async (req, res) => {
   try {
-    const { TaskName, assignedTo, StartDate, EndDate, TaskDescription } =
-      req.body;
+    const {
+      TaskName,
+      assignedTo,
+      StartDate,
+      EndDate,
+      TaskDescription,
+      projectId,
+      subTasks,
+    } = req.body;
     //const milestone = await Milestones.findById(milestone)
     const task = new Tasks({
       TaskName,
@@ -26,7 +33,10 @@ UserRouter.post("/TaskAssign", async (req, res) => {
       StartDate,
       EndDate,
       TaskDescription,
+      projectId,
+      subTasks,
     });
+    console.log(task);
 
     await task.save();
 
@@ -34,6 +44,65 @@ UserRouter.post("/TaskAssign", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+UserRouter.put("/updateTask/:id", async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    console.log(taskId);
+    if (!taskId) {
+      return res.status(400).json({ success: false, error: "Invalid Task ID" });
+    }
+
+    const {
+      TaskName,
+      StartDate,
+      EndDate,
+      TaskDescription,
+      assignedTo,
+      subTasks,
+      projectId,
+    } = req.body;
+
+    const existingTask = await Tasks.findById(taskId);
+
+    if (!existingTask) {
+      return res.status(404).json({ success: false, error: "Task not found" });
+    }
+
+    existingTask.TaskName = TaskName;
+    existingTask.StartDate = StartDate;
+    existingTask.EndDate = EndDate;
+    existingTask.TaskDescription = TaskDescription;
+    existingTask.assignedTo = assignedTo;
+    existingTask.subTasks = subTasks;
+    existingTask.projectId = projectId;
+
+    await existingTask.save();
+
+    console.log("Task Edited");
+    res.status(200).json({ success: true, updatedTask: existingTask });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+UserRouter.delete("/deleteTask/:id", async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const result = await Tasks.deleteOne({ _id: taskId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "No record found for the given ID",
+      });
+    }
+    console.log("Deleted Task");
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -116,10 +185,12 @@ UserRouter.get("/view", async (req, res) => {
 // Delete Todo
 UserRouter.delete("/delete/:taskId", async (req, res) => {
   try {
-    const { taskId } = req.params;
+    const taskId = req.params.taskId;
+    // console.log(taskId);
 
     // Check if the todo exists
     const todo = await Todo.findById(taskId);
+    console.log(todo);
     if (!todo) {
       return res.status(404).json({ success: false, error: "Todo not found" });
     }
@@ -265,9 +336,11 @@ UserRouter.get("/activeUsers", async (req, res) => {
 
 UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
   try {
+    console.log("Adding project details");
     const { Budget, teamMembers, StartDate, EndDate } = req.body;
     const projectId = req.params.projectId;
-    const teamMemberIds = teamMembers.map((member) => member.id);
+    const teamMemberIds = teamMembers.map((member) => member._id);
+    console.log(teamMembers);
     // Find the project by ID
     const project = await Projects.findById(projectId);
 
@@ -277,12 +350,13 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
 
     // Update project details
     project.Budget = Budget;
-    project.TeamMembers = teamMemberIds;
+    project.teamMembers = teamMemberIds;
     project.StartDate = StartDate;
     project.EndDate = EndDate;
 
     // Save the updated project
     const updatedProject = await project.save();
+    console.log(updatedProject);
 
     res.status(200).json(updatedProject);
   } catch (error) {
@@ -292,12 +366,18 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
 });
 
 //Test route
-UserRouter.get("/project/:id", async (req, res) => {
+UserRouter.get("/project/", async (req, res) => {
   try {
-    const projectList = await Projects.find({
-      ProjectManager: req.body.id,
-    });
-    projectList.name = "hii";
+    // Get the count of task records
+    const taskCount = await Tasks.countDocuments({});
+
+    // Log the count to the console
+    console.log("Number of task records:", taskCount);
+
+    // Delete all task records
+    const projectList = await Tasks.deleteMany({});
+
+    // Respond with the list of deleted tasks
     res.json(projectList);
   } catch (error) {
     console.error(error);
@@ -410,6 +490,31 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "teamMembers",
+          foreignField: "_id",
+          as: "teamMembersDetails",
+        },
+      },
+      // Projection stage to include team members' names
+      {
+        $addFields: {
+          teamMembers: {
+            $map: {
+              input: "$teamMembersDetails",
+              as: "member",
+              in: {
+                _id: "$$member._id",
+                name: {
+                  $concat: ["$$member.firstname", " ", "$$member.lastname"],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         $addFields: {
           projectManager: {
             $arrayElemAt: ["$projectManagerDetails", 0],
@@ -427,18 +532,21 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
       {
         $project: {
           projectManagerDetails: 0, // Exclude projectManagerDetails array from final result
+          teamMembersDetails: 0,
+          // TeamMembers: 0,
         },
       },
     ]);
+    console.log(project);
 
     if (!project || project.length === 0) {
       return res.status(404).json({ message: "Project not found" });
     }
 
     // Check if the logged-in user is authorized to view this project
-    if (project[0].ProjectManager.toString() !== req.session.userId) {
-      return res.status(403).json({ message: "Unauthorized" });
-    }
+    // if (project[0].ProjectManager.toString() !== req.session.userId) {
+    //   return res.status(403).json({ message: "Unauthorized" });
+    // }
     console.log(project[0]);
 
     res.status(200).json(project[0]);

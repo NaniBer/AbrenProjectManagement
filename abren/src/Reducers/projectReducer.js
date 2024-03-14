@@ -108,6 +108,52 @@ const projectReducer = (state = initialState, action) => {
           ],
         },
       };
+    case "DELETE_TASK":
+      const taskId = action.payload;
+      // Find the index of the task in the project tasks array
+      const taskIndexToDelete = state.project.tasks.findIndex(
+        (task) => task._id === taskId
+      );
+      // Remove the task from the Task array in the state
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          tasks: [
+            ...state.project.tasks.slice(0, taskIndexToDelete),
+            ...state.project.tasks.slice(taskIndexToDelete + 1),
+          ],
+        },
+      };
+
+    case "ADD_TASK":
+      const newTask = action.payload;
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          tasks: [...state.project.tasks, newTask],
+        },
+      };
+    case "EDIT_TASK":
+      const updatedTask = action.payload;
+      console.log(updatedTask);
+      // Find the index of the resource in the project resources array
+      const taskIndex = state.project.tasks.findIndex(
+        (task) => task._id === updatedTask._id
+      );
+      // Update the resource details in the state
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          tasks: [
+            ...state.project.tasks.slice(0, taskIndex),
+            updatedTask,
+            ...state.project.tasks.slice(taskIndex + 1),
+          ],
+        },
+      };
 
     default:
       return state;

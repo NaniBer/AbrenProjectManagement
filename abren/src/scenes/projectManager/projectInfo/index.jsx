@@ -14,11 +14,13 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Autocomplete from "@mui/material/Autocomplete";
-import { mockDataProject, mockDataTeam } from "../../../data/mockData";
 import * as Yup from "yup";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
 import { useSelector } from "react-redux";
+
+import swal from "sweetalert";
+import dayjs from "dayjs";
 
 const MAX_BUDGET_LENGTH = 10; // Assuming a maximum of 10 characters for the budget
 const validationSchema = Yup.object().shape({
@@ -74,6 +76,17 @@ const Project = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Show loading modal
+    swal({
+      title: "Please wait...",
+      text: "Adding details",
+      buttons: false,
+      closeOnEsc: false,
+      closeOnClickOutside: false,
+      icon: "info",
+    });
+
     try {
       await validationSchema.validate(
         {
@@ -92,6 +105,7 @@ const Project = () => {
         Budget,
         teamMembers: selectedTeamMembers,
       };
+
       console.log(newProject);
 
       setSubmittedProjects(newProject);
@@ -113,8 +127,18 @@ const Project = () => {
 
         const result = await response.json();
         console.log(result); // Assuming the server responds with some data
+
+        // Close loading modal
+        swal.close();
+
+        // Show success message using SweetAlert
+        swal("Success!", "Details added successfully", "success");
       } catch (error) {
         console.error("Error adding project details:", error.message);
+        // Close loading modal
+        swal.close();
+        // Show error message using SweetAlert
+        swal("Error!", "Failed to add details", "error");
       }
 
       // Reset form fields, state, and selected team members
@@ -133,6 +157,8 @@ const Project = () => {
         errors[err.path] = err.message;
       });
       setValidationErrors(errors);
+      // Close loading modal
+      swal.close();
     }
   };
 
@@ -290,11 +316,11 @@ const Project = () => {
                       .filter(
                         (user) =>
                           !selectedTeamMembers.find(
-                            (selectedUser) => selectedUser.id === user._id
+                            (selectedUser) => selectedUser._id === user._id
                           )
                       )
                       .map((user) => ({
-                        id: user._id,
+                        _id: user._id,
                         name: user.name,
                       }))}
                     value={selectedTeamMembers}
@@ -494,12 +520,12 @@ const Project = () => {
                 {submittedProjects.teamMembers &&
                   submittedProjects.teamMembers.map((member) => (
                     <Tooltip
-                      key={member.id}
+                      key={member._id}
                       title={member.name}
                       placement="top"
                     >
                       <Avatar
-                        key={member.id}
+                        key={member._id}
                         sx={{
                           bgcolor: colors.primary[110],
                           height: "30px",
@@ -525,7 +551,7 @@ const Project = () => {
                 >
                   Start Date:{" "}
                 </Typography>
-                {submittedProjects?.StartDate}
+                {dayjs(submittedProjects?.StartDate).format("YYYY.MM.DD")}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <Typography
@@ -536,7 +562,7 @@ const Project = () => {
                   {" "}
                   End Date:{" "}
                 </Typography>{" "}
-                {submittedProjects.EndDate}
+                {dayjs(submittedProjects?.EndDate).format("YYYY.MM.DD")}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <Typography
