@@ -27,7 +27,7 @@ const Viewproject = () => {
       if (row.id === rowId) {
         return {
           ...row,
-          status: row.status === "inactive" ? "active" : "inactive",
+          status: row.status === "Inactive" ? "Active" : "Inactive",
         };
       }
       return row;
@@ -134,14 +134,14 @@ const Viewproject = () => {
   const columns = [
     {
       field: 'projectname',
-      headerName: 'Project name',
+      headerName: 'Project Name',
       flex: 1,
       cellClassName: 'name-column--cell',
     },
     {
       field: 'description',
       headerName: 'Description',
-      flex: 2,
+      flex: 2.5,
       renderCell: ({ row }) => (
         <div
           style={{ cursor: 'pointer' }}
@@ -153,15 +153,10 @@ const Viewproject = () => {
     },
     {
       field: 'projectmanager',
-      headerName: 'Project manager',
-      flex: 1,
+      headerName: 'Project Manager',
+      flex: 1.5,
     },
-    {
-      field: 'status',
-      headerName: 'Status',
-      flex: 1,
-      cellClassName: 'name-column--cell',
-    },
+    
     {
       field: 'actions',
       headerName: 'Actions',
@@ -173,9 +168,15 @@ const Viewproject = () => {
           onClick={() => handleDisable(row.id)}
           disabled={false}
         >
-          {row.status === 'active' ? 'Disable' : 'Enable'}
+          {row.status === 'Active' ? 'Disable' : 'Enable'}
         </Button>
       ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 1,
+      cellClassName: 'name-column--cell',
     },
     {
       field: 'update',
@@ -191,7 +192,7 @@ const Viewproject = () => {
     {
       field: 'delete',
       headerName: 'Delete',
-      flex: 0.5,
+      flex: 1,
       width: 100,
       renderCell: ({ row }) => (
         <Button variant="" color="primary" onClick={() => handleDelete(row.id)}>
@@ -283,9 +284,11 @@ const Viewproject = () => {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 500,
-            bgcolor: 'background.paper',
+            // bgcolor: '#1F2A40',
+            backgroundColor:colors.primary[400],
             boxShadow: 24,
             p: 4,
+            borderRadius:"20px",
           }}
         >
           <Typography variant="h2" component="h2" gutterBottom sx={{mb:"20px"}}>

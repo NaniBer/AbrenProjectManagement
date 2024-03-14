@@ -4,11 +4,11 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+// import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import AddCardIcon from "@mui/icons-material/AddCard";
 // import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import LogoutIcon from "@mui/icons-material/Logout";
+// import LogoutIcon from "@mui/icons-material/Logout";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewCompactIcon from "@mui/icons-material/ViewCompact";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -195,27 +195,27 @@ const SidebarAdmin = () => {
               setSelected={setSelected}
             />
 
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Account
-            </Typography>
-            <Item
+            </Typography> */}
+            {/* <Item
               title="Update and Reset"
               to="/updateandreset"
               icon={<RestartAltIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <div >
-              <Item
+              {/* <Item
                 title="Log Out"
                 icon={<LogoutIcon />}
                 // selected={selected}
                 setSelected={setSelected}
-              />
+              /> */}
             </div>
           </Box>
         </Menu>

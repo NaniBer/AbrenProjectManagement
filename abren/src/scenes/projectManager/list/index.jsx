@@ -208,7 +208,8 @@ const Resource = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: 'background.paper',
+            backgroundColor:colors.primary[400],
+            borderRadius: '20px',
             boxShadow: 24,
             p: 4,
             maxWidth: 800,
@@ -414,6 +415,14 @@ const Resource = () => {
                   </Button>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
+                  
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     variant="contained"
                     color="primary"
@@ -421,13 +430,6 @@ const Resource = () => {
                     startIcon={<AddIcon />}
                   >
                     Add
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCancel}
-                  >
-                    Cancel
                   </Button>
                 </Box>
               </Grid>

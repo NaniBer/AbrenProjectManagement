@@ -15,6 +15,9 @@ import {
 } from "@mui/material";
 import Header from "../../../components/Header";
 import { tokens } from "../../../theme";
+import { dummyProjectData } from "../../../data/mockData";
+import { PMtodolost } from "../../../data/mockData"; 
+import { assignedTask } from "../../../data/mockData"; 
 
 const Calendar = () => {
   const theme = useTheme();
@@ -58,6 +61,10 @@ const Calendar = () => {
           backgroundColor={colors.primary[400]}
           p="15px"
           borderRadius="4px"
+          sx={{
+            maxHeight: "75vh", // Maximum height of the sidebar
+            overflowY: currentEvents.length > 3 ? "auto" : "initial", // Enable overflow-y auto when content exceeds 3 items
+          }}
         >
           <Typography variant="h5">Events</Typography>
           <List>
@@ -111,16 +118,28 @@ const Calendar = () => {
             eventClick={handleEventClick}
             eventsSet={(events) => setCurrentEvents(events)}
             initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
+              ...dummyProjectData.map((project) => ({
+                id: project.name,
+                title: project.name,
+                start: project.endDate,
+                end: project.endDate,
+                allDay: true,
+              })),
+              ...PMtodolost.map((task) => ({
+                id: task.id,
+                title: task.taskName,
+                start: task.dueDate,
+                end: task.dueDate,
+                allDay: true,
+              })),
+              // Add assignedTask data as initial events
+              ...assignedTask.map((task) => ({
+                id: task.taskName,
+                title: task.taskName,
+                start: task.endDate,
+                end: task.endDate,
+                allDay: true,
+              })),
             ]}
           />
         </Box>

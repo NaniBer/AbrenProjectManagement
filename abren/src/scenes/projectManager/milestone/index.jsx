@@ -241,11 +241,12 @@ const Milestone = () => {
         <Modal open={isFormOpen} onClose={() => setIsFormOpen(false)}>
           <Box
             sx={{
+              borderRadius:'20px',
+              backgroundColor:colors.primary[400],
               position: "absolute",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
               maxWidth: 700,
@@ -468,18 +469,19 @@ const Milestone = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
                     type="submit"
                     startIcon={<AddIcon />}
                   >
                     Add
                   </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </Button>
+                  
                 </Box>
                 </Grid>
             </Grid>

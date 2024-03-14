@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField,useTheme } from '@mui/material';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import Header from '../../../components/Header';
 import Autocomplete from '@mui/material/Autocomplete';
 import { mockDataTeam } from '../../../data/mockData';
 import Swal from  "sweetalert";
+import { tokens } from '../../../theme';
+
+
 
 
 const Form = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const [selectedUser, setSelectedUser] = useState('');
 
   const handleFormSubmit = (values, formik) => {
@@ -78,6 +83,7 @@ const Form = () => {
                 helperText={(formik.touched.projectname && formik.errors.projectname) || 'Please enter a clear and concise name for the project you intend to create.'}
                 className="form-field"
                 sx={{
+                  backgroundColor:colors.primary[400],
                   gridColumn: "span 4" ,
                   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                     borderColor: '#868dfb',
@@ -105,6 +111,7 @@ const Form = () => {
                 helperText={formik.touched.description && formik.errors.description || 'Please enter a detailed description for the project you intend to create.'}
                 className="form-field"
                 sx={{
+                  backgroundColor:colors.primary[400],
                   gridColumn: "span 4" ,
                   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                     borderColor: '#868dfb',
@@ -132,6 +139,7 @@ const Form = () => {
                     fullWidth
                     variant="filled"
                     sx={{
+                      backgroundColor:colors.primary[400],
                       gridColumn: "span 4" ,
                       '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#868dfb',
@@ -142,6 +150,11 @@ const Form = () => {
                         '&.Mui-focused': {
                           color:'#868dfb',
                         },
+                      },
+                    }}
+                    helperTextProps={{
+                      sx: {
+                        backgroundColor: 'transparent', // Set background color to transparent
                       },
                     }}
                   />

@@ -29,10 +29,18 @@ const Resource = () => {
         const endDate = new Date(project.endDate);
         const differenceInTime = endDate.getTime() - today.getTime();
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-        return differenceInDays > 0 ? differenceInDays : 0;
+    
+        if (differenceInDays < 0) {
+          return `Overdue by ${Math.abs(differenceInDays)} ${Math.abs(differenceInDays) === 1 ? 'day' : 'days'}`;
+        } else if (differenceInDays === 0) {
+          return 'Due today';
+        } else {
+          return `${differenceInDays} ${differenceInDays === 1 ? 'day' : 'days'} left`;
+        }
       });
       setDaysLeft(daysLeftArray);
-    };
+   
+     };
 
     calculateDaysLeft();
   }, []);
@@ -55,7 +63,7 @@ const Resource = () => {
       <Header title="Projects" subtitle="Manage Projects" />
       <Grid container spacing={2}>
         {Project.map((project, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} key={index}>
             <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
               <CardContent sx={{ textAlign: 'left' }}>
                 <Typography variant="h4" color={colors.primary[110]}>
@@ -76,7 +84,7 @@ const Resource = () => {
                 <Box display="flex" alignItems="center" mt={2}>
                   <AccessTimeIcon color="secondary" />
                   <Typography variant="body1" sx={{ ml: 1 }}>
-                    {daysLeft[index]} {daysLeft[index] === 1 ? 'day' : 'days'} left
+                  {daysLeft[index]}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mt={2}>

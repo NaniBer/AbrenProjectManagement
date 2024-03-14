@@ -1,191 +1,179 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import {
-  Box,
   Typography,
-  Grid,
   useTheme,
   Card,
   CardContent,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  IconButton,
 } from '@mui/material';
+import { SaveAlt } from '@mui/icons-material'; // Import download icon
 import { tokens } from '../../../theme';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import ExpandMore icon
-import {  LineChart, Line,BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'; // Import Recharts components
-import { projectData , budgetVsActualData , scheduleStatusData} from '../../../data/mockData'; // Importing the dummy data
-// import { NoEncryption } from '@mui/icons-material';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas'; // Import html2canvas
 
+// Dummy data
+const projects = [
+  {
+    id: 1,
+    name: "Project A",
+    startDate: "2024-02-21",
+    endDate: "2024-02-28",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+      { id: 4, name: "Task 4", progress: 80 },
+      { id: 5, name: "Task 5", progress: 20 },
+      { id: 6, name: "Task 6", progress: 10 },
+      { id: 7, name: "Task 7", progress: 70 },
+      { id: 8, name: "Task 8", progress: 40 },
+      { id: 9, name: "Task 9", progress: 50 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project B",
+    startDate: "2024-03-01",
+    endDate: "2024-03-07",
+    teamMembers: [
+      {
+        id: 3,
+        firstname: "Alice",
+        lastname: "Smith",
+        email: "alice@example.com",
+      },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 4, name: "Task 1", progress: 60 },
+      { id: 5, name: "Task 2", progress: 30 },
+      { id: 6, name: "Task 3", progress: 90 },
+    ],
+  },
+  {
+    id: 3,
+    name: "Project C",
+    startDate: "2024-03-06",
+    endDate: "2024-03-12",
+    teamMembers: [
+      {
+        id: 3,
+        firstname: "Alice",
+        lastname: "Smith",
+        email: "alice@example.com",
+      },
+      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+    ],
+    tasks: [
+      { id: 7, name: "Task 1", progress: 70 },
+      { id: 8, name: "Task 2", progress: 100 },
+      { id: 9, name: "Task 3", progress: 90 },
+    ],
+  },
+];
 
-const Resource = () => {
+function calculateProjectProgress(project) {
+  const totalTasks = project.tasks.length;
+  const totalProgress = project.tasks.reduce((acc, task) => acc + task.progress, 0);
+  return totalProgress / totalTasks;
+}
+
+const ProgressReport = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [selectedProject, setSelectedProject] = useState(projects[0]);
+  const chartRef = useRef(null);
 
+  const handleChangeProject = (event) => {
+    const projectId = parseInt(event.target.value);
+    const project = projects.find(proj => proj.id === projectId);
+    setSelectedProject(project);
+  };
+
+  const projectOptions = projects.map(project => (
+    <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>
+  ));
+
+  const projectProgress = calculateProjectProgress(selectedProject);
+
+  const handleDownloadPDF = () => {
+    html2canvas(chartRef.current).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth * 0.9; // Adjust the image width as needed
+      const imgHeight = (imgWidth * canvas.height) / canvas.width;
+      const xPos = (pdfWidth - imgWidth) / 2;
+      const yPos = (pdfHeight - imgHeight) / 2;
+      pdf.text(`Progress Report: ${selectedProject.name}`, 10, 10);
+      pdf.text(`Start Date: ${selectedProject.startDate}`, 10, 20);
+      pdf.text(`End Date: ${selectedProject.endDate}`, 10, 30);
+      pdf.text(`Progress: ${projectProgress.toFixed(2)}%`, 10, 40);
+      pdf.addImage(imgData, 'PNG', xPos, yPos, imgWidth, imgHeight);
+      pdf.save(`progress_report_${selectedProject.name}.pdf`);
+    });
+  };
+  
 
   return (
-      <Accordion sx={{backgroundColor: colors.primary[400], borderRadius: '15px',
-}}>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-        <Accordion sx={{backgroundColor: colors.primary[400]}}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+    <div>
+      <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px', position: 'relative' }}>
+        <CardContent>
+          <Typography variant="h3" sx={{ mb: 2, ml: 2, mt: 2 }}>Progress Report:<Typography variant='h4' component="span" sx={{ color: colors.primary[110] }}> {selectedProject.name}</Typography></Typography>
+          <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
+            <FormControl sx={{ m: 1, mt: 2, mr: 2 }}>
+              <InputLabel id="project-select-label">Select Project</InputLabel>
+              <Select
+                labelId="project-select-label"
+                id="project-select"
+                value={selectedProject.id}
+                label="Select Project"
+                onChange={handleChangeProject}
+              >
+                {projectOptions}
+              </Select>
+            </FormControl>
+            <IconButton onClick={handleDownloadPDF} color="primary" aria-label="download pdf"
             >
-              <Typography variant="h4">Project Status Report</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-          {/* Your existing card */}
-          {/* <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}> */}
-            <CardContent sx={{ textAlign: 'left' }}>
-              {/* Content of your existing card */}
-              <Typography variant="h4" sx={{ mb: 3 , mt:2}}>
-                <Typography variant="h3" component="span" color={colors.primary[110]} sx={{ mr: 1 }}>Project Name:{' '} </Typography>{projectData.projectName}
-              </Typography>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Report Date:{' '} </Typography>{projectData.reportDate}
-              </Typography>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Current Status:{' '}{' '} </Typography>{projectData.currentStatus}
-              </Typography>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr:1}}>
-                  Project Overview: 
-                </Typography>
-                {projectData.projectOverview}
-              </Typography>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr:1}}>
-                  Milestones Achieved:
-                </Typography>
-              </Typography>
-              <ul>
-                {projectData.milestones.map((milestone, index) => (
-                  <li key={index}>{milestone}</li>
-                ))}
-              </ul>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr:1}}>
-                  Resource Allocation:
-                </Typography>
-              </Typography>
-              <ul>
-                <li>Team Members:
-                  <ul>
-                    {projectData.resourceAllocation.teamMembers.map((member) => (
-                      <li key={member.id}>{member.name} - {member.role}</li>
-                    ))}
-                  </ul>
-                </li>
-                <li>Budget: {projectData.resourceAllocation.budget}</li>
-                <li>Timeline: {projectData.resourceAllocation.timeline}</li>
-                <li>Technology: {projectData.resourceAllocation.technology}</li>
-                <li>Equipment: {projectData.resourceAllocation.equipment}</li>
-                <li>Training: {projectData.resourceAllocation.training}</li>
-                <li>Other Resources: {projectData.resourceAllocation.otherResources}</li>
-              </ul>
-
-              <Typography variant="body1" sx={{ mb: 1 , mt:2}}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr:1}}>
-                  Next Steps and Action Items:
-                </Typography>
-              </Typography>
-              <ul>
-                {projectData.nextSteps.map((step, index) => (
-                  <li key={index}>{step}</li>
-                ))}
-                {projectData.actionItems.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </CardContent>
-          {/* </Card> */}
-          </AccordionDetails>
-          </Accordion>
-        </Grid>
-        <Grid item xs={6}>
-          {/* Budget vs. Actual Chart */}
-          <Card sx={{ marginTop: '20px',backgroundColor: colors.primary[400], borderRadius: '15px' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>Budget vs. Actual</Typography>
-              <BarChart
-                width={500}
-                height={250}
-                data={budgetVsActualData}
-                margin={{ top: 20, right: 35, left: 2, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="planned" fill={colors.blueAccent[400]} name="Planned Budget" />
-                <Bar dataKey="actual" fill={colors.redAccent[400]} name="Actual Expenditure" />
-              </BarChart>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={6}>
-        <Card
-            sx={{
-              marginTop: '20px',
-              backgroundColor: colors.primary[400],
-              borderRadius: '15px',
-            }}
-          >
-            <CardContent sx={{ textAlign: 'left' }}>
-              {/* <Typography variant="h4" sx={{ mb: 3, mt: 2 }}>
-                Project Schedule Status
-              </Typography> */}
-              <Typography variant="h6" sx={{ mb: 2 }}>Project Schedule Status</Typography>
-
-              <LineChart
-                width={480}
-                height={250}
-                data={scheduleStatusData}
-                margin={{ top: 20, right: 35, left: 2, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="completed"
-                  stroke={colors.greenAccent[400]}
-                  name="Completed"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="inProgress"
-                  stroke={colors.blueAccent[400]}
-                  name="In Progress"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="notStarted"
-                  stroke={colors.redAccent[400]}
-                  name="Not Started"
-                />
-              </LineChart>
-            </CardContent>
-          </Card>
-       </Grid>
-
-      </Grid>
-      </Accordion>
-
-
-
+              <SaveAlt sx={{ mt:3 ,color: 'white', fontSize: '28px' }} />
+            </IconButton>
+          </Box>
+          <div ref={chartRef}>
+            <BarChart
+              width={800}
+              height={400}
+              data={selectedProject.tasks}
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis label={{ value: 'Progress (%)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="progress" fill="#8884d8" />
+            </BarChart>
+          </div>
+          <Box sx={{ position: 'relative', backgroundColor: colors.primary[300], padding: '10px', borderRadius: '0 0 15px 15px' }}>
+            <Typography variant="h6" sx={{ color: colors.grey[100] }}>Summary</Typography>
+            <Typography variant="body1" sx={{ color: colors.grey[100] }}>Start Date: {selectedProject.startDate}</Typography>
+            <Typography variant="body1" sx={{ color: colors.grey[100] }}>End Date: {selectedProject.endDate}</Typography>
+            <Typography variant="body1" sx={{ color: colors.grey[100] }}>Progress: {projectProgress.toFixed(2)}%</Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
-export default Resource;
+export default ProgressReport;

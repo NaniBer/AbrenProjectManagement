@@ -5,16 +5,11 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-// import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-// import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-// import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-// import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-// import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-// import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+// import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { profile } from "../../data/mockData";
 import Logo from "../../images/abren2.png";
 
@@ -143,10 +138,10 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Saron
+                  John Doe
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Project Manager
+                  Team Member
                 </Typography>
               </Box>
             </Box>
@@ -155,25 +150,13 @@ const Sidebar = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/"
+              to="/dashboardTeamMember"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
- <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Projects
-            </Typography>
-            <Item
-              title="Project1"
-              to="/project"
-              icon={<AccountTreeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+
+          
            
 
             <Typography
@@ -181,29 +164,38 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Pages
+              Project
             </Typography>
+
             <Item
+              title="View Assigned Project"
+              to="/viewAssignedProject"
+              icon={<AccountTreeOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="View Assigned Task"
+              to="/viewAssignedTask"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+              {/* <Item
+              title="Task Progress"
+              to="/updateProgressTask"
+              icon={<DonutLargeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            /> */}
+                <Item
               title="Kanban"
-              to="/kanbanPM"
+              to="/kanban"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-              <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-                    <Item
-              title="Report"
-              to="/report"
-              icon={<SummarizeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+  
             {/* <Typography
               variant="h6"
               color={colors.grey[300]}

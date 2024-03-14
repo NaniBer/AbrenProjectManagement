@@ -13,7 +13,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { mockDataProject } from '../../../data/mockData';
+import Autocomplete from '@mui/material/Autocomplete';
+import { mockDataProject, mockDataTeam } from '../../../data/mockData';
 import * as Yup from 'yup';
 import { tokens } from '../../../theme';
 import Header from '../../../components/Header';
@@ -30,6 +31,9 @@ const validationSchema = Yup.object().shape({
     .number()
     .positive("Budget must be a positive number")
     .required("Budget is required"),
+  teamMembers: Yup.array()
+    .required('Team Members are required')
+    .min(1, 'Please select at least one team member'),
 });
 
 const Project = () => {
@@ -43,6 +47,8 @@ const Project = () => {
   const [submittedProjects, setSubmittedProjects] = useState([...mockDataProject]);
   const [validationErrors, setValidationErrors] = useState({});
   const [editingIndex, setEditingIndex] = useState(-1);
+  const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
+
   
 
   const handleStartDateChange = (e) => {
@@ -61,6 +67,7 @@ const Project = () => {
     setStartDate('');
     setEndDate('');
     setBudget('');
+    setSelectedTeamMembers([]);
     setValidationErrors({});
     setIsFormOpen(false);
     setEditingIndex(-1);
@@ -74,28 +81,32 @@ const Project = () => {
           startDate,
           endDate,
           budget,
+          teamMembers: selectedTeamMembers, // Include selected team members in validation
         },
         { abortEarly: false }
       );
-
+  
       const newProject = {
         ...submittedProjects[editingIndex],
         startDate,
         endDate,
         budget,
-      };
+        teamMembers: selectedTeamMembers,
 
+      };
+  
       const updatedProjects = [...submittedProjects];
       updatedProjects[editingIndex] = newProject;
       setSubmittedProjects(updatedProjects);
-
-      // Reset form fields and state
+  
+      // Reset form fields, state, and selected team members
       setStartDate('');
       setEndDate('');
       setBudget('');
       setValidationErrors({});
       setIsFormOpen(false);
       setEditingIndex(-1);
+      setSelectedTeamMembers([]); // Clear selected team members
     } catch (error) {
       console.error(error);
       // Handle validation errors here
@@ -113,6 +124,7 @@ const Project = () => {
     setStartDate(project.startDate || '');
     setEndDate(project.endDate || '');
     setBudget(project.budget || '');
+    setSelectedTeamMembers(project.teamMembers);
     // Toggle editing state
     setEditingIndex(editingIndex === index ? -1 : index);
     // Open the modal for editing
@@ -138,6 +150,8 @@ const Project = () => {
             width: '100%',
             outline: 'none',
             overflow: 'auto',
+            backgroundColor: colors.primary[400],
+            borderRadius: '10px'
           }}
         >
           <Typography variant="h5" sx={{ mb: 2 }}>
@@ -223,6 +237,39 @@ const Project = () => {
                 </Box>
               </Grid>
               <Grid item xs={6}>
+              <Box sx={{ mb: 2 }}>
+                  <Autocomplete
+                    multiple
+                    id="teamMembers"
+                    options={mockDataTeam}
+                    getOptionLabel={(option) => `${option.firstname} ${option.lastname}`}
+                    value={selectedTeamMembers}
+                    onChange={(event, value) => setSelectedTeamMembers(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="Team Members"
+                        fullWidth
+                        error={!!validationErrors.teamMembers}
+                        helperText={validationErrors.teamMembers}
+                      />
+                    )}
+                    sx={{
+                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor:'#868dfb',
+                      },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        '&.Mui-focused': {
+                          color:'#868dfb',
+                        },
+                      },
+                    }}
+                  />
+                </Box>
                 <Box sx={{ mb: 2 }}>
 
                   <TextField
@@ -329,58 +376,67 @@ const Project = () => {
       </Modal>
 
       <Grid container spacing={2}>
-        {submittedProjects.map((project, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ marginTop: '20px',backgroundColor: colors.primary[400], borderRadius: '15px' }}>
-              <CardContent sx={{ textAlign: 'left' }}>
-                <Typography variant="h4" sx={{ mb: 1 }} color={colors.primary[110]}>
-                  {project.projectname}
-                </Typography>
-                <Typography variant="body1" sx={{mt:4, mb: 1 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} >  Description:  </Typography> {project.description}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
+      {submittedProjects.map((project, index) => (
+  <Grid item xs={12}  key={index}>
+    <Card sx={{ marginTop: '20px',backgroundColor: colors.primary[400], borderRadius: '15px' }}>
+      <CardContent sx={{ textAlign: 'left' }}>
+        <Typography variant="h4" sx={{ mb: 1 }} color={colors.primary[110]}>
+          {project.projectname}
+        </Typography>
+        <Typography variant="body1" sx={{mt:4, mb: 1 }}>
+          <Typography component="span" color={colors.greenAccent[400]} >  Description:  </Typography> {project.description}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+            <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>
+              Project Manager:
+            </Typography>
+            <Tooltip title={project.projectmanager} arrow>
+              <Avatar
+                sx={{
+                  bgcolor: colors.primary[110],
+                  height: '30px',
+                  width: '30px',
+                  mr: 1,
+                  cursor: 'pointer', // Add cursor pointer for indicating tooltip
+                }}
+              >
+                {project.projectmanager.charAt(0)}
+              </Avatar>
+            </Tooltip>
+          </Box>
+        </Typography>
+        <Box display="flex" alignItems="center" mt={2}>
+          <Typography variant="body1" sx={{ mr: 1,marginBottom: 2 }} color={colors.greenAccent[400]}>
+            Team Members:
+          </Typography>
+          {project.teamMembers && project.teamMembers.map((member) => (
+            <Tooltip key={member.id} title={member.email} placement="top">
+              <Avatar key={member.id} sx={{ bgcolor: colors.primary[110], height: '30px', width: '30px', mr: 1, mb:2 }}>
+                {`${member.firstname.charAt(0)}${member.lastname.charAt(0)}`}
+              </Avatar>
+            </Tooltip>
+          ))}
+        </Box>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Start Date: </Typography>{project.startDate}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> End Date: </Typography> {project.endDate}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> Budget: </Typography>{project.budget}
+        </Typography>
+        <Box display="flex" justifyContent="flex-end">
+          <Button color="secondary" onClick={() => handleEditProject(index)}>
+            {project.startDate && project.endDate && project.budget ? 'Edit' : 'Add'}
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
+  </Grid>
+))}
 
-
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>
-                    Project Manager:
-                </Typography>
-                <Tooltip title={project.projectmanager} arrow>
-                    <Avatar
-                    sx={{
-                        bgcolor: colors.primary[110],
-                        height: '30px',
-                        width: '30px',
-                        mr: 1,
-                        cursor: 'pointer', // Add cursor pointer for indicating tooltip
-                    }}
-                    >
-                    {project.projectmanager.charAt(0)}
-                    </Avatar>
-                </Tooltip>
-                </Box>
-
-
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Start Date: </Typography>{project.startDate}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> End Date: </Typography> {project.endDate}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}> Budget: </Typography>{project.budget}
-                </Typography>
-                <Box display="flex" justifyContent="flex-end">
-                <Button color="secondary" onClick={() => handleEditProject(index)}>
-                {project.startDate && project.endDate && project.budget ? 'Edit' : 'Add'}
-                </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
       </Grid>
     </Box>
   );
