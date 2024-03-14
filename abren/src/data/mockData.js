@@ -83,46 +83,46 @@ export const Project = [
       { id: 3, name: "Task 3", progress: 100 },
     ],
   },
-  {
-    id: 2,
-    name: "Project B",
-    startDate: "2024-03-01",
-    endDate: "2024-03-07",
-    teamMembers: [
-      {
-        id: 3,
-        firstname: "Alice",
-        lastname: "Smith",
-        email: "alice@example.com",
-      },
-      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
-    ],
-    tasks: [
-      { id: 4, name: "Task 1", progress: 60 },
-      { id: 5, name: "Task 2", progress: 30 },
-      { id: 6, name: "Task 3", progress: 90 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Project C",
-    startDate: "2024-03-06",
-    endDate: "2024-03-12",
-    teamMembers: [
-      {
-        id: 3,
-        firstname: "Alice",
-        lastname: "Smith",
-        email: "alice@example.com",
-      },
-      { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
-    ],
-    tasks: [
-      { id: 4, name: "Task 1", progress: 70 },
-      { id: 5, name: "Task 2", progress: 100 },
-      { id: 6, name: "Task 3", progress: 90 },
-    ],
-  },
+  // {
+  //   id: 2,
+  //   name: "Project B",
+  //   startDate: "2024-03-01",
+  //   endDate: "2024-03-07",
+  //   teamMembers: [
+  //     {
+  //       id: 3,
+  //       firstname: "Alice",
+  //       lastname: "Smith",
+  //       email: "alice@example.com",
+  //     },
+  //     { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+  //   ],
+  //   tasks: [
+  //     { id: 4, name: "Task 1", progress: 60 },
+  //     { id: 5, name: "Task 2", progress: 30 },
+  //     { id: 6, name: "Task 3", progress: 90 },
+  //   ],
+  // },
+  // {
+  //   id: 2,
+  //   name: "Project C",
+  //   startDate: "2024-03-06",
+  //   endDate: "2024-03-12",
+  //   teamMembers: [
+  //     {
+  //       id: 3,
+  //       firstname: "Alice",
+  //       lastname: "Smith",
+  //       email: "alice@example.com",
+  //     },
+  //     { id: 4, firstname: "Bob", lastname: "Smith", email: "bob@example.com" },
+  //   ],
+  //   tasks: [
+  //     { id: 4, name: "Task 1", progress: 70 },
+  //     { id: 5, name: "Task 2", progress: 100 },
+  //     { id: 6, name: "Task 3", progress: 90 },
+  //   ],
+  // },
 ];
 
 export const profile = [
@@ -185,16 +185,14 @@ export const mockDataProject = [
     description: "smth is a tech company  ",
     projectmanager: "saronbisrat.kaizen",
     status: "inactive",
-
   },
   {
     id: 3,
     projectname: "Hello World Website",
-    description: 
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     projectmanager: "helloworld.hello",
     status: "inactive",
-
   },
 ];
 
@@ -322,8 +320,6 @@ export const mockDataContacts = [
   },
 ];
 
-
-
 //     country: "AD",
 //     "hot dog": 137,
 //     "hot dogColor": "hsl(229, 70%, 50%)",
@@ -435,7 +431,6 @@ export const mockPieData = [
   },
 ];
 
-
 export const projectData = {
   projectName: "Project 1",
   projectOverview:
@@ -477,18 +472,18 @@ export const projectData = {
 };
 
 export const budgetVsActualData = [
-  { category: 'Category 1', planned: 5000, actual: 6000 },
-  { category: 'Category 2', planned: 8000, actual: 7500 },
-  { category: 'Category 3', planned: 3000, actual: 4000 },
-  { category: 'Category 4', planned: 6000, actual: 5500 },
-  { category: 'Category 5', planned: 6000, actual: 5500 },
-  { category: 'Category 6', planned: 6000, actual: 5500 },
+  { category: "Category 1", planned: 5000, actual: 6000 },
+  { category: "Category 2", planned: 8000, actual: 7500 },
+  { category: "Category 3", planned: 3000, actual: 4000 },
+  { category: "Category 4", planned: 6000, actual: 5500 },
+  { category: "Category 5", planned: 6000, actual: 5500 },
+  { category: "Category 6", planned: 6000, actual: 5500 },
   // Add more data as needed
 ];
 
 export const scheduleStatusData = [
-  { date: '2022-09-01', completed: 20, inProgress: 50, notStarted: 30 },
-  { date: '2022-09-02', completed: 25, inProgress: 45, notStarted: 30 },
-  { date: '2022-09-03', completed: 30, inProgress: 40, notStarted: 30 },
+  { date: "2022-09-01", completed: 20, inProgress: 50, notStarted: 30 },
+  { date: "2022-09-02", completed: 25, inProgress: 45, notStarted: 30 },
+  { date: "2022-09-03", completed: 30, inProgress: 40, notStarted: 30 },
   // Add more data as needed
 ];

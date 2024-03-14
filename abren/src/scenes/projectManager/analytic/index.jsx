@@ -23,6 +23,7 @@ const TaskAnalytics = () => {
   const tasks = project.tasks;
 
   const [daysLeft, setDaysLeft] = useState({});
+  const [startedDate, setStartedDate] = useState({});
   const [progressData, setProgressData] = useState([100, 70]); // Initial progress data
   const [TaskList, setTaskList] = useState([]);
 
@@ -31,18 +32,55 @@ const TaskAnalytics = () => {
     // console.log(tasks);
     const calculateDaysLeft = () => {
       const today = new Date();
+
       const daysLeftArray = TaskList.map((task) => {
-        const EndDate = new Date(task.EndDate);
-        const differenceInTime = EndDate.getTime() - today.getTime();
+        const endDate = new Date(task.EndDate);
+        const differenceInTime = endDate.getTime() - today.getTime();
+
         const differenceInDays = Math.ceil(
           differenceInTime / (1000 * 3600 * 24)
         );
-        return differenceInDays > 0 ? differenceInDays : 0;
+
+        if (differenceInDays < 0) {
+          return `Overdue by ${Math.abs(differenceInDays)} ${
+            Math.abs(differenceInDays) === 1 ? "day" : "days"
+          }`;
+        } else if (differenceInDays === 0) {
+          return "Due today";
+        } else {
+          return `${differenceInDays} ${
+            differenceInDays === 1 ? "day" : "days"
+          } left`;
+        }
       });
       setDaysLeft(daysLeftArray);
     };
+    const calculateDaysToStart = () => {
+      const today = new Date();
+      const daysToStartArray = TaskList.map((task) => {
+        const startDate = new Date(task.StartDate);
+        const differenceInTime = startDate.getTime() - today.getTime();
+        const differenceInDays = Math.ceil(
+          differenceInTime / (1000 * 3600 * 24)
+        );
+
+        if (differenceInDays === 0) {
+          return "Starting today";
+        } else if (differenceInDays < 0) {
+          return `Started ${Math.abs(differenceInDays)} ${
+            Math.abs(differenceInDays) === 1 ? "day" : "days"
+          } ago`;
+        } else {
+          return `Starting in ${differenceInDays} ${
+            differenceInDays === 1 ? "day" : "days"
+          }`;
+        }
+      });
+      setStartedDate(daysToStartArray);
+    };
 
     calculateDaysLeft();
+    calculateDaysToStart();
   }, [TaskList, tasks]);
 
   // Dummy function to update progress data
@@ -97,12 +135,7 @@ const TaskAnalytics = () => {
                   >
                     Start Date:{" "}
                   </Typography>
-                  {new Date(task.StartDate).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {startedDate[index]}
                 </Typography>
                 <Typography variant="body1">
                   <Typography
@@ -112,7 +145,7 @@ const TaskAnalytics = () => {
                   >
                     End Date:{" "}
                   </Typography>
-                  {new Date(task.StartDate).toLocaleDateString("en-US", {
+                  {new Date(task.EndDate).toLocaleDateString("en-US", {
                     weekday: "short",
                     year: "numeric",
                     month: "long",
@@ -121,9 +154,9 @@ const TaskAnalytics = () => {
                 </Typography>
                 <Box display="flex" alignItems="center" mt={2}>
                   <AccessTimeIcon color="secondary" />
+
                   <Typography variant="body1" sx={{ ml: 1 }}>
-                    {daysLeft[index]} {daysLeft[index] === 1 ? "day" : "days"}{" "}
-                    left
+                    {daysLeft[index]}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mt={2}>
@@ -132,7 +165,7 @@ const TaskAnalytics = () => {
                     sx={{ mr: 1, marginTop: 2 }}
                     color={colors.greenAccent[400]}
                   >
-                    Team Members:
+                    Assigned To:
                   </Typography>
                   {task.assignedTo.map((member) => (
                     <Tooltip
