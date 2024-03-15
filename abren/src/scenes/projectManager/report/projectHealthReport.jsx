@@ -13,9 +13,12 @@ import {
 } from '@mui/material';
 import { tokens } from '../../../theme';
 
-const BudgetChart = ({ project, milestones, resources, projects, selectedProjectId, handleChange }) => {
+const BudgetChart = ({ project, milestones, resources, projects, selectedProjectId, handleChange, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const chartWidth = isDashboard ? 200 : 700;
+  const chartHeight = isDashboard ? 100 : 300;
 
   // Function to calculate total used budget for the selected project
   const calculateUsedBudget = () => {
@@ -69,7 +72,7 @@ const BudgetChart = ({ project, milestones, resources, projects, selectedProject
         </Box>
         <Typography variant="h3" sx={{ mb: 2 ,ml:2, mt:2}}>Budget Chart - <Typography variant='h4' component= "span" sx={{color: colors.primary[110]}}>{project.projectname}</Typography></Typography>
         <Typography variant="subtitle1" sx={{ mb: 2 ,ml:2}}>Date: {new Date().toLocaleDateString()}</Typography>
-        <BarChart width={800} height={400} data={data} margin={{ top: 20, right: 20, left: 20, bottom: 30 }}>
+        <BarChart width={chartWidth} height={chartHeight} data={data} margin={{ top: 20, right: 20, left: 20, bottom: 30 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis label={{ value: 'Budget (ETB)', angle: -90, position: 'insideLeft' }} />
@@ -81,17 +84,19 @@ const BudgetChart = ({ project, milestones, resources, projects, selectedProject
           />
           <Bar dataKey="budget" name="Budget" fill={colors.primary[110]} />
         </BarChart>
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.primary[300], padding: '10px', borderRadius: '0 0 15px 15px' }}>
-          <Typography variant="h6" sx={{ color: colors.grey[100] }}>Summary</Typography>
-          <Typography variant="body1" sx={{ color: colors.grey[100] }}>Allocated Budget: {data[0].budget} ETB</Typography>
-          <Typography variant="body1" sx={{ color: colors.grey[100] }}>Used Budget: {data[1].budget} ETB ({totalUsedPercentage}%)</Typography>
-        </Box>
+        {!isDashboard && (
+          <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.primary[300], padding: '10px', borderRadius: '0 0 15px 15px' }}>
+            <Typography variant="h6" sx={{ color: colors.grey[100] }}>Summary</Typography>
+            <Typography variant="body1" sx={{ color: colors.grey[100] }}>Allocated Budget: {data[0].budget} ETB</Typography>
+            <Typography variant="body1" sx={{ color: colors.grey[100] }}>Used Budget: {data[1].budget} ETB ({totalUsedPercentage}%)</Typography>
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-const BudgetChartContainer = ({ projects, milestones, resources }) => {
+const BudgetChartContainer = ({ projects, milestones, resources, isDashboard }) => {
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0].id);
 
   const handleChange = (event) => {
@@ -110,6 +115,8 @@ const BudgetChartContainer = ({ projects, milestones, resources }) => {
           projects={projects}
           selectedProjectId={selectedProjectId}
           handleChange={handleChange}
+          isDashboard={isDashboard} // Pass the isDashboard prop
+
         />
       )}
     </div>

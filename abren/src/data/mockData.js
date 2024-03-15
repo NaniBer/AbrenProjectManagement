@@ -86,6 +86,55 @@ export const Project = [
   
 ];
 
+export const ProjectAnalyticsReport = [
+  {
+    id: 1,
+    name: "Project A",
+    startDate: "2024-02-21",
+    endDate: "2024-03-10",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Project B",
+    startDate: "2024-02-21",
+    endDate: "2024-03-10",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+    ],
+  },
+  {
+    id: 3,
+    name: "Project C",
+    startDate: "2024-02-21",
+    endDate: "2024-03-10",
+    teamMembers: [
+      { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
+      { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
+    ],
+    tasks: [
+      { id: 1, name: "Task 1", progress: 80 },
+      { id: 2, name: "Task 2", progress: 50 },
+      { id: 3, name: "Task 3", progress: 100 },
+    ],
+  },
+  
+];
+
 export const profile = [
   {
     id: 1,
@@ -301,6 +350,44 @@ export const DashboardTMdata = [
     priority: "High",
   },
 ];
+export const DashboardPMdata = [
+  {
+    id: "1",
+    taskName: "Conduct user research to understand the target audience's needs and preferences.",
+    dueDate: new Date("2024-03-13"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "2",
+    taskName: "Develop a content strategy and create engaging content for the website.",
+    dueDate: new Date("2024-03-12"),
+    status: "In Progress",
+    priority: "Medium",
+  },
+  {
+    id: "3",
+    taskName: "Develop backend infrastructure and manage the database for the website.",
+    dueDate: new Date("2024-04-15"),
+    status: "Completed",
+    priority: "Low",
+  },
+  {
+    id: "4",
+    taskName: "Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    dueDate: new Date("2024-03-15"),
+    status: "Not Started",
+    priority: "Low",
+  },
+  {
+    id: "5",
+    taskName: "Optimize the website for search engines to improve visibility and organic traffic",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+
+];
 
 export const mockUpdatedDataProject = [
   {
@@ -464,5 +551,64 @@ export const PMtodolost = [
     dueDate: new Date("2024-03-10"),
     status: "Not Started",
     priority: "High",
+  },
+];
+
+
+
+ export const dummyMilestones = [
+  {
+    name: 'Milestone 1',
+    description: 'Complete phase 1 of the project',
+    allocatedBudget: 2000,
+    status: 'In Progress',
+    priority: 'High',
+    resource: 'Resource 1',
+    quantity: 10,
+    projectId: 1,
+  },
+  {
+    name: 'Milestone 2',
+    description: 'Procure necessary materials',
+    allocatedBudget: 1000,
+    status: 'Pending',
+    priority: 'Medium',
+    resource: 'Resource 2',
+    quantity: 20,
+    projectId: 1,
+  },
+  {
+    name: 'Milestone 3',
+    description: 'Finalize project documentation',
+    allocatedBudget: 1500,
+    status: 'Completed',
+    priority: 'Low',
+    resource: 'Resource 3',
+    quantity: 15,
+    projectId: 2,
+  },
+];
+
+ export const dummyResources = [
+  {
+    name: 'Resource 1',
+    category: 'work',
+    quantity: 10,
+    cost: 0,
+    rate: 50,
+  },
+  {
+    name: 'Resource 2',
+    category: 'material',
+    quantity: 20,
+    cost: 0,
+    rate: 10,
+  },
+  {
+    name: 'Resource 3',
+    category: 'work',
+    quantity: 15,
+    cost: 0,
+    rate: 60,
   },
 ];

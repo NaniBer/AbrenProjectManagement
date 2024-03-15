@@ -4,7 +4,7 @@ import { FaAngleDown } from 'react-icons/fa';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckIcon from '@mui/icons-material/Check';
 import { tokens } from '../../../theme';
-import { Box, Button, useTheme, Modal, Typography, Checkbox , Slider} from '@mui/material';
+import { Box, Button, useTheme, Modal, Typography, Checkbox, Slider } from '@mui/material';
 import swal from 'sweetalert';
 import { assignedTask } from '../../../data/mockData';
 
@@ -37,8 +37,7 @@ function TaskList() {
         { name: "Subtask A", status: "Not completed" },
         { name: "Subtask B", status: "Not completed" },
         { name: "Subtask C", status: "Not completed" },
-        { name: "Subtask D", status: " completed" }
-
+        { name: "Subtask D", status: "completed" }
       ],
     },
     {
@@ -82,16 +81,17 @@ function TaskList() {
   const [tasks, setTasks] = useState([]);
   const [subtaskChecked, setSubtaskChecked] = useState([]);
   const [taskProgress, setTaskProgress] = useState(0);
+  
 
   useEffect(() => {
     // Calculate categories based on dates
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Remove time from today's date
-  
+
     const updatedTasks = dummyTaskData.map(task => {
       const taskDate = new Date(task.endDate);
       taskDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to compare only the date part
-  
+
       if (taskDate.getTime() === today.getTime()) {
         return { ...task, category: 'today' };
       } else if (taskDate > today) {
@@ -100,10 +100,10 @@ function TaskList() {
         return { ...task, category: 'recent' }; // Assign all tasks with end dates before today to the 'assigned' category
       }
     });
-  
+
     setTasks(updatedTasks);
   }, []);
-  
+
   const toggleRecent = () => setShowRecent(!showRecent);
   const toggleToday = () => setShowToday(!showToday);
   const toggleUpcoming = () => setShowUpcoming(!showUpcoming);
@@ -116,7 +116,7 @@ function TaskList() {
 
   const columns = [
     { field: 'name', headerName: 'Task Name', width: 250 },
-    { field: 'date', headerName: 'Due Date', width: 250 },
+    { field: 'endDate', headerName: 'Due Date', width: 250 },
     { field: 'project', headerName: 'Project', width: 250 },
   ];
 
@@ -135,11 +135,13 @@ function TaskList() {
     setTaskProgress(progress);
   };
   
+
   const handleTaskClick = (task) => {
     setSelectedRowData(task);
     if (task.subtasks) {
-      setSubtaskChecked(Array(task.subtasks.length).fill(false));
-      calculateProgress(Array(task.subtasks.length).fill(false));
+      const checkedArray = task.subtasks.map(subtask => subtask.status === "completed");
+      setSubtaskChecked(checkedArray);
+      calculateProgress(checkedArray);
     }
   };
 
@@ -169,9 +171,8 @@ function TaskList() {
     const updatedChecked = [...subtaskChecked];
     updatedChecked[index] = !updatedChecked[index];
     setSubtaskChecked(updatedChecked);
-    calculateProgress(updatedChecked); // Call calculateProgress function with updated array
+    calculateProgress(updatedChecked);
   };
-  
 
   const handleCheckboxClick = (event, row) => {
     if (event && event.stopPropagation) {
@@ -202,7 +203,7 @@ function TaskList() {
       }
     });
   };
-  
+
   const handleMarkAsCompleted = () => {
     swal({
       title: "Task Completed?",
@@ -242,7 +243,7 @@ function TaskList() {
         <div style={{ marginBottom: '20px', borderBottom: '1px solid #ccc' }}>
           <h6 style={{ marginBottom: '10px', marginTop: '10px', cursor: 'pointer' }} onClick={toggleRecent}>
             <FaAngleDown style={{ marginLeft: '3px', verticalAlign: 'middle' }} />
-             Assigned
+            Assigned
           </h6>
           {showRecent && (
             <DataGrid
@@ -414,7 +415,7 @@ function TaskList() {
                   {selectedRowData.subtasks.map((subtask, index) => (
                     <Box key={index} display="flex" alignItems="center" gutterBottom>
                       <Checkbox color="secondary" checked={subtaskChecked[index]} onChange={() => handleCheckboxChange(index)} />
-                      <Typography variant="body2" gutterBottom style={{ color: subtaskChecked[index] ? 'grey' : 'inherit' }}>
+                      <Typography variant="body2" gutterBottom style={{ color: subtask.status === "completed" ? 'grey' : 'inherit' }}>
                         {subtask.name}
                       </Typography>
                     </Box>
@@ -424,7 +425,7 @@ function TaskList() {
                   </Typography>
                 </>
               )}
-               {!selectedRowData.subtasks && (
+              {!selectedRowData.subtasks && (
                 <Box sx={{ width: '95%' }}>
                   <Typography id="progress-slider" variant="h5" sx={{ color: colors.greenAccent[400], paddingTop: '20px' }} gutterBottom>
                     Progress:

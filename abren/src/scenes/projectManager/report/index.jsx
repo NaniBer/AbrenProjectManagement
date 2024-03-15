@@ -7,7 +7,7 @@ import Header from '../../../components/Header';
 import { tokens } from '../../../theme';
 import ProjectStatusReport from "../../projectManager/report/projectStatusReport";
 import ProjectHealthReport from "../../projectManager/report/projectHealthReport";
-
+import ProjectsAnalyticsReport from "../../projectManager/report/projectsAnalyticsReport"
 const Resource = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -18,6 +18,7 @@ const Resource = () => {
       <Header title="Projects" subtitle="Manage Projects" />
     <ProjectStatusReport/>
     <ProjectHealthReport/>
+    <ProjectsAnalyticsReport/>
 
 
 

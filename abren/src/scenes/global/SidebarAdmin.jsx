@@ -60,6 +60,16 @@ const SidebarAdmin = () => {
 
   return (
     <Box
+    sx={{
+      position: "sticky",
+      top: 0,
+      height: "100vh",
+      overflowY: "auto",
+      width: isCollapsed ? "90px" : "320px",
+      transition: "width 0.3s ease",
+    }}
+  >
+    <Box
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
@@ -223,6 +233,8 @@ const SidebarAdmin = () => {
       </div>
       </Box>
     </Box>
+    </Box>
+
   );
 };
 
