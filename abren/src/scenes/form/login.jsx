@@ -98,9 +98,9 @@ const Login = () => {
               response.json().then((data) => {
                 if (!admin) {
                   user.projects = data;
-                  console.log(user);
+                  // console.log(user.projects);
                   dispatch(loginSucess(user));
-                  navigate("/pm");
+                  navigate("/user/");
                 } else {
                   dispatch(loginSucess(user));
                   navigate("/admin");

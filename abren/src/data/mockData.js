@@ -1,4 +1,4 @@
-import { tokens } from "../theme";
+// import { tokens } from "../theme";
 
 export const Team = [
   {
@@ -72,7 +72,7 @@ export const Project = [
     id: 1,
     name: "Project A",
     startDate: "2024-02-21",
-    endDate: "2024-02-28",
+    endDate: "2024-03-10",
     teamMembers: [
       { id: 1, firstname: "John", lastname: "Doe", email: "john@example.com" },
       { id: 2, firstname: "Jane", lastname: "Doe", email: "jane@example.com" },
@@ -178,6 +178,15 @@ export const mockDataProject = [
     description: "kaizen is a tech company ",
     projectmanager: "saronbisrat.kaizen",
     status: "active",
+  },
+];
+
+export const mockAssignedProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
   },
   {
     id: 2,
@@ -486,4 +495,222 @@ export const scheduleStatusData = [
   { date: "2022-09-02", completed: 25, inProgress: 45, notStarted: 30 },
   { date: "2022-09-03", completed: 30, inProgress: 40, notStarted: 30 },
   // Add more data as needed
+];
+
+export const DashboardTMdata = [
+  {
+    id: "1",
+    taskName:
+      "Conduct user research to understand the target audience's needs and preferences.",
+    dueDate: new Date("2024-03-13"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "2",
+    taskName:
+      "Develop a content strategy and create engaging content for the website.",
+    dueDate: new Date("2024-03-12"),
+    status: "In Progress",
+    priority: "Medium",
+  },
+  {
+    id: "3",
+    taskName:
+      "Develop backend infrastructure and manage the database for the website.",
+    dueDate: new Date("2024-04-15"),
+    status: "Completed",
+    priority: "Low",
+  },
+  {
+    id: "4",
+    taskName:
+      "Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    dueDate: new Date("2024-03-15"),
+    status: "Not Started",
+    priority: "Low",
+  },
+  {
+    id: "5",
+    taskName:
+      "Optimize the website for search engines to improve visibility and organic traffic",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "6",
+    taskName: "Do the UI of the new e-learning dashboard",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+];
+
+export const mockUpdatedDataProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: "2024-03-12",
+    endDate: "2024-03-13",
+  },
+  {
+    id: 1,
+    projectname: "New website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: "2024-03-12",
+    endDate: "2024-03-12",
+  },
+];
+export const dummyProjectData = [
+  {
+    name: "Project 1",
+    startDate: "2024-03-12",
+    endDate: "2024-03-13",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.",
+    tasks: ["Task1", "Task2", "Task3"],
+  },
+  {
+    name: "Project 2",
+    startDate: "2024-03-15",
+    endDate: "2024-03-14",
+    description:
+      "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Ut scelerisque auctor nibh vitae vestibulum.",
+    tasks: ["TaskA", "TaskB", "TaskC"],
+  },
+  {
+    name: "Project 3",
+    startDate: "2024-03-25",
+    endDate: "2024-04-01",
+    description:
+      "Donec posuere nisi et neque ullamcorper scelerisque. Fusce at augue massa. Nullam vel viverra elit. Vivamus dignissim hendrerit pulvinar. Integer venenatis vehicula ultrices.",
+    tasks: ["TaskX", "TaskY", "TaskZ"],
+  },
+  {
+    name: "Project 4",
+    startDate: "2024-03-25",
+    endDate: "2024-04-01",
+    description:
+      "Donec posuere nisi et neque ullamcorper scelerisque. Fusce at augue massa. Nullam vel viverra elit. Vivamus dignissim hendrerit pulvinar. Integer venenatis vehicula ultrices.",
+    tasks: ["TaskX", "TaskY", "TaskZ"],
+  },
+];
+
+export const updatedTasks = [
+  {
+    id: 1,
+    taskName: "Task 1",
+    date: "2024-03-04",
+    project: "Project A",
+    completed: false,
+  },
+  {
+    id: 2,
+    taskName: "Task 2",
+    date: "2024-03-08",
+    project: "Project B",
+    completed: false,
+  },
+  {
+    id: 3,
+    taskName: "Task 3",
+    date: "2024-03-09",
+    project: "Project C",
+    completed: false,
+  },
+  {
+    id: 4,
+    taskName: "Task 4",
+    date: "2024-03-09",
+    project: "Project D",
+    completed: true,
+  },
+];
+
+export const dummyTaskData = {
+  name: "Task 1",
+  startDate: "2024-03-09",
+  endDate: "2024-03-12",
+  project: "Project X",
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.",
+  subtasks: ["Subtask 1", "Subtask 2", "Subtask 3"],
+};
+
+export const assignedTask = [
+  {
+    taskName: "Task 1",
+    startDate: "2024-03-09",
+    endDate: "2024-03-13",
+    project: "Project X",
+
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.",
+    subtasks: ["Subtask 1", "Subtask 2", "Subtask 3"],
+  },
+  {
+    taskName: "Task 2",
+    startDate: "2024-03-09",
+    endDate: "2024-03-14",
+    project: "Project X",
+
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.",
+    subtasks: ["Subtask 1", "Subtask 2", "Subtask 3"],
+  },
+];
+
+export const PMtodolost = [
+  {
+    id: "1",
+    taskName: " PM user research",
+    dueDate: new Date("2024-03-13"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "2",
+    taskName:
+      " PM Develop a content strategy and create engaging content for the website.",
+    dueDate: new Date("2024-03-12"),
+    status: "In Progress",
+    priority: "Medium",
+  },
+  {
+    id: "3",
+    taskName:
+      " PM Develop backend infrastructure and manage the database for the website.",
+    dueDate: new Date("2024-04-15"),
+    status: "Completed",
+    priority: "Low",
+  },
+  {
+    id: "4",
+    taskName:
+      "PM Conduct thorough testing to ensure the website's functionality, usability, and performance.",
+    dueDate: new Date("2024-03-15"),
+    status: "Not Started",
+    priority: "Low",
+  },
+  {
+    id: "5",
+    taskName:
+      "PM Optimize the website for search engines to improve visibility and organic traffic",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
+  {
+    id: "6",
+    taskName: "PM Do the UI of the new e-learning dashboard",
+    dueDate: new Date("2024-03-10"),
+    status: "Not Started",
+    priority: "High",
+  },
 ];

@@ -149,6 +149,7 @@ const Project = () => {
       setIsFormOpen(false);
       setEditingIndex(-1);
       setSelectedTeamMembers([]); // Clear selected team members
+      setSelectedTeamMembers([]); // Clear selected team members
     } catch (error) {
       console.error(error);
       // Handle validation errors here
@@ -290,6 +291,43 @@ const Project = () => {
                     InputProps={{
                       readOnly: true,
                     }}
+                    sx={{
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
+                        },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: validationErrors.EndDate ? "red" : "#868dfb",
+                        },
+                      },
+                    }}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box sx={{ mb: 2 }}>
+                  <Autocomplete
+                    multiple
+                    id="teamMembers"
+                    options={activeUsers}
+                    getOptionLabel={(option) => `${option.name}`}
+                    value={selectedTeamMembers}
+                    onChange={(event, value) => setSelectedTeamMembers(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="Team Members"
+                        fullWidth
+                        error={!!validationErrors.teamMembers}
+                        helperText={validationErrors.teamMembers}
+                        placeholder="Project Manager"
+                      />
+                    )}
                     sx={{
                       "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                         {

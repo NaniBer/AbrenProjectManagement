@@ -653,6 +653,13 @@ const Task = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
                     type="submit"
                     startIcon={edit ? <EditIcon /> : <AddIcon />}
                   >

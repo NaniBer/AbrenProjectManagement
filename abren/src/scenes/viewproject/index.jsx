@@ -35,14 +35,15 @@ const Viewproject = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
+
         const fetchedData = data.map((row) => ({
           ...row,
           id: row._id,
           description: row.ProjectDescription,
           projectname: row.ProjectName,
-          projectmanager: row.ProjectManager.username,
+          projectmanager: row.ProjectManager.name,
         }));
-        console.log(fetchedData);
+        // console.log(fetchedData);
         setProjectData(fetchedData);
       });
   }, []);

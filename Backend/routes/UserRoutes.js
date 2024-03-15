@@ -158,8 +158,10 @@ UserRouter.post("/addTodolist", async (req, res) => {
       Status,
       UserId: loggedInUserId,
     });
+    console.log(todo);
 
     await todo.save();
+    console.log("Task Added");
     res.status(201).json({ success: true, todo });
   } catch (error) {
     console.error(error);
@@ -168,12 +170,15 @@ UserRouter.post("/addTodolist", async (req, res) => {
 });
 
 //View All Todo
-UserRouter.get("/view", async (req, res) => {
+UserRouter.get("/view/:userId", async (req, res) => {
   try {
+    // const loggedInUserId = req.params.userId;
     const loggedInUserId = req.session.userId;
+    console.log(loggedInUserId);
 
     // Retrieve all todos where UserId matches the logged-in user's ID
     const todos = await Todo.find({ UserId: loggedInUserId });
+    console.log(todos);
 
     res.status(200).json({ success: true, todos });
   } catch (error) {
@@ -366,19 +371,11 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
 });
 
 //Test route
-UserRouter.get("/project/", async (req, res) => {
+UserRouter.get("/test/", async (req, res) => {
   try {
     // Get the count of task records
-    const taskCount = await Tasks.countDocuments({});
-
-    // Log the count to the console
-    console.log("Number of task records:", taskCount);
-
-    // Delete all task records
-    const projectList = await Tasks.deleteMany({});
-
-    // Respond with the list of deleted tasks
-    res.json(projectList);
+    const tasks = await Tasks.find();
+    res.json(tasks);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -676,6 +673,86 @@ UserRouter.delete("/deleteMilestone/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+UserRouter.get("/projectsByTeamMember/:teamMemberId", async (req, res) => {
+  try {
+    const teamMemberId = req.params.teamMemberId;
+    // Query the projects table to find projects where the team member is assigned
+    const projects = await Projects.find({ teamMembers: teamMemberId });
+
+    // Array to store tasks related to the projects
+    const tasksPromises = projects.map(async (project) => {
+      // Query the tasks table to find tasks related to the project
+      const tasks = await Tasks.find({ projectId: project._id });
+      return { ...project.toJSON(), tasks }; // Add tasks to the project object
+    });
+
+    // Wait for all tasks promises to resolve
+    const projectsWithTasks = await Promise.all(tasksPromises);
+
+    res.json(projectsWithTasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+UserRouter.get("/tasksByAssignedTo/:assignedToId", async (req, res) => {
+  try {
+    const assignedToId = req.params.assignedToId;
+    // Query the projects table to find projects where the team member is assigned
+    const tasks = await Tasks.find({ "assignedTo._id": assignedToId });
+
+    // Array to store tasks related to the projects
+    const projectPromises = tasks.map(async (task) => {
+      // Query the tasks table to find tasks related to the project
+      const projectId = task.projectId;
+      const { ProjectName: projectName } = await Projects.findOne({
+        _id: projectId,
+      }).select("ProjectName");
+
+      return { ...task.toJSON(), projectName }; // Add tasks to the project object
+    });
+
+    // Wait for all tasks promises to resolve
+    const TasksWithProjectName = await Promise.all(projectPromises);
+    console.log(TasksWithProjectName);
+
+    res.json(TasksWithProjectName);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+UserRouter.get("/getEvents/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Fetch tasks assigned to the user
+    const tasks = await Tasks.find({ "assignedTo._id": userId }).select(
+      "TaskName StartDate EndDate"
+    );
+
+    // Fetch projects assigned to the user
+    const projects = await Projects.find({ teamMembers: userId }).select(
+      "ProjectName EndDate StartDate"
+    );
+
+    // Fetch todos for the user
+    const todos = await Todo.find({ UserId: userId }).select("TodoName Date");
+
+    // Construct the response object
+    const responseData = {
+      tasks: tasks,
+      projects: projects,
+      todos: todos,
+    };
+
+    res.json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

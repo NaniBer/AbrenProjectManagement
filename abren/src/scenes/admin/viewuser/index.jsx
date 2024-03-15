@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,9 +11,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import { mockDataTeam } from "../../../data/mockData";
 import Header from "../../../components/Header";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import swal from "sweetalert";
-
 
 const Team = () => {
   const theme = useTheme();
@@ -27,12 +26,33 @@ const Team = () => {
   const [updatedEmail, setUpdatedEmail] = useState("");
   const [updatedUsername, setUpdatedUsername] = useState("");
 
+  useEffect(() => {
+    fetch("/admin/getUsers")
+      .then((response) => response.json())
+      .then((data) => {
+        const fetchedData = data.map((row) => ({
+          ...row,
+          id: row._id,
+          status: row.disabled ? "Inactive" : "Active", // Set the status based on the disabled value
+          role: "User",
+        }));
+        console.log(fetchedData);
+        setTeamData(fetchedData);
+      });
+  }, []);
   const handleDisable = (rowId) => {
     const updatedTeamData = teamData.map((row) => {
       if (row.id === rowId) {
+        const newStatus = row.status === "Inactive" ? "Active" : "Inactive";
+        console.log(newStatus);
+        fetch(`/admin/disableUsers/${rowId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newStatus: newStatus }),
+        });
         return {
           ...row,
-          status: row.status === "inactive" ? "active" : "inactive",
+          status: newStatus,
         };
       }
       return row;
@@ -53,20 +73,55 @@ const Team = () => {
   };
 
   const handleModalSave = () => {
-    const updatedTeamData = teamData.map((row) => {
-      if (row.id === selectedRow.id) {
-        return {
-          ...row,
-          firstname: updatedFirstName || row.firstname,
-          lastname: updatedLastName || row.lastname,
-          email: updatedEmail || row.email,
-          username: updatedUsername || row.username,
-        };
-      }
-      return row;
-    });
-    setTeamData(updatedTeamData);
-    handleCloseModal();
+    const id = selectedRow.id;
+    const firstname = updatedFirstName || selectedRow.firstname;
+    const lastname = updatedLastName || selectedRow.lastname;
+    const email = updatedEmail || selectedRow.email;
+    const username = updatedUsername || selectedRow.username;
+
+    const formData = {
+      firstName: firstname,
+      lastName: lastname,
+      email,
+      username,
+    };
+    console.log(formData);
+
+    fetch(`/admin/updateUser/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.status);
+          // Update the teamData state with the new data
+          const updatedTeamData = teamData.map((row) => {
+            console.log(id);
+            if (row.id === id) {
+              console.log(firstname, lastname, email, username);
+              return {
+                ...row,
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                username: username,
+              };
+            }
+            return row;
+          });
+          console.log(updatedTeamData);
+          setTeamData(updatedTeamData);
+          handleCloseModal();
+          swal("Updated!", "The row has been updated.", "success");
+        } else {
+          swal("Error!", "Failed to update the row.", "error");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+        swal("Error!", "Failed to update the row.", "error");
+      });
   };
 
   const handleCloseModal = () => {
@@ -80,36 +135,30 @@ const Team = () => {
 
   const columns = [
     {
-      field: 'firstname',
-      headerName: 'Firstname',
+      field: "firstname",
+      headerName: "Firstname",
       flex: 1,
-      cellClassName: 'name-column--cell',
+      cellClassName: "name-column--cell",
     },
     {
-      field: 'lastname',
-      headerName: 'Lastname',
+      field: "lastname",
+      headerName: "Lastname",
       flex: 1,
-      cellClassName: 'name-column--cell',
+      cellClassName: "name-column--cell",
     },
     {
-      field: 'email',
-      headerName: 'Email',
+      field: "email",
+      headerName: "Email",
       flex: 2,
     },
     {
-      field: 'username',
-      headerName: 'Username',
+      field: "username",
+      headerName: "Username",
       flex: 1.5,
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      flex: 1,
-      cellClassName: 'name-column--cell',
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "actions",
+      headerName: "Actions",
       flex: 1,
       renderCell: ({ row }) => (
         <Button
@@ -118,53 +167,61 @@ const Team = () => {
           onClick={() => handleDisable(row.id)}
           disabled={false}
         >
-          {row.status === 'active' ? 'Disable' : 'Enable'}
+          {row.status === "Active" ? "Disable" : "Enable"}
         </Button>
       ),
     },
     {
-      field: 'update',
-      headerName: 'Update',
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "update",
+      headerName: "Update",
       width: 120,
       renderCell: ({ row }) => (
         <Button variant="" onClick={() => handleUpdate(row.id)}>
           <EditIcon />
         </Button>
       ),
-    }
-  ]; 
+    },
+  ];
 
   return (
     <Box m="20px">
       <Header title="View User" subtitle="Managing the members" />
 
-      <Box m="40px 0 0 0" 
-      height="75vh"
-      sx={{
-        "& .MuiDataGrid-root": {
-          border: 'none',
-        },
-        "& .MuiDataGrid-cell": {
-          borderBottom: 'none',
-        },
-        "& .name-column--cell": {
-          color: colors.greenAccent[300],
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: colors.blueAccent[700],
-          borderBottom: 'none',
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: colors.primary[400],
-        },
-        "& .MuiDataGrid-footerContainer": {
-          borderTop: 'none',
-          backgroundColor: colors.blueAccent[700],
-        },
-        "& .MuiCheckbox-root": {
-          color: `${colors.greenAccent[200]} !important`,
-        },
-      }}
+      <Box
+        m="40px 0 0 0"
+        height="75vh"
+        sx={{
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+          },
+          "& .name-column--cell": {
+            color: colors.greenAccent[300],
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+          },
+          "& .MuiCheckbox-root": {
+            color: `${colors.greenAccent[200]} !important`,
+            borderRadius: "90%", // Make the checkboxes round
+          },
+        }}
       >
         <DataGrid
           checkboxSelection
@@ -173,10 +230,10 @@ const Team = () => {
           onRowDoubleClick={(params) => {
             const row = params.row;
             swal({
-              title: 'Row Information',
-               // icon: 'info',
+              title: "Row Information",
+              // icon: 'info',
               content: {
-                element: 'div',
+                element: "div",
                 attributes: {
                   innerHTML: `
                     <p style="color: primary;"><strong>Firstname:</strong> ${row.firstname}</p>
@@ -188,7 +245,7 @@ const Team = () => {
                   style: "text-align: left; color: black;", // Set text color to black
                 },
               },
-              backdrop: 'rgba(255,255,255,0.8)', // Lighten the backdrop
+              backdrop: "rgba(255,255,255,0.8)", // Lighten the backdrop
             });
             // swal({
             //   title: 'Row Information',
@@ -237,14 +294,15 @@ const Team = () => {
               fullWidth
               margin="normal"
               sx={{
-                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#868dfb',
-                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor: "#868dfb",
+                  },
               }}
               InputLabelProps={{
                 sx: {
-                  '&.Mui-focused': {
-                    color: '#868dfb',
+                  "&.Mui-focused": {
+                    color: "#868dfb",
                   },
                 },
               }}
@@ -256,18 +314,19 @@ const Team = () => {
               fullWidth
               margin="normal"
               sx={{
-                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#868dfb',
-                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor: "#868dfb",
+                  },
               }}
               InputLabelProps={{
                 sx: {
-                  '&.Mui-focused': {
-                    color: '#868dfb',
+                  "&.Mui-focused": {
+                    color: "#868dfb",
                   },
                 },
               }}
-            /> 
+            />
             <TextField
               label="Email"
               value={updatedEmail}
@@ -275,14 +334,15 @@ const Team = () => {
               fullWidth
               margin="normal"
               sx={{
-                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#868dfb',
-                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor: "#868dfb",
+                  },
               }}
               InputLabelProps={{
                 sx: {
-                  '&.Mui-focused': {
-                    color: '#868dfb',
+                  "&.Mui-focused": {
+                    color: "#868dfb",
                   },
                 },
               }}
@@ -294,15 +354,16 @@ const Team = () => {
               fullWidth
               margin="normal"
               sx={{
-                mb: '25px',
-                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#868dfb',
-                },
+                mb: "25px",
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor: "#868dfb",
+                  },
               }}
               InputLabelProps={{
                 sx: {
-                  '&.Mui-focused': {
-                    color: '#868dfb',
+                  "&.Mui-focused": {
+                    color: "#868dfb",
                   },
                 },
               }}

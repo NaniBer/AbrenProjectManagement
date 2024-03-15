@@ -396,11 +396,12 @@ const Milestone = () => {
         <Modal open={isFormOpen} onClose={() => setIsFormOpen(false)}>
           <Box
             sx={{
+              borderRadius: "20px",
+              backgroundColor: colors.primary[400],
               position: "absolute",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
               boxShadow: 24,
               p: 4,
               maxWidth: 700,

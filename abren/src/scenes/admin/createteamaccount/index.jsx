@@ -1,23 +1,38 @@
-import React, { useState } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, TextField, CircularProgress } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../../components/Header";
 import swal from "sweetalert";
-
+import { useSelector } from "react-redux";
 const Form = () => {
+  const user = useSelector((state) => state.auth.user);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
+  const storeState = useSelector((state) => state);
+  useEffect(() => {
+    console.log(storeState.auth.user._id);
+  }, []);
 
   const handleFormSubmit = (values, formik) => {
     const { firstName, lastName, username, email, password } = values;
     console.log(firstName, lastName, username, email, password);
+    const adminId = storeState.auth.user._id;
+    const formData = {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      adminId,
+    };
     if (
       values.firstName &&
       values.lastName &&
@@ -25,17 +40,39 @@ const Form = () => {
       values.username &&
       values.password
     ) {
+      setLoading(true);
       formik.resetForm();
 
       // Perform your form submission logic here
       formik.setSubmitting(false); // Set submitting to false after successful submission
-
-      // Show success SweetAlert
-      swal(
-        "User Account Created",
-        "The new user account has been created successfully.",
-        "success"
-      );
+      fetch("/admin/CreateUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => {
+          const statusCode = response.status;
+          console.log(statusCode);
+          if (statusCode == 201) {
+            // Show success SweetAlert
+            swal(
+              "User Account Created",
+              "The new user account has been created successfully.",
+              "success"
+            );
+            console.log("Created Successfully");
+          } else if (statusCode == 409) {
+            swal(
+              "Username exists",
+              "The new user account has not been created successfully.",
+              "Fail"
+            );
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     }
   };
   const handleFirstNameChange = (event, handleChange) => {
@@ -236,6 +273,11 @@ const Form = () => {
                 Create New User Account
               </Button>
             </Box>
+            {loading && (
+              <Box display="flex" justifyContent="center" my={3}>
+                <CircularProgress />
+              </Box>
+            )}
           </form>
         )}
       </Formik>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import DashboardAdmin from "../../scenes/dashboard-admin";
-import Topbar from "../../scenes/global/Topbar";
+import TopbarAdmin from "../../scenes/global/TopbarAdmin";
 import SidebarAdmin from "../../scenes/global/SidebarAdmin";
 import Createproject from "../../scenes/admin/createproject";
 import Createteamaccount from "../../scenes/admin/createteamaccount";
@@ -24,7 +24,7 @@ function AdminPage() {
         <div className="App">
           <SidebarAdmin />
           <main className="content">
-            <Topbar />
+            <TopbarAdmin />
             <Routes>
               <Route path="/" element={<DashboardAdmin />}></Route>
               <Route path="/team" element={<Team />}></Route>

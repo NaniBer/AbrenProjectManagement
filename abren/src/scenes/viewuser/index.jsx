@@ -41,7 +41,7 @@ const Team = () => {
         console.log(fetchedData);
         setTeamData(fetchedData);
       });
-  }, []);
+  }, [teamData]);
   const handleDisable = (rowId) => {
     // Update the teamData state array
     const updatedTeamData = teamData.map((row) => {
@@ -76,45 +76,56 @@ const Team = () => {
   };
 
   const handleModalSave = () => {
-    const updatedTeamData = teamData.map((row) => {
-      if (row.id === selectedRow.id) {
-        const id = selectedRow.id;
-        console.log(id);
-        const firstname = updatedFirstName || row.firstname;
-        const lastname = updatedLastName || row.lastname;
-        const email = updatedEmail || row.email;
-        const username = updatedUsername || row.username;
-        const formData = {
-          id,
-          firstName: firstname,
-          lastName: lastname,
-          email,
-          username,
-        };
-        console.log(formData);
-        fetch(`/admin/updateUser/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }).then((response) => {
-          const statusCode = response.status;
-          if (statusCode == 200) {
-            return {
-              ...row,
-              firstname: updatedFirstName || row.firstname,
-              lastname: updatedLastName || row.lastname,
-              email: updatedEmail || row.email,
-              username: updatedUsername || row.username,
-            };
-          }
-        });
-      }
-      swal("Updated!", "The row has been updated.", "success");
+    console.log("hellp");
+    const id = selectedRow.id;
+    const firstname = updatedFirstName || selectedRow.firstname;
+    const lastname = updatedLastName || selectedRow.lastname;
+    const email = updatedEmail || selectedRow.email;
+    const username = updatedUsername || selectedRow.username;
 
-      return row;
-    });
-    setTeamData(updatedTeamData);
-    handleCloseModal();
+    const formData = {
+      firstName: firstname,
+      lastName: lastname,
+      email,
+      username,
+    };
+    console.log(formData);
+
+    fetch(`/admin/updateUser/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.status);
+          // Update the teamData state with the new data
+          const updatedTeamData = teamData.map((row) => {
+            console.log(id);
+            if (row.id === id) {
+              console.log(firstname, lastname, email, username);
+              return {
+                ...row,
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                username: username,
+              };
+            }
+            return row;
+          });
+          console.log(updatedTeamData);
+          setTeamData(updatedTeamData);
+          handleCloseModal();
+          swal("Updated!", "The row has been updated.", "success");
+        } else {
+          swal("Error!", "Failed to update the row.", "error");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+        swal("Error!", "Failed to update the row.", "error");
+      });
   };
 
   const handleCloseModal = () => {

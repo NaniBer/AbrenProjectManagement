@@ -15,6 +15,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { profile } from "../../data/mockData";
 import Logo from "../../images/abren2.png";
 import { useSelector, useDispatch } from "react-redux";
@@ -52,6 +53,8 @@ const Sidebar = () => {
 
   const [firstName, setFirstName] = useState("");
   const user = useSelector((state) => state.auth.user);
+  const projectslist = user.projects;
+  const firstNamedata = user.firstname;
 
   const [projects, setProjects] = useState([]);
 
@@ -62,12 +65,8 @@ const Sidebar = () => {
   });
   useEffect(() => {
     console.log(user);
-    if (user) {
-      setFirstName(user.firstname);
-      user.projects.forEach((project) => {
-        setProjects([...projects, project]);
-      });
-    }
+    setProjects(projectslist);
+    setFirstName(firstNamedata);
   }, [user]);
   const handleProjectSelect = async (projectId) => {
     console.log(projectId);
@@ -226,27 +225,41 @@ const Sidebar = () => {
                   color={colors.grey[300]}
                   sx={{ m: "15px 0 5px 20px" }}
                 >
-                  Projects
+                  Projects You Lead
                 </Typography>
-                <Item
-                  title="Project1"
-                  to="/pm/project"
-                  icon={<AccountTreeOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  onClick={() => console.log("hii")}
-                />
+
                 {projects.map((project, index) => (
                   <Item
                     key={index}
                     title={project.ProjectName}
-                    to="/pm/project"
+                    to="/user/project"
                     icon={<AccountTreeOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     onClick={() => handleProjectSelect(project._id)}
                   />
                 ))}
+                <Typography
+                  variant="h6"
+                  color={colors.grey[300]}
+                  sx={{ m: "15px 0 5px 20px" }}
+                >
+                  Projects You're On
+                </Typography>
+                <Item
+                  title="View Assigned Project"
+                  to="/user/viewAssignedProject"
+                  icon={<AccountTreeOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="View Assigned Task"
+                  to="/user/viewAssignedTask"
+                  icon={<FormatListBulletedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
 
                 <Typography
                   variant="h6"
@@ -257,21 +270,21 @@ const Sidebar = () => {
                 </Typography>
                 <Item
                   title="Kanban"
-                  to="/pm/kanban"
+                  to="/user/kanban"
                   icon={<PersonOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />
                 <Item
                   title="Calendar"
-                  to="/pm/calendar"
+                  to="/user/calendar"
                   icon={<PersonOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />
                 <Item
                   title="Report"
-                  to="/pm/report"
+                  to="user/report"
                   icon={<SummarizeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}

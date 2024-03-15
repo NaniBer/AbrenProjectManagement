@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, TextField, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../../components/Header";
@@ -7,10 +7,38 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { mockDataTeam } from "../../../data/mockData";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert";
+import { tokens } from "../../../theme";
 
 const Form = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const [selectedUser, setSelectedUser] = useState("");
+  const [activeUsers, setActiveUsers] = useState([]);
   const navigate = useNavigate();
+  useEffect(() => {
+    fetch("/Users/activeUsers")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to retrieve active users");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Handle the retrieved active users data
+        console.log(data);
+
+        const activeUsers = data.map((user) => ({
+          _id: user._id,
+          name: `${user.firstname} ${user.lastname}`,
+        }));
+
+        // Set selectedTeamMembers with the extracted data
+        setActiveUsers(activeUsers);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
 
   const handleFormSubmit = (values, formik) => {
     const { projectname, description } = values;
@@ -19,6 +47,7 @@ const Form = () => {
       ProjectDescription: description,
       ProjectManager: selectedUser,
     };
+
     if (values.projectname && values.description && selectedUser) {
       fetch("/admin/CreateProject", {
         method: "POST",
@@ -30,7 +59,7 @@ const Form = () => {
             button: "Ok!",
           });
         }
-        navigate("/viewproject");
+        navigate("admin/viewproject");
       });
 
       formik.setSubmitting(false); // Set submitting to false after successful submission
@@ -59,9 +88,6 @@ const Form = () => {
 
     return errors;
   };
-
-  // Extracting usernames from the mockDataTeam array
-  const usernames = mockDataTeam.map((teamMember) => teamMember.username);
 
   return (
     <Box m="20px">
@@ -98,6 +124,7 @@ const Form = () => {
                 }
                 className="form-field"
                 sx={{
+                  backgroundColor: colors.primary[400],
                   gridColumn: "span 4",
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
@@ -131,6 +158,7 @@ const Form = () => {
                 }
                 className="form-field"
                 sx={{
+                  backgroundColor: colors.primary[400],
                   gridColumn: "span 4",
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
@@ -149,8 +177,8 @@ const Form = () => {
                 {" "}
                 {/* Spanning 4 columns */}
                 <Autocomplete
-                  options={usernames} // Set the dropdown options to the usernames array
-                  getOptionLabel={(option) => option} // Use the username as the label
+                  options={activeUsers} // Set the dropdown options to the usernames array
+                  getOptionLabel={(option) => `${option.name}`} // Use the username as the label
                   value={selectedUser}
                   onChange={handleUserSelect}
                   renderInput={(params) => (

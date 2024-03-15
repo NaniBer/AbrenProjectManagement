@@ -1,167 +1,206 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import {
   Typography,
-  Grid,
+  useTheme,
   Card,
   CardContent,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  useTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
 } from '@mui/material';
 import { tokens } from '../../../theme';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import ExpandMore icon
-import { PieChart, Pie, Tooltip, Legend } from 'recharts'; // Import Recharts components
-import { BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 
-
-const Resource = () => {
+const BudgetChart = ({ project, milestones, resources, projects, selectedProjectId, handleChange }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Dummy project data
-  const projectData = {
-    projectName: "Dummy Project",
-    manager: "John Doe",
-    reportDate: "2024-03-10",
+  // Function to calculate total used budget for the selected project
+  const calculateUsedBudget = () => {
+    let totalUsedBudget = 0;
+    milestones.forEach((milestone) => {
+      if (milestone.projectId === project.id) {
+        const resource = resources.find((res) => res.name === milestone.resource);
+        if (resource) {
+          totalUsedBudget += milestone.quantity * resource.rate;
+        }
+      }
+    });
+    return totalUsedBudget;
   };
 
-  // Dummy project health summary data
-  const projectHealthSummary = {
-    scheduleAdherence: {
-      status: 'On Track',
-      details: 'The project is currently adhering to the planned schedule. All milestones have been achieved on time.',
+  // Data for the chart
+  const data = [
+    {
+      name: 'Allocated Budget',
+      budget: project.budget,
+      fill: colors.primary[110], // Allocated Budget Color
     },
-    budgetCompliance: {
-      status: 'Under Budget',
-      details: 'The project\'s actual expenditure is below the approved budget. Cost-saving measures have been implemented effectively.',
+    {
+      name: 'Used Budget',
+      budget: calculateUsedBudget(),
+      fill: colors.greenAccent[400], // Used Budget Color
     },
-    qualityMeasures: {
-      status: 'Meeting Expectations',
-      details: 'Quality control measures have been implemented rigorously, resulting in high-quality deliverables and minimal defects.',
-    },
-  };
-
-  // Dummy data for schedule performance
-  const schedulePerformanceData = [
-    { milestone: 'Design Phase', plannedDate: '2024-03-15', actualDate: '2024-01-20', status: 'Completed' },
-    { milestone: 'Development Phase', plannedDate: '2024-02-28', actualDate: '2024-03-05', status: 'Completed' },
-    { milestone: 'Testing Phase', plannedDate: '2024-04-15', actualDate: '2024-04-18', status: 'Completed' },
-    { milestone: 'Deployment Phase', plannedDate: '2024-05-30', actualDate: '2024-06-05', status: 'In Progress' },
   ];
 
-  // Dummy data for budget performance
-  const budgetPerformanceData = [
-    { category: 'Labor', plannedAmount: 50000, actualAmount: 52000, costOverrun: 2000 },
-    { category: 'Materials', plannedAmount: 20000, actualAmount: 25000, costOverrun: 5000 },
-    { category: 'Equipment', plannedAmount: 10000, actualAmount: 11000, costOverrun: 1000 },
-    { category: 'Miscellaneous', plannedAmount: 5000, actualAmount: 6000, costOverrun: 1000 },
-  ];
+  // Calculate total budget used percentage
+  const totalUsedPercentage = ((data[1].budget / data[0].budget) * 100).toFixed(2);
 
   return (
-    <Accordion sx={{ backgroundColor: colors.primary[400], borderRadius: '15px', marginTop: '40px' }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Accordion sx={{ backgroundColor: colors.primary[400] }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+    <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px', position: 'relative' }}>
+      <CardContent>
+        <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
+          <FormControl sx={{ m: 1, mt:2, mr:2 }}>
+            <InputLabel id="project-select-label">Select Project</InputLabel>
+            
+            <Select
+              labelId="project-select-label"
+              id="project-select"
+              value={selectedProjectId}
+              onChange={handleChange}
             >
-              <Typography variant="h4">Project Overview</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <CardContent sx={{ textAlign: 'left' }}>
-                <Typography variant="h4" sx={{ mb: 3, mt: 2 }}>
-                  <Typography
-                    variant="h3"
-                    component="span"
-                    sx={{ mr: 1, color: colors.primary[110] }}
-                  >
-                    Project Name:{' '}
-                  </Typography>
-                  {projectData.projectName}
-                </Typography>
-
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Manager:</Typography>{projectData.manager}
-                </Typography>
-
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Report Date:</Typography>{projectData.reportDate}
-                </Typography>
-
-                {/* Display Project Health Summary */}
-                <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Project Health Summary</Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Schedule Adherence:</Typography>{projectHealthSummary.scheduleAdherence.status}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  {projectHealthSummary.scheduleAdherence.details}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Budget Compliance:</Typography>{projectHealthSummary.budgetCompliance.status}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  {projectHealthSummary.budgetCompliance.details}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  <Typography component="span" color={colors.greenAccent[400]} sx={{ mr: 1 }}>Quality Measures:</Typography>{projectHealthSummary.qualityMeasures.status}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1, mt: 2 }}>
-                  {projectHealthSummary.qualityMeasures.details}
-                </Typography>
-
-                {/* Display Schedule Performance */}
-                {/* <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Schedule Performance</Typography> */}
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
-                      <CardContent>
-                        <Typography variant="h6" sx={{ mb: 2 }}>Schedule Performance</Typography>
-                        <PieChart width={400} height={300}>
-                  <Pie
-                    dataKey="value"
-                    data={schedulePerformanceData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    label
-                  />
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={6}>
-                    {/* Display Budget Performance */}
-                    <Card sx={{ marginTop: '20px', backgroundColor: colors.primary[400], borderRadius: '15px' }}>
-                      <CardContent>
-                        <Typography variant="h6" sx={{ mb: 2 }}>Budget Performance</Typography>
-                        {/* <Typography variant="h5" sx={{ mb: 2, color: colors.primary[110] }}>Budget Performance</Typography> */}
-                        <BarChart width={400} height={300} data={budgetPerformanceData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="category" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="plannedAmount" fill={colors.blueAccent[400]} name="Planned Amount" />
-                          <Bar dataKey="actualAmount" fill={colors.greenAccent[400]} name="Actual Amount" />
-                          <Bar dataKey="costOverrun" fill={colors.redAccent[400]} name="Cost Overrun" />
-                        </BarChart>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </AccordionDetails>
-          </Accordion>
-        </Grid>
-      </Grid>
-    </Accordion>
+              {projects.map((proj) => (
+                <MenuItem key={proj.id} value={proj.id}>{proj.projectname}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Typography variant="h3" sx={{ mb: 2 ,ml:2, mt:2}}>Budget Chart - <Typography variant='h4' component= "span" sx={{color: colors.primary[110]}}>{project.projectname}</Typography></Typography>
+        <Typography variant="subtitle1" sx={{ mb: 2 ,ml:2}}>Date: {new Date().toLocaleDateString()}</Typography>
+        <BarChart width={800} height={400} data={data} margin={{ top: 20, right: 20, left: 20, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis label={{ value: 'Budget (ETB)', angle: -90, position: 'insideLeft' }} />
+          <Tooltip />
+          <Legend
+            verticalAlign="bottom"
+            align="center"
+            wrapperStyle={{ paddingTop: '20px' }} // Adjust padding as needed
+          />
+          <Bar dataKey="budget" name="Budget" fill={colors.primary[110]} />
+        </BarChart>
+        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.primary[300], padding: '10px', borderRadius: '0 0 15px 15px' }}>
+          <Typography variant="h6" sx={{ color: colors.grey[100] }}>Summary</Typography>
+          <Typography variant="body1" sx={{ color: colors.grey[100] }}>Allocated Budget: {data[0].budget} ETB</Typography>
+          <Typography variant="body1" sx={{ color: colors.grey[100] }}>Used Budget: {data[1].budget} ETB ({totalUsedPercentage}%)</Typography>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
-export default Resource;
+const BudgetChartContainer = ({ projects, milestones, resources }) => {
+  const [selectedProjectId, setSelectedProjectId] = useState(projects[0].id);
+
+  const handleChange = (event) => {
+    setSelectedProjectId(event.target.value);
+  };
+
+  const selectedProject = projects.find((project) => project.id === selectedProjectId);
+
+  return (
+    <div>
+      {selectedProject && (
+        <BudgetChart
+          project={selectedProject}
+          milestones={milestones}
+          resources={resources}
+          projects={projects}
+          selectedProjectId={selectedProjectId}
+          handleChange={handleChange}
+        />
+      )}
+    </div>
+  );
+};
+
+// Dummy data
+const mockUpdatedDataProject = [
+  {
+    id: 1,
+    projectname: "Kaizen website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: '2024-03-12',
+    endDate: '2024-03-13',
+    budget: 5000,
+  },
+  {
+    id: 2,
+    projectname: "New website",
+    description: "kaizen is a tech company ",
+    projectmanager: "saronbisrat.kaizen",
+    status: "active",
+    startDate: '2024-03-12',
+    endDate: '2024-03-12',
+    budget: 3000,
+  },
+];
+
+const dummyMilestones = [
+  {
+    name: 'Milestone 1',
+    description: 'Complete phase 1 of the project',
+    allocatedBudget: 2000,
+    status: 'In Progress',
+    priority: 'High',
+    resource: 'Resource 1',
+    quantity: 10,
+    projectId: 1,
+  },
+  {
+    name: 'Milestone 2',
+    description: 'Procure necessary materials',
+    allocatedBudget: 1000,
+    status: 'Pending',
+    priority: 'Medium',
+    resource: 'Resource 2',
+    quantity: 20,
+    projectId: 1,
+  },
+  {
+    name: 'Milestone 3',
+    description: 'Finalize project documentation',
+    allocatedBudget: 1500,
+    status: 'Completed',
+    priority: 'Low',
+    resource: 'Resource 3',
+    quantity: 15,
+    projectId: 2,
+  },
+];
+
+const dummyResources = [
+  {
+    name: 'Resource 1',
+    category: 'work',
+    quantity: 10,
+    cost: 0,
+    rate: 50,
+  },
+  {
+    name: 'Resource 2',
+    category: 'material',
+    quantity: 20,
+    cost: 0,
+    rate: 10,
+  },
+  {
+    name: 'Resource 3',
+    category: 'work',
+    quantity: 15,
+    cost: 0,
+    rate: 60,
+  },
+];
+
+export default function App() {
+  return (
+    <div>
+      <BudgetChartContainer projects={mockUpdatedDataProject} milestones={dummyMilestones} resources={dummyResources} />
+    </div>
+  );
+}

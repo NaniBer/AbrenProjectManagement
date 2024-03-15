@@ -145,7 +145,7 @@ router.put("/updateUser/:id", async (req, res) => {
     // existingUser.updatedBy = updatedBy;
     // Save the updated user to the database
     await existingUser.save();
-
+    console.log("user edited");
     res.status(200).json({ message: "Account updated successfully" });
   } catch (error) {
     console.error("Error updating user:", error);
@@ -194,13 +194,14 @@ router.post("/CreateProject", async (req, res) => {
     const { ProjectName, ProjectDescription, ProjectManager } = req.body;
     console.log(req.body);
     // const createdBy = req.session.adminId;
-    // Check if the user already exists
+    // Check if the project already exists
     const existingProject = await Admin.findOne({ ProjectName });
     if (existingProject) {
       return res.status(409).json({ message: "Project already exists" });
     }
     //Search for project manager id
-    const user = await Users.findOne({ username: ProjectManager });
+    const user = await Users.findOne({ _id: ProjectManager._id });
+    console.log(user);
     const ProjectManagerId = user._id;
     // Create a new Project
     const newProject = new Projects({
@@ -276,9 +277,41 @@ router.get("/getProjects", async (req, res) => {
   try {
     // const projectList = await Projects.find();
     // res.json(projectList);
-    const projectList = await Projects.find()
-      .populate("ProjectManager", "username")
-      .select("ProjectName ProjectDescription ProjectManager");
+    const projectList = await Projects.aggregate([
+      {
+        $lookup: {
+          from: "users", // Assuming your users collection name is "users"
+          localField: "ProjectManager",
+          foreignField: "_id",
+          as: "ProjectManager",
+        },
+      },
+      {
+        $addFields: {
+          ProjectManager: {
+            $map: {
+              input: "$ProjectManager",
+              as: "manager",
+              in: {
+                _id: "$$manager._id",
+                name: {
+                  $concat: ["$$manager.firstname", " ", "$$manager.lastname"],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          ProjectName: 1,
+          ProjectDescription: 1,
+          ProjectManager: 1,
+        },
+      },
+    ]);
+
+    console.log(projectList);
 
     res.json(projectList);
   } catch (err) {
@@ -301,23 +334,25 @@ router.delete("/deleteProjects/:id", async (req, res) => {
 router.put("/updateProjects/:id", async (req, res) => {
   try {
     const { id, ProjectName, ProjectDescription, ProjectManager } = req.body;
-    // console.log(id, ProjectName, ProjectDescription, ProjectManager);
-    const user = await Users.findOne({ username: ProjectManager });
-    const ProjectManagerId = user._id;
-    const updatedBusiness = await Projects.updateOne(
-      { _id: id },
-      {
-        $set: {
-          ProjectName: ProjectName,
-          ProjectDescription: ProjectDescription,
-          ProjectManager: ProjectManagerId,
-        },
-      }
-    );
-    console.log(updatedBusiness);
-    res.status(200).json(updatedBusiness);
-  } catch (err) {
-    res.json({ message: err });
+    console.log(id, ProjectName, ProjectDescription, ProjectManager);
+
+    // Assuming ProjectManager is an object with an id property
+    const projectManagerId = ProjectManager._id;
+    console.log(projectManagerId);
+
+    const updatedProject = await Projects.findByIdAndUpdate(id, {
+      $set: {
+        ProjectName: ProjectName,
+        ProjectDescription: ProjectDescription,
+        ProjectManager: projectManagerId,
+      },
+    });
+    console.log(updatedProject);
+    console.log("project updated");
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -393,4 +428,5 @@ router.put("/ResetAdmin", async (req, res) => {
     res.status(500).json({ message: "Error updating admin password" });
   }
 });
+
 module.exports = router;
