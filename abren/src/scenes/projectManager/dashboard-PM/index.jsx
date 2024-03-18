@@ -77,11 +77,11 @@ const DashboardPM = () => {
   const getPriorityColor = (priority) => {
     switch (priority.toLowerCase()) {
       case 'high':
-        return colors.greenAccent[500]; 
+        return '#FF5733'; // Red
       case 'medium':
-        return colors.primary[110]; 
+        return '#FFD700'; // Yellow
       case 'low':
-        return colors.blueAccent[400];
+        return colors.greenAccent[500]; // Green
       default:
         return '#000000'; // Default color
     }
