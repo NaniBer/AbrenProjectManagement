@@ -154,7 +154,15 @@ const projectReducer = (state = initialState, action) => {
           ],
         },
       };
-
+    case "REPLACE_TASKS":
+      const newTasks = action.payload;
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          tasks: newTasks,
+        },
+      };
     default:
       return state;
   }

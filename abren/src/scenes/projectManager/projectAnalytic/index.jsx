@@ -64,7 +64,7 @@ const Resource = () => {
 
   useEffect(() => {
     const calculateProgressData = (project) => {
-      const taskProgresses = project.tasks.map((task) => task.progress);
+      const taskProgresses = project.tasks.map((task) => task.status);
       const totalProgress = taskProgresses.reduce((acc, curr) => acc + curr, 0);
       return Math.round(totalProgress / taskProgresses.length); // Average progress of all tasks
     };

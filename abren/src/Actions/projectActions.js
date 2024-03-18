@@ -43,3 +43,8 @@ export const editTask = (updatedTask) => ({
   type: "EDIT_TASK",
   payload: updatedTask,
 });
+
+export const replaceTasks = (newTasks) => ({
+  type: "REPLACE_TASKS",
+  payload: newTasks,
+});

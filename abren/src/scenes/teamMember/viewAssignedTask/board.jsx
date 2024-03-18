@@ -16,78 +16,30 @@ import { useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import swal from "sweetalert";
 import { useSelector, useDispatch } from "react-redux";
-// import updatedTasks from "../../../data/mockData";
+import Swal from "sweetalert2";
+import { replaceTasks } from "../../../Actions/projectActions";
 
 function TaskList() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const user = useSelector((state) => state.auth.user);
-  const userid = user._id;
+  const dispatch = useDispatch();
 
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [subTaskChecked, setSubtaskChecked] = useState([]);
+  const [status, setStatus] = useState(0);
 
-  const dummyTaskData = [
-    {
-      id: 1,
-      name: "Task 1",
-      startDate: "2024-03-09",
-      endDate: "2024-03-12",
-      project: "Project X",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id turpis at urna tincidunt sodales sed id turpis. Mauris non leo a metus tempus gravida.",
-      subtasks: ["Subtask 1", "Subtask 2", "Subtask 3"],
-    },
-    {
-      id: 2,
-      name: "Task 2",
-      startDate: "2024-03-13",
-      endDate: "2024-03-14",
-      project: "Project Y",
-      description:
-        "Nullam non bibendum lectus. Donec ac ultricies libero. Sed eget dapibus odio.",
-      subtasks: ["Subtask A", "Subtask B", "Subtask C"],
-    },
-    {
-      id: 3,
-      name: "Task 3",
-      startDate: "2024-03-19",
-      endDate: "2024-03-25",
-      project: "Project Z",
-      description:
-        "Fusce auctor elit at magna feugiat, nec lacinia mi tempus. Fusce nec ex id magna gravida ultrices.",
-    },
-    {
-      id: 4,
-      name: "Task 4",
-      startDate: "2024-03-14",
-      endDate: "2024-03-15",
-      project: "Project W",
-      description:
-        "Quisque vestibulum magna et libero ultricies, quis porttitor eros gravida.",
-    },
-    {
-      id: 5,
-      name: "Task 5",
-      startDate: "2024-03-15",
-      endDate: "2024-03-15",
-      project: "Project V",
-      description:
-        "Vestibulum consequat nisl et fermentum luctus. Fusce sit amet semper mauris.",
-    },
-    {
-      id: 6,
-      name: "Task 6",
-      startDate: "2024-03-18",
-      endDate: "2024-03-20",
-      project: "Project U",
-      description:
-        "Etiam malesuada felis at purus suscipit, in convallis ex fringilla.",
-    },
-  ];
+  const handleStatusChange = (event, newValue) => {
+    console.log("hi");
+    setStatus(newValue);
+    console.log(newValue);
+  };
+  const user = useSelector((state) => state.auth.user);
+  const userid = user._id;
 
   useEffect(() => {
     // Calculate categories based on dates
@@ -120,6 +72,7 @@ function TaskList() {
             return { ...task, category: "assigned" }; // Assign all tasks with end dates before today to the 'assigned' category
           }
         });
+        console.log(updatedTasks);
 
         setTasks(updatedTasks);
 
@@ -164,19 +117,78 @@ function TaskList() {
 
   const moveTask = (newCategory) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === selectedTaskId ? { ...task, category: newCategory } : task
+      task._id === selectedTaskId ? { ...task, category: newCategory } : task
     );
     setTasks(updatedTasks);
     handleMenuClose();
   };
 
+  // Function to update the progress of a task
+  const handleUpdateProgress = (taskId, subTask) => {
+    // Set loading to true before starting the fetch request
+    setLoading(true);
+
+    // Update progress
+    fetch(`/Users/updateProgressOfTask/${taskId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update progress");
+        }
+        return response.json(); // Return the response JSON data
+      })
+      .then((data) => {
+        console.log("Progress updated successfully:", data.message);
+
+        // Replace subtasks
+        return fetch(`/Users/updatesubtasks/${taskId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ subTasks: subTask }),
+        });
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Subtasks replaced successfully:", data.subTasks);
+        dispatch(replaceTasks(tasks));
+
+        // Close the modal and show SweetAlert on success
+        setSelectedRowData(null);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Progress successfully recorded.",
+        });
+      })
+      .catch((error) => {
+        console.error("There was a problem:", error.message);
+        // Handle error
+      })
+      .finally(() => {
+        // Set loading to false after the fetch request completes
+        setLoading(false);
+      });
+  };
+
   const toggleTaskCompletion = (taskId) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
+      task._id === taskId ? { ...task, completed: !task.completed } : task
     );
     setTasks(updatedTasks);
 
-    const selectedTask = tasks.find((task) => task.id === taskId);
+    const selectedTask = tasks.find((task) => task._id === taskId);
     if (selectedTask.completed) {
       swal({
         title: "Mark Task as Incomplete?",
@@ -199,7 +211,7 @@ function TaskList() {
         buttons: ["Cancel", "Remove"],
       }).then((willRemove) => {
         if (willRemove) {
-          const updatedTasks = tasks.filter((task) => task.id !== taskId);
+          const updatedTasks = tasks.filter((task) => task._id !== taskId);
           setTasks(updatedTasks);
           swal("Task Removed!", {
             icon: "success",
@@ -212,15 +224,29 @@ function TaskList() {
 
   const handleTaskClick = (task) => {
     setSelectedRowData(task);
-    setSubtaskChecked(
-      task.subtasks ? Array(task.subtasks.length).fill(false) : []
-    );
+    if (task.subTasks) {
+      setSubtaskChecked(Array(task.subTasks.length).fill(false));
+      calculateProgress(Array(task.subTasks.length).fill(false));
+      const defaultChecked = task.subTasks.map((subTask) => subTask.completed);
+      setSubtaskChecked(defaultChecked);
+      calculateProgress(defaultChecked);
+    }
   };
 
-  const handleCheckboxChange = (index) => {
+  const handleCheckboxChange = (index, subTask) => {
     const updatedChecked = [...subTaskChecked];
     updatedChecked[index] = !updatedChecked[index];
     setSubtaskChecked(updatedChecked);
+    calculateProgress(updatedChecked);
+    const completed = subTask.completed;
+    subTask.completed = !completed;
+  };
+
+  const calculateProgress = (checkedArray) => {
+    const completedCount = checkedArray.filter((item) => item).length;
+    const totalCount = checkedArray.length;
+    const progress = (completedCount / totalCount) * 100;
+    setStatus(progress);
   };
 
   const kanbanColumns = [
@@ -247,6 +273,7 @@ function TaskList() {
               >
                 {column.title}
               </Typography>
+
               {tasks
                 .filter((task) => task.category === column.id)
                 .map((task) => (
@@ -265,7 +292,7 @@ function TaskList() {
                       >
                         <Checkbox
                           checked={task.completed}
-                          onChange={() => toggleTaskCompletion(task.id)}
+                          onChange={() => toggleTaskCompletion(task._id)}
                           sx={{
                             position: "absolute",
                             marginBottom: "10px",
@@ -383,9 +410,11 @@ function TaskList() {
                 </Typography>{" "}
                 {selectedRowData.TaskDescription}
               </Typography>
-
               {selectedRowData.subTasks &&
-                selectedRowData.subTasks.length > 0 && (
+                selectedRowData.subTasks.length > 0 &&
+                selectedRowData.subTasks.some(
+                  (subTask) => subTask.name.trim().length > 0
+                ) && (
                   <>
                     <Typography variant="subtitle1" gutterBottom>
                       <Typography
@@ -409,7 +438,7 @@ function TaskList() {
                         <Checkbox
                           color="secondary"
                           checked={subTaskChecked[index]}
-                          onChange={() => handleCheckboxChange(index)}
+                          onChange={() => handleCheckboxChange(index, subTask)}
                         />
                         <Typography
                           variant="body2"
@@ -418,40 +447,71 @@ function TaskList() {
                             color: subTaskChecked[index] ? "grey" : "inherit",
                           }}
                         >
-                          {subTask}
+                          {subTask.name}
                         </Typography>
                       </Box>
                     ))}
+
+                    <Typography
+                      variant="body2"
+                      gutterBottom
+                      style={{
+                        color: colors.greenAccent[400],
+                        paddingTop: "15px",
+                      }}
+                    >
+                      Progress: {status.toFixed(0)}%
+                    </Typography>
                   </>
                 )}
+              {console.log(selectedRowData.status)}
+              {selectedRowData.subTasks &&
+                selectedRowData.subTasks.length > 0 && (
+                  <Box sx={{ width: "95%" }}>
+                    <Typography
+                      id="progress-slider"
+                      variant="h5"
+                      sx={{
+                        color: colors.greenAccent[400],
+                        paddingTop: "20px",
+                      }}
+                      gutterBottom
+                    >
+                      Progress:
+                    </Typography>
+                    <Slider
+                      aria-labelledby="progress-slider"
+                      valueLabelDisplay="auto"
+                      onChange={handleStatusChange}
+                      value={status}
+                      sx={{ color: colors.primary[110] }}
+                    />
+                  </Box>
+                )}
 
-              {!selectedRowData.subtasks && (
-                <Box sx={{ width: "95%" }}>
-                  <Typography
-                    id="progress-slider"
-                    variant="h5"
-                    sx={{ color: colors.greenAccent[400], paddingTop: "20px" }}
-                    gutterBottom
-                  >
-                    Progress:
-                  </Typography>
-                  <Slider
-                    aria-labelledby="progress-slider"
-                    valueLabelDisplay="auto"
-                    // value={50} // Set your progress value here
-                    sx={{ color: colors.primary[110] }}
-                  />
-                </Box>
-              )}
               <Button
                 variant="contained"
                 color="primary"
                 startIcon={<FaCheck />}
-                onClick={() => toggleTaskCompletion(selectedRowData.id)}
+                onClick={() => toggleTaskCompletion(selectedRowData._id)}
                 sx={{ position: "absolute", bottom: "20px", right: "20px" }}
-                // marginTop= '20px'
               >
                 Mark as Completed
+              </Button>
+              {console.log(selectedRowData.status)}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<FaCheck />}
+                onClick={() =>
+                  handleUpdateProgress(
+                    selectedRowData._id,
+                    selectedRowData.subTasks
+                  )
+                }
+                sx={{}}
+              >
+                Update Progress
               </Button>
             </>
           )}

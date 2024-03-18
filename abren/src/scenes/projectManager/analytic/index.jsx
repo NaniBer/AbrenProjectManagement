@@ -87,6 +87,7 @@ const TaskAnalytics = () => {
   const updateProgressData = () => {
     // Simulating new progress data
     const newProgressData = [80, 50]; // Assuming you have new progress data for each task
+
     setProgressData(newProgressData);
   };
 
@@ -194,7 +195,7 @@ const TaskAnalytics = () => {
                 <Box mt={2}>
                   <LinearProgress
                     variant="determinate"
-                    value={progressData[index]} // Set the value dynamically
+                    value={task.status} // Set the value dynamically
                     sx={{
                       borderRadius: "10px", // Adjust border radius
                       backgroundColor: colors.grey[500], // Change background color
@@ -207,7 +208,7 @@ const TaskAnalytics = () => {
                   <Typography
                     variant="body2"
                     align="right"
-                  >{`${progressData[index]}%`}</Typography>
+                  >{`${task.status}%`}</Typography>
                 </Box>
               </CardContent>
             </Card>

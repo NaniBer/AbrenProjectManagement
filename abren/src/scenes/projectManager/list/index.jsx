@@ -14,8 +14,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-// import EditIcon from '@mui/icons-material/Edit';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"; // Import the expand icon
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Header from "../../../components/Header";
 import { tokens } from "../../../theme";
 import swal from "sweetalert";
@@ -48,11 +47,12 @@ const truncateTaskDescription = (TaskDescription) => {
 };
 
 const truncateSubtask = (subtask) => {
-  if (subtask.length <= MAX_SUBTASK_LENGTH) {
-    return subtask;
+  if (subtask.name.length <= MAX_SUBTASK_LENGTH) {
+    return subtask.name;
   }
-  return `${subtask.substring(0, MAX_SUBTASK_LENGTH)}...`;
+  return `${subtask.name.substring(0, MAX_SUBTASK_LENGTH)}...`;
 };
+
 const Task = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -66,13 +66,14 @@ const Task = () => {
   const [submittedTasks, setSubmittedTasks] = useState([]);
   const [assignedTo, setAssignedTo] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
-  const [subTasks, setSubtasks] = useState([""]);
-  const [expandedCardIndex, setExpandedCardIndex] = useState(-1); // Initialize with -1 to indicate no card is expanded
+  const [subTasks, setSubtasks] = useState([{ name: "", completed: false }]);
+  const [expandedCardIndex, setExpandedCardIndex] = useState(-1);
   const [teamMembers, setTeamMembers] = useState([]);
   const [edit, setEdit] = useState(false);
   const [editedTask, setEditedTask] = useState();
   const project = useSelector((state) => state.project.project);
   const tasks = project.tasks;
+
   const handleTaskNameChange = (e) => {
     setTaskName(e.target.value);
   };
@@ -92,19 +93,19 @@ const Task = () => {
   const handleTaskDescriptionChange = (e) => {
     setTaskDescription(e.target.value);
   };
-
   const handleSubtaskChange = (index, e) => {
     const updatedSubtasks = [...subTasks];
-    updatedSubtasks[index] = e.target.value;
+    updatedSubtasks[index] = { name: e.target.value, completed: false };
     setSubtasks(updatedSubtasks);
   };
+
   const handleAddTask = () => {
     setTeamMembers(project.teamMembers);
     console.log(project.teamMembers);
     setIsFormOpen(true);
   };
   const handleAddSubtask = () => {
-    setSubtasks([...subTasks, ""]);
+    setSubtasks([...subTasks, { name: "", completed: false }]);
   };
 
   const handleRemoveSubtask = (index) => {
@@ -144,6 +145,7 @@ const Task = () => {
         },
         { abortEarly: false }
       );
+      console.log(subTasks);
 
       const newTask = {
         TaskName,
@@ -153,13 +155,15 @@ const Task = () => {
         assignedTo,
         subTasks,
         projectId: project._id,
+        status: 0,
       };
+      console.log(newTask);
 
       // Check for duplicate task name while adding
       const isDuplicate = submittedTasks.some(
         (task) => task.TaskName === TaskName
       );
-      console.log(TaskName);
+      console.log(newTask);
 
       if (isDuplicate) {
         // Close loading modal
@@ -204,7 +208,8 @@ const Task = () => {
             setEndDate("");
             setTaskDescription("");
             setAssignedTo([]);
-            setSubtasks([""]);
+            setSubtasks([{ name: "", completed: false }]);
+
             setValidationErrors({}); // Reset validation errors
             setIsFormOpen(false);
 
@@ -269,7 +274,8 @@ const Task = () => {
               setEndDate("");
               setTaskDescription("");
               setAssignedTo([]);
-              setSubtasks([""]);
+              setSubtasks([{ name: "", completed: false }]);
+
               setValidationErrors({}); // Reset validation errors
               setIsFormOpen(false);
               // Close loading modal
@@ -303,9 +309,9 @@ const Task = () => {
     setEndDate(task.EndDate.substring(0, 10));
     setTaskDescription(task.TaskDescription);
     setAssignedTo(task.assignedTo);
-    setSubtasks(task.subTasks);
+    setSubtasks(task.subTasks); // Set subtasks directly without mapping
     setTeamMembers(project.teamMembers);
-    console.log(task);
+
     setEditedTask(task);
     setEdit(true);
 
@@ -333,7 +339,7 @@ const Task = () => {
 
     swal({
       title: "Are you sure?",
-      text: `You are about to delete the Task labeled ${submittedTasks[index].TaskeName}`,
+      text: `You are about to delete the Task labeled ${submittedTasks[index].TaskName}`,
       icon: "warning",
       buttons: ["Cancel", "Delete"],
       dangerMode: true,
@@ -610,7 +616,7 @@ const Task = () => {
                             label={`Subtask ${index + 1}`}
                             variant="outlined"
                             fullWidth
-                            value={subtask}
+                            value={subtask.name}
                             onChange={(e) => handleSubtaskChange(index, e)}
                             sx={{
                               "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
@@ -643,13 +649,6 @@ const Task = () => {
                   </Button>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </Button>
                   <Button
                     variant="contained"
                     color="primary"
@@ -793,18 +792,14 @@ const Task = () => {
                     <Typography variant="subtitle1" sx={{ mt: 2 }}>
                       Subtasks:
                     </Typography>
-                    {Task.subTasks.map((subtask, subtaskIndex) => (
-                      <Tooltip title={subtask} arrow>
-                        <Typography
-                          key={subtaskIndex}
-                          variant="body1"
-                          sx={{ mb: 3 }}
-                        >
-                          {`- ${truncateSubtask(subtask)}`}{" "}
-                          {/* Use truncateSubtask function here */}
-                        </Typography>
-                      </Tooltip>
-                    ))}
+                    {Task.subTasks &&
+                      Task.subTasks.map((subtask, subtaskIndex) => (
+                        <Tooltip title={subtask.name} arrow key={subtaskIndex}>
+                          <Typography variant="body1" sx={{ mb: 3 }}>
+                            {`- ${truncateSubtask(subtask)}`}
+                          </Typography>
+                        </Tooltip>
+                      ))}
                   </>
                 )}
 

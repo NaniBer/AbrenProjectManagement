@@ -48,7 +48,8 @@ const TasksSchema = mongoose.Schema({
   },
   subTasks: [
     {
-      type: String,
+      name: String,
+      completed: Boolean, // Add the completed attribute
     },
   ],
 });

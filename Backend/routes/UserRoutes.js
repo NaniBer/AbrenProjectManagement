@@ -25,6 +25,7 @@ UserRouter.post("/TaskAssign", async (req, res) => {
       TaskDescription,
       projectId,
       subTasks,
+      status,
     } = req.body;
     //const milestone = await Milestones.findById(milestone)
     const task = new Tasks({
@@ -35,6 +36,7 @@ UserRouter.post("/TaskAssign", async (req, res) => {
       TaskDescription,
       projectId,
       subTasks,
+      status,
     });
     console.log(task);
 
@@ -103,6 +105,34 @@ UserRouter.delete("/deleteTask/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+UserRouter.put("/updatesubtasks/:taskId/", async (req, res) => {
+  const { taskId } = req.params;
+  const newSubtasks = req.body.subTasks; // Assuming the new subtasks data is sent in the request body under the key 'subTasks'
+
+  try {
+    const task = await Tasks.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Replace the subtasks with the new data
+    task.subTasks = newSubtasks;
+
+    // Save the updated task
+    await task.save();
+    console.log("Subtasks updated");
+
+    res.json({
+      message: "Subtasks replaced successfully",
+      subTasks: task.subTasks,
+    });
+  } catch (error) {
+    console.error("Error updating subtasks:", error.message);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -428,6 +458,31 @@ UserRouter.delete("/deleteResource/:id", async (req, res) => {
 
 //Team Memeber
 //Add progress on the assigned task
+UserRouter.put("/updateProgressoftask/:taskId", async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { status } = req.body;
+
+    // Find the task by ID and update its status
+    const updatedTask = await Tasks.findByIdAndUpdate(taskId, {
+      status: status,
+    });
+    console.log(updatedTask.status);
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    console.log("task updated");
+
+    res.json({
+      message: "Task status updated successfully",
+      task: updatedTask,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 //Update progress on the assigned value
 
