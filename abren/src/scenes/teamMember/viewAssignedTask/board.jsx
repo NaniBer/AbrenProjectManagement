@@ -42,9 +42,20 @@ function TaskList() {
   const userid = user._id;
 
   useEffect(() => {
-    // Calculate categories based on dates
+    Swal.fire({
+      title: "Loading",
+      html: "Fetching tasks...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     fetch(`/Users/tasksByAssignedTo/${userid}`)
       .then((response) => {
+        // Hide loading spinner once response is received
+        Swal.close();
+
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -72,7 +83,6 @@ function TaskList() {
             return { ...task, category: "assigned" }; // Assign all tasks with end dates before today to the 'assigned' category
           }
         });
-        console.log(updatedTasks);
 
         setTasks(updatedTasks);
 
@@ -256,268 +266,287 @@ function TaskList() {
   ];
 
   return (
-    <Box>
-      <Grid container spacing={3}>
-        {kanbanColumns.map((column) => (
-          <Grid item xs={12} md={4} key={column.id}>
+    <>
+      {tasks.length === 0 ? (
+        <Typography variant="h4" sx={{ mb: 1 }} color={colors.primary[110]}>
+          No projects to juggle just yet! Hang tight, and when you're assigned
+          to one, it'll burst onto this screen like confetti.
+        </Typography>
+      ) : (
+        <Box>
+          <Grid container spacing={3}>
+            {kanbanColumns.map((column) => (
+              <Grid item xs={12} md={4} key={column.id}>
+                <Box
+                  p={2}
+                  bgcolor={colors.primary[100]}
+                  borderRadius={4}
+                  sx={{ backgroundColor: colors.blueAccent[300] }}
+                >
+                  <Typography
+                    variant="h3"
+                    gutterBottom
+                    style={{ color: colors.grey[900] }}
+                  >
+                    {column.title}
+                  </Typography>
+
+                  {tasks
+                    .filter((task) => task.category === column.id)
+                    .map((task) => (
+                      <Card
+                        key={task._id}
+                        variant="outlined"
+                        sx={{ marginBottom: 2 }}
+                      >
+                        <CardContent sx={{ position: "relative" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Checkbox
+                              checked={task.completed}
+                              onChange={() => toggleTaskCompletion(task._id)}
+                              sx={{
+                                position: "absolute",
+                                marginBottom: "10px",
+                                marginLeft: "-10px",
+                                "& .MuiIconButton-root": {
+                                  borderRadius: "50%",
+                                },
+                                "& .MuiSvgIcon-root": {
+                                  width: "1em",
+                                  height: "1em",
+                                },
+                                "&.Mui-checked .MuiSvgIcon-root": {
+                                  color: colors.greenAccent[500],
+                                },
+                              }}
+                            />
+                            <Typography
+                              variant="body1"
+                              style={{
+                                marginBottom: "8px",
+                                paddingLeft: "25px",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => handleTaskClick(task)}
+                            >
+                              {task.TaskName}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: colors.greenAccent[400] }}
+                          >
+                            {new Date(task.EndDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Modal
+            open={selectedRowData !== null}
+            onClose={() => setSelectedRowData(null)}
+          >
             <Box
-              p={2}
-              bgcolor={colors.primary[100]}
-              borderRadius={4}
-              sx={{ backgroundColor: colors.blueAccent[300] }}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                backgroundColor: colors.primary[400],
+                borderRadius: "20px",
+                boxShadow: 24,
+                p: 4,
+                maxWidth: 600,
+                height: "70%",
+                width: "100%",
+                outline: "none",
+                overflow: "auto",
+              }}
             >
               <Typography
-                variant="h3"
+                variant="h2"
+                sx={{ color: colors.primary[110], paddingBottom: "15px" }}
                 gutterBottom
-                style={{ color: colors.grey[900] }}
               >
-                {column.title}
+                Task Details
               </Typography>
-
-              {tasks
-                .filter((task) => task.category === column.id)
-                .map((task) => (
-                  <Card
-                    key={task._id}
-                    variant="outlined"
-                    sx={{ marginBottom: 2 }}
-                  >
-                    <CardContent sx={{ position: "relative" }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Checkbox
-                          checked={task.completed}
-                          onChange={() => toggleTaskCompletion(task._id)}
-                          sx={{
-                            position: "absolute",
-                            marginBottom: "10px",
-                            marginLeft: "-10px",
-                            "& .MuiIconButton-root": {
-                              borderRadius: "50%",
-                            },
-                            "& .MuiSvgIcon-root": {
-                              width: "1em",
-                              height: "1em",
-                            },
-                            "&.Mui-checked .MuiSvgIcon-root": {
-                              color: colors.greenAccent[500],
-                            },
-                          }}
-                        />
-                        <Typography
-                          variant="body1"
-                          style={{
-                            marginBottom: "8px",
-                            paddingLeft: "25px",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => handleTaskClick(task)}
-                        >
-                          {task.TaskName}
-                        </Typography>
-                      </Box>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: colors.greenAccent[400] }}
-                      >
-                        {new Date(task.EndDate).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Modal
-        open={selectedRowData !== null}
-        onClose={() => setSelectedRowData(null)}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: colors.primary[400],
-            borderRadius: "20px",
-            boxShadow: 24,
-            p: 4,
-            maxWidth: 600,
-            height: "70%",
-            width: "100%",
-            outline: "none",
-            overflow: "auto",
-          }}
-        >
-          <Typography
-            variant="h2"
-            sx={{ color: colors.primary[110], paddingBottom: "15px" }}
-            gutterBottom
-          >
-            Task Details
-          </Typography>
-          {selectedRowData && (
-            <>
-              <Typography variant="subtitle1" gutterBottom>
-                <Typography
-                  variant="h5"
-                  component="span"
-                  sx={{
-                    color: colors.greenAccent[400],
-                    paddingTop: "10px",
-                    paddingBottom: "15px",
-                  }}
-                >
-                  Task Name:{" "}
-                </Typography>
-                {selectedRowData.TaskName}
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                <AccessTimeIcon color="secondary" />
-                <Typography
-                  variant="body1"
-                  component="span"
-                  sx={{
-                    color: colors.greenAccent[400],
-                    paddingLeft: "10px",
-                    paddingBottom: "15px",
-                  }}
-                >
-                  {calculateDueDate(
-                    selectedRowData.StartDate,
-                    selectedRowData.EndDate
-                  )}
-                </Typography>
-              </Typography>
-              <Typography variant="subtitle1" gutterBottom>
-                <Typography
-                  variant="h5"
-                  sx={{ color: colors.greenAccent[400], paddingTop: "15px" }}
-                >
-                  {" "}
-                  Description:
-                </Typography>{" "}
-                {selectedRowData.TaskDescription}
-              </Typography>
-              {selectedRowData.subTasks &&
-                selectedRowData.subTasks.length > 0 &&
-                selectedRowData.subTasks.some(
-                  (subTask) => subTask.name.trim().length > 0
-                ) && (
-                  <>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <Typography
-                        variant="h5"
-                        component="span"
-                        sx={{
-                          color: colors.greenAccent[400],
-                          paddingBottom: "10px",
-                        }}
-                      >
-                        Subtasks:
-                      </Typography>
-                    </Typography>
-                    {selectedRowData.subTasks.map((subTask, index) => (
-                      <Box
-                        key={index}
-                        display="flex"
-                        alignItems="center"
-                        gutterBottom
-                      >
-                        <Checkbox
-                          color="secondary"
-                          checked={subTaskChecked[index]}
-                          onChange={() => handleCheckboxChange(index, subTask)}
-                        />
-                        <Typography
-                          variant="body2"
-                          gutterBottom
-                          style={{
-                            color: subTaskChecked[index] ? "grey" : "inherit",
-                          }}
-                        >
-                          {subTask.name}
-                        </Typography>
-                      </Box>
-                    ))}
-
+              {selectedRowData && (
+                <>
+                  <Typography variant="subtitle1" gutterBottom>
                     <Typography
-                      variant="body2"
-                      gutterBottom
-                      style={{
+                      variant="h5"
+                      component="span"
+                      sx={{
+                        color: colors.greenAccent[400],
+                        paddingTop: "10px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      Task Name:{" "}
+                    </Typography>
+                    {selectedRowData.TaskName}
+                  </Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    <AccessTimeIcon color="secondary" />
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      sx={{
+                        color: colors.greenAccent[400],
+                        paddingLeft: "10px",
+                        paddingBottom: "15px",
+                      }}
+                    >
+                      {calculateDueDate(
+                        selectedRowData.StartDate,
+                        selectedRowData.EndDate
+                      )}
+                    </Typography>
+                  </Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    <Typography
+                      variant="h5"
+                      sx={{
                         color: colors.greenAccent[400],
                         paddingTop: "15px",
                       }}
                     >
-                      Progress: {status.toFixed(0)}%
-                    </Typography>
-                  </>
-                )}
-              {console.log(selectedRowData.status)}
-              {selectedRowData.subTasks &&
-                selectedRowData.subTasks.length > 0 && (
-                  <Box sx={{ width: "95%" }}>
-                    <Typography
-                      id="progress-slider"
-                      variant="h5"
-                      sx={{
-                        color: colors.greenAccent[400],
-                        paddingTop: "20px",
-                      }}
-                      gutterBottom
-                    >
-                      Progress:
-                    </Typography>
-                    <Slider
-                      aria-labelledby="progress-slider"
-                      valueLabelDisplay="auto"
-                      onChange={handleStatusChange}
-                      value={status}
-                      sx={{ color: colors.primary[110] }}
-                    />
-                  </Box>
-                )}
+                      {" "}
+                      Description:
+                    </Typography>{" "}
+                    {selectedRowData.TaskDescription}
+                  </Typography>
+                  {selectedRowData.subTasks &&
+                    selectedRowData.subTasks.length > 0 &&
+                    selectedRowData.subTasks.some(
+                      (subTask) => subTask.name.trim().length > 0
+                    ) && (
+                      <>
+                        <Typography variant="subtitle1" gutterBottom>
+                          <Typography
+                            variant="h5"
+                            component="span"
+                            sx={{
+                              color: colors.greenAccent[400],
+                              paddingBottom: "10px",
+                            }}
+                          >
+                            Subtasks:
+                          </Typography>
+                        </Typography>
+                        {selectedRowData.subTasks.map((subTask, index) => (
+                          <Box
+                            key={index}
+                            display="flex"
+                            alignItems="center"
+                            gutterBottom
+                          >
+                            <Checkbox
+                              color="secondary"
+                              checked={subTaskChecked[index]}
+                              onChange={() =>
+                                handleCheckboxChange(index, subTask)
+                              }
+                            />
+                            <Typography
+                              variant="body2"
+                              gutterBottom
+                              style={{
+                                color: subTaskChecked[index]
+                                  ? "grey"
+                                  : "inherit",
+                              }}
+                            >
+                              {subTask.name}
+                            </Typography>
+                          </Box>
+                        ))}
 
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<FaCheck />}
-                onClick={() => toggleTaskCompletion(selectedRowData._id)}
-                sx={{ position: "absolute", bottom: "20px", right: "20px" }}
-              >
-                Mark as Completed
-              </Button>
-              {console.log(selectedRowData.status)}
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<FaCheck />}
-                onClick={() =>
-                  handleUpdateProgress(
-                    selectedRowData._id,
-                    selectedRowData.subTasks
-                  )
-                }
-                sx={{}}
-              >
-                Update Progress
-              </Button>
-            </>
-          )}
+                        <Typography
+                          variant="body2"
+                          gutterBottom
+                          style={{
+                            color: colors.greenAccent[400],
+                            paddingTop: "15px",
+                          }}
+                        >
+                          Progress: {status.toFixed(0)}%
+                        </Typography>
+                      </>
+                    )}
+                  {console.log(selectedRowData.status)}
+                  {selectedRowData.subTasks &&
+                    selectedRowData.subTasks.length > 0 && (
+                      <Box sx={{ width: "95%" }}>
+                        <Typography
+                          id="progress-slider"
+                          variant="h5"
+                          sx={{
+                            color: colors.greenAccent[400],
+                            paddingTop: "20px",
+                          }}
+                          gutterBottom
+                        >
+                          Progress:
+                        </Typography>
+                        <Slider
+                          aria-labelledby="progress-slider"
+                          valueLabelDisplay="auto"
+                          onChange={handleStatusChange}
+                          value={status}
+                          sx={{ color: colors.primary[110] }}
+                        />
+                      </Box>
+                    )}
+
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<FaCheck />}
+                    onClick={() => toggleTaskCompletion(selectedRowData._id)}
+                    sx={{ position: "absolute", bottom: "20px", right: "20px" }}
+                  >
+                    Mark as Completed
+                  </Button>
+                  {console.log(selectedRowData.status)}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<FaCheck />}
+                    onClick={() =>
+                      handleUpdateProgress(
+                        selectedRowData._id,
+                        selectedRowData.subTasks
+                      )
+                    }
+                    sx={{}}
+                  >
+                    Update Progress
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Modal>
         </Box>
-      </Modal>
-    </Box>
+      )}
+    </>
   );
 }
 

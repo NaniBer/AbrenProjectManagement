@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  useTheme,
+  Menu,
+  MenuItem,
+  Badge,
+  ListItemIcon,
+} from "@mui/material";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
@@ -11,7 +19,12 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { PMtodolost, assignedTask, mockUpdatedDataProject } from "../../data/mockData"; // Import your dummy data
+import {
+  PMtodolost,
+  assignedTask,
+  mockUpdatedDataProject,
+} from "../../data/mockData"; // Import your dummy data
+import { useSelector } from "react-redux";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -21,46 +34,69 @@ const Topbar = () => {
   const [anchorElNotification, setAnchorElNotification] = useState(null);
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [tasks, setTasks] = useState(PMtodolost);
-  
-  useEffect(() => {
-    const today = new Date();
-    const nearingDeadlineTasks = tasks.filter(task => {
-      const daysLeft = Math.ceil((new Date(task.dueDate) - today) / (1000 * 60 * 60 * 24));
-      return daysLeft === 1 || daysLeft === 0; // Include tasks due today (daysLeft === 0)
-    });
-    const notificationTasks = nearingDeadlineTasks.map(task => ({
-      type: "task",
-      name: task.taskName,
-      daysLeft: (new Date(task.dueDate)).setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0) ? "Due Today" : 1, // Set daysLeft to "Due Today" if task is due today
-      isUrgent: task.priority === "High" // Check if task is high priority
-    }));
-    setNotificationTasks(notificationTasks);
-  }, [tasks]);
-  
-  
+  const notifications = useSelector((state) => state.auth.notifications); // Fetching notifications from Redux state
 
   useEffect(() => {
     const today = new Date();
-    const nearingDeadlineProjects = mockUpdatedDataProject.filter(project => new Date(project.endDate) <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)); // Within a week
-    const notificationProjects = nearingDeadlineProjects.map(project => ({
+    const nearingDeadlineTasks = tasks.filter((task) => {
+      const daysLeft = Math.ceil(
+        (new Date(task.dueDate) - today) / (1000 * 60 * 60 * 24)
+      );
+      return daysLeft === 1 || daysLeft === 0; // Include tasks due today (daysLeft === 0)
+    });
+    const notificationTasks = nearingDeadlineTasks.map((task) => ({
+      type: "task",
+      name: task.taskName,
+      daysLeft:
+        new Date(task.dueDate).setHours(0, 0, 0, 0) ===
+        today.setHours(0, 0, 0, 0)
+          ? "Due Today"
+          : 1, // Set daysLeft to "Due Today" if task is due today
+      isUrgent: task.priority === "High", // Check if task is high priority
+    }));
+    setNotificationTasks(notificationTasks);
+  }, [tasks]);
+
+  useEffect(() => {
+    const today = new Date();
+    const nearingDeadlineProjects = mockUpdatedDataProject.filter(
+      (project) =>
+        new Date(project.endDate) <=
+        new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+    ); // Within a week
+    const notificationProjects = nearingDeadlineProjects.map((project) => ({
       type: "project",
       name: project.projectname,
-      daysLeft: Math.ceil((new Date(project.endDate) - today) / (1000 * 60 * 60 * 24)), // Calculate days left
+      daysLeft: Math.ceil(
+        (new Date(project.endDate) - today) / (1000 * 60 * 60 * 24)
+      ), // Calculate days left
       // isUrgent: project.priority === "High" // Check if project is high priority
     }));
-    setNotificationTasks(prevState => [...prevState, ...notificationProjects]);
+    setNotificationTasks((prevState) => [
+      ...prevState,
+      ...notificationProjects,
+    ]);
   }, []);
 
   useEffect(() => {
     const today = new Date();
-    const nearingDeadlineTasks = assignedTask.filter(task => new Date(task.endDate) <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)); // Within a week
-    const notificationAssignedTasks = nearingDeadlineTasks.map(task => ({
+    const nearingDeadlineTasks = assignedTask.filter(
+      (task) =>
+        new Date(task.endDate) <=
+        new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+    ); // Within a week
+    const notificationAssignedTasks = nearingDeadlineTasks.map((task) => ({
       type: "assignedTask",
       name: task.taskName,
-      daysLeft: Math.ceil((new Date(task.endDate) - today) / (1000 * 60 * 60 * 24)), // Calculate days left
-      isUrgent: task.priority === "High" // Check if task is high priority
+      daysLeft: Math.ceil(
+        (new Date(task.endDate) - today) / (1000 * 60 * 60 * 24)
+      ), // Calculate days left
+      isUrgent: task.priority === "High", // Check if task is high priority
     }));
-    setNotificationTasks(prevState => [...prevState, ...notificationAssignedTasks]);
+    setNotificationTasks((prevState) => [
+      ...prevState,
+      ...notificationAssignedTasks,
+    ]);
   }, []);
 
   const handleProfileIconClick = (event) => {
@@ -84,7 +120,6 @@ const Topbar = () => {
     // Close the notification menu
     setAnchorElNotification(null);
   };
-  
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -115,7 +150,10 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton id="notification-icon" onClick={handleNotificationIconClick}>
+        <IconButton
+          id="notification-icon"
+          onClick={handleNotificationIconClick}
+        >
           <Badge badgeContent={notificationTasks.length} color="error">
             <NotificationsOutlinedIcon />
           </Badge>
@@ -142,36 +180,54 @@ const Topbar = () => {
       >
         {notificationTasks.map((task, index) => (
           <Box key={index}>
-          <MenuItem
-            onClick={() => handleCloseNotificationMenu(index)}
-            component={Link}
-            to={task.type === "project" ? "/projectInfo" : task.type === "assignedTask" ? "/list" : "/kanbanPM"}
-            sx={{ whiteSpace: 'normal' }}
-          >  
-            <ListItemIcon>
-                <span style={{ fontSize: "26px", color: task.isUrgent ? 'red' : (task.type === "project" ? colors.primary[110] : colors.greenAccent[500]) }}>&#8226;</span>
+            <MenuItem
+              onClick={() => handleCloseNotificationMenu(index)}
+              component={Link}
+              to={
+                task.type === "project"
+                  ? "/projectInfo"
+                  : task.type === "assignedTask"
+                  ? "/list"
+                  : "/kanbanPM"
+              }
+              sx={{ whiteSpace: "normal" }}
+            >
+              <ListItemIcon>
+                <span
+                  style={{
+                    fontSize: "26px",
+                    color: task.isUrgent
+                      ? "red"
+                      : task.type === "project"
+                      ? colors.primary[110]
+                      : colors.greenAccent[500],
+                  }}
+                >
+                  &#8226;
+                </span>
               </ListItemIcon>
               <Box sx={{ flex: 1, ml: -1 }}>
                 <div>{task.name}</div>
-                <div style={{ color: colors.grey[500], fontSize: '12px' }}>
-                {task.type === "project"
-                  ? task.daysLeft === 0
-                    ? "Due Today"
-                    : task.daysLeft === 1
+                <div style={{ color: colors.grey[500], fontSize: "12px" }}>
+                  {task.type === "project"
+                    ? task.daysLeft === 0
+                      ? "Due Today"
+                      : task.daysLeft === 1
                       ? "1 day left"
-                      : task.daysLeft < 0  
-                        ? `${Math.abs(task.daysLeft)} days overdue`
-                        : `${task.daysLeft} days left`
-                  : task.daysLeft === 0
+                      : task.daysLeft < 0
+                      ? `${Math.abs(task.daysLeft)} days overdue`
+                      : `${task.daysLeft} days left`
+                    : task.daysLeft === 0
                     ? "Due Today"
-                    : task.daysLeft === 1  // Adjusted condition to display "1 day left"
-                      ? "1 day left"
-                      : `${task.daysLeft}  `
-                 }
-               </div>
+                    : task.daysLeft === 1 // Adjusted condition to display "1 day left"
+                    ? "1 day left"
+                    : `${task.daysLeft}  `}
+                </div>
               </Box>
             </MenuItem>
-            {index !== notificationTasks.length - 1 && <Box sx={{ borderBottom: `1px solid ${colors.grey[500]}` }} />}
+            {index !== notificationTasks.length - 1 && (
+              <Box sx={{ borderBottom: `1px solid ${colors.grey[500]}` }} />
+            )}
           </Box>
         ))}
       </Menu>
@@ -190,12 +246,12 @@ const Topbar = () => {
             display: "flex",
             alignItems: "center",
             color: colors.grey[100], // Set the text color
-            '&:hover': {
+            "&:hover": {
               backgroundColor: colors.primary[200], // Change background color on hover
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+          <ListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
             <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
           Profile
@@ -206,12 +262,12 @@ const Topbar = () => {
             display: "flex",
             alignItems: "center",
             color: colors.grey[100], // Set the text color
-            '&:hover': {
+            "&:hover": {
               backgroundColor: colors.primary[200], // Change background color on hover
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+          <ListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
             <ExitToAppIcon fontSize="small" />
           </ListItemIcon>
           Logout

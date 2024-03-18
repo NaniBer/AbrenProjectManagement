@@ -31,7 +31,9 @@ import Header from "../../../components/Header";
 const Resource = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
   const projectId = useSelector((state) => state.project.project._id);
+  const budget = useSelector((state) => state.project.project.Budget);
   const resources = useSelector((state) => state.project.project.resources);
   const dispatch = useDispatch();
 
@@ -68,6 +70,21 @@ const Resource = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Calculate total cost
+    let totalCost;
+    if (Frequency === 0) {
+      totalCost = Quantity * Cost;
+    } else {
+      totalCost = Quantity * Cost * Frequency;
+    }
+    console.log(budget);
+
+    // Check if total cost exceeds budget
+    if (totalCost >= budget) {
+      // Show error message for exceeding budget
+      swal("Error!", "Total cost exceeds budget", "error");
+      return; // Exit function early
+    }
 
     let CostCategory;
 
@@ -163,32 +180,26 @@ const Resource = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(backendResource),
           });
-
           if (response.status === 201) {
             const data = await response.json();
             console.log(data.resource);
             backendResource._id = data.resource._id;
             backendResource.TotalCost = data.resource.TotalCost;
-
             // Update submitted resources
             setSubmittedResources((prevResources) => [
               ...prevResources,
               backendResource,
             ]);
             dispatch(addResource(data.resource));
-
             // Clear the form fields
             setResourceName("");
             setCategory("");
             setQuantity(0);
             setCost("");
             setFrequency(0);
-
             setIsFormOpen(false);
-
             // Close loading modal
             swal.close();
-
             // Show success message
             swal("Success!", "Resource added successfully", "success");
           } else {

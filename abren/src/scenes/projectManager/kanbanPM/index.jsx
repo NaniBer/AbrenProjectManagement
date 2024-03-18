@@ -11,27 +11,31 @@ import {
   CardContent,
   IconButton,
 } from "@mui/material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-
 import AddIcon from "@mui/icons-material/Add";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
-
-import { color } from "@mui/system";
-import { useSelector } from "react-redux";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { useSelector, useDispatch } from "react-redux";
+import Swal from "sweetalert2";
+import {
+  addTodo,
+  deleteTodo,
+  editTodo,
+  loadTodos,
+} from "../../../Actions/projectActions";
 
 const TaskCategory = ({ category, tasks }) => (
   <div className="text-primary">
     <h3>{category}</h3>
     <ul>
       {tasks.map((task) => (
-        <li key={task.id}>{task.taskName}</li>
+        <li key={task._id}>{task.taskName}</li>
       ))}
     </ul>
   </div>
@@ -41,19 +45,32 @@ const Kanban = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
-  const [today, setToday] = useState("");
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
+  const [today, setToday] = useState("");
   const [submittedtask, setSubmittedTask] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  // const [userId, setUserId] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add"); // Add state variable for modal mode
+  const dispatch = useDispatch();
+
   const user = useSelector((state) => state.auth.user);
   const userid = user._id;
 
   useEffect(() => {
     setDueDate(new Date());
     setToday(dayjs(new Date()));
-    //Get all the todos the user has already inputted
+
+    // Show loading spinner
+    Swal.fire({
+      title: "Loading",
+      html: "Fetching todos...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     fetch(`/Users/view/${userid}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -66,11 +83,20 @@ const Kanban = () => {
         return response.json();
       })
       .then((data) => {
+        // Hide loading spinner
+        Swal.close();
         setSubmittedTask(data.todos);
+        dispatch(loadTodos(data.todo));
         console.log(data.todos);
       })
       .catch((error) => {
         console.error("Request failed with status code:", error);
+        // Hide loading spinner and show error message
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch todos",
+        });
       });
   }, []);
 
@@ -84,38 +110,93 @@ const Kanban = () => {
     setPriority(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const backEndData = {
+    const updatedTodoData = {
       TodoName: taskName,
       Date: dueDate,
       Status: status,
       Priority: priority,
     };
 
-    fetch("/Users/addTodolist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(backEndData),
-    })
-      .then((response) => {
-        const statusCode = response.status;
-        if (statusCode === 201) {
-          //Todo list created successfully
-          return response.json();
+    if (modalMode === "add") {
+      try {
+        const response = await fetch("/Users/addTodolist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedTodoData),
+        });
+
+        if (response.status === 201) {
+          const data = await response.json();
+          updatedTodoData._id = data.todo._id;
+          setSubmittedTask((prevTask) => [...prevTask, updatedTodoData]);
+
+          // Show success message using SweetAlert
+          Swal.fire({
+            icon: "success",
+            title: "Task Added Successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          dispatch(addTodo(updatedTodoData));
         } else {
           throw new Error("Failed to create todo list");
         }
-      })
-      .then((data) => {
-        console.log(data);
-        backEndData._id = data.todo._id;
-        setSubmittedTask((prevTask) => [...prevTask, backEndData]);
-      });
+      } catch (error) {
+        console.error("Error creating todo list:", error.message);
+        // Handle error (e.g., display an error message)
+      }
+    } else if (modalMode === "edit" && editingTaskId !== null) {
+      try {
+        const response = await fetch(`/Users/updateTodo/${editingTaskId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTodoData),
+        });
+
+        if (response.ok) {
+          // Update the submittedTask state with the updated task
+          const updatedTasks = submittedtask.map((task) =>
+            task._id === editingTaskId ? { ...task, ...updatedTodoData } : task
+          );
+          setSubmittedTask(updatedTasks);
+          setEditingTaskId(null);
+
+          // Show success message using SweetAlert
+          Swal.fire({
+            icon: "success",
+            title: "Task Edited Successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          dispatch(editTodo(updatedTodoData));
+        } else {
+          throw new Error("Failed to update todo list");
+        }
+      } catch (error) {
+        console.error("Error updating todo list:", error.message);
+        // Handle error (e.g., display an error message)
+      }
+    }
+
+    setTaskName("");
+    setDueDate(new Date());
+    setStatus("");
+    setPriority("");
+
+    setIsFormOpen(false);
+    setModalMode("add"); // Reset modal mode to "add"
+  };
+
+  const handleEditModalSubmit = (e) => {
+    e.preventDefault();
 
     const updatedTasks = submittedtask.map((task) => {
-      if (task.id === editingTaskId) {
+      if (task._id === editingTaskId) {
         return {
           ...task,
           status,
@@ -124,12 +205,70 @@ const Kanban = () => {
       return task;
     });
 
-    setTaskName("");
-    setDueDate(new Date());
-    setStatus("");
-    setPriority("");
+    setSubmittedTask(updatedTasks);
+    setEditingTaskId(null);
+    setIsEditModalOpen(false);
+  };
 
-    setIsFormOpen(false);
+  const handleDeleteTask = (taskId) => {
+    // Display confirmation dialog using SweetAlert
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will not be able to recover this task!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // If user confirms, proceed with the deletion
+        try {
+          const response = await fetch(`/Users/delete/${taskId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const statusCode = response.status;
+          if (statusCode == 403) {
+            throw new Error("Unauthorized");
+          } else if (statusCode === 500) {
+            throw new Error("Failed to delete todo");
+          } else {
+            const data = await response.json();
+            console.log(data.message); // Log success message
+            setSubmittedTask((prevTasks) =>
+              prevTasks.filter((task) => task._id !== taskId)
+            );
+            // Show success message using SweetAlert
+            Swal.fire("Deleted!", "Your task has been deleted.", "success");
+            dispatch(deleteTodo(taskId));
+          }
+        } catch (error) {
+          console.error("Error deleting todo:", error.message);
+          // Show error message using SweetAlert
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `Error deleting task: ${error.message}`,
+          });
+        }
+      }
+    });
+  };
+
+  const handleEditTask = (taskId) => {
+    const task = submittedtask.find((task) => task._id === taskId);
+
+    if (task) {
+      setTaskName(task.TodoName);
+      setDueDate(new Date(task.Date));
+      setStatus(task.Status);
+      setPriority(task.Priority);
+      setEditingTaskId(taskId);
+      setIsFormOpen(true); // Open the form modal
+      setModalMode("edit"); // Set modal mode to "edit"
+    }
   };
 
   const theme = useTheme();
@@ -152,52 +291,10 @@ const Kanban = () => {
       return `${diffDays} days left`;
     }
   };
-  const handleDeleteTask = (taskId) => {
-    fetch(`/Users/delete/${taskId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then(async (response) => {
-        const statusCode = response.status;
-        if (statusCode == 403) {
-          console.log();
-          throw new Error("Unauthorized");
-        } else if (statusCode === 500) {
-          throw new Error("Failed to delete todo");
-        } else {
-          const data = await response.json();
-          console.log(data.message); // Log success message
-          setSubmittedTask((prevTasks) =>
-            prevTasks.filter((task) => task._id !== taskId)
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error deleting todo:", error.message);
-      });
-  };
-
-  const handleEditTask = (taskId) => {
-    // Find the task with the corresponding ID
-    const task = submittedtask.find((task) => task.id === taskId);
-
-    // If the task is found, set its initial status in the state
-    if (task) {
-      setStatus(task.Status);
-      setEditingTaskId(taskId); // Set the ID of the task being edited
-      setIsFormOpen(true); // Open the modal for editing
-    }
-  };
-
   return (
     <>
       <Box m="20px">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header title="Todo List" subtitle="Categorizes your tasks" />
 
           <Button
@@ -214,11 +311,10 @@ const Kanban = () => {
               mb: "15px",
             }}
           >
-            Add Task
+            {modalMode === "add" ? "Add Task" : "Edit Task"}
           </Button>
         </Box>
       </Box>
-
       <Modal open={isFormOpen} onClose={() => setIsFormOpen(false)}>
         <Box
           sx={{
@@ -235,7 +331,7 @@ const Kanban = () => {
           }}
         >
           <Typography variant="h5" sx={{ mb: 2 }}>
-            Add Task
+            {modalMode === "add" ? "Add Task" : "Edit Task"}
           </Typography>
           <form onSubmit={handleSubmit}>
             <Box sx={{ mb: 2 }}>
@@ -351,7 +447,7 @@ const Kanban = () => {
 
             <Box display="flex" justifyContent="flex-end">
               <Button type="submit" variant="contained">
-                Submit
+                {modalMode === "add" ? "Submit" : "Save"}
               </Button>
             </Box>
           </form>
@@ -374,7 +470,7 @@ const Kanban = () => {
                   .filter((task) => task.Status === "Not Started")
                   .map((task) => (
                     <Card
-                      key={task.id}
+                      key={task._id}
                       sx={{ mt: 1, backgroundColor: "fffff" }}
                     >
                       <CardContent>
@@ -460,6 +556,14 @@ const Kanban = () => {
                           }}
                         >
                           <IconButton
+                            onClick={() => handleEditTask(task._id)}
+                            color="secondary"
+                            size="small"
+                            sx={{ paddingBottom: "1px" }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
                             onClick={() => handleDeleteTask(task._id)}
                             color="secondary"
                             size="small"
@@ -488,7 +592,7 @@ const Kanban = () => {
                   .filter((task) => task.Status === "In Progress")
                   .map((task) => (
                     <Card
-                      key={task.id}
+                      key={task._id}
                       sx={{ mt: 1, backgroundColor: "fffff" }}
                     >
                       <CardContent>
@@ -496,7 +600,7 @@ const Kanban = () => {
                           variant="body1"
                           style={{ fontSize: "1.2rem", marginBottom: "8px" }}
                         >
-                          {task.taskName}
+                          {task.TodoName}
                         </Typography>
 
                         <div
@@ -574,6 +678,14 @@ const Kanban = () => {
                           }}
                         >
                           <IconButton
+                            onClick={() => handleEditTask(task._id)}
+                            color="secondary"
+                            size="small"
+                            sx={{ paddingBottom: "1px" }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
                             onClick={() => handleDeleteTask(task._id)}
                             color="secondary"
                             size="small"
@@ -599,7 +711,7 @@ const Kanban = () => {
                   .filter((task) => task.Status === "Completed")
                   .map((task) => (
                     <Card
-                      key={task.id}
+                      key={task._id}
                       sx={{ mt: 1, backgroundColor: "fffff" }}
                     >
                       <CardContent>
@@ -607,7 +719,7 @@ const Kanban = () => {
                           variant="body1"
                           style={{ fontSize: "1.2rem", marginBottom: "8px" }}
                         >
-                          {task.taskName}
+                          {task.TodoName}
                         </Typography>
 
                         <div
@@ -684,6 +796,14 @@ const Kanban = () => {
                             justifyContent: "flex-end",
                           }}
                         >
+                          <IconButton
+                            onClick={() => handleEditTask(task._id)}
+                            color="secondary"
+                            size="small"
+                            sx={{ paddingBottom: "1px" }}
+                          >
+                            <EditIcon />
+                          </IconButton>
                           <IconButton
                             onClick={() => handleDeleteTask(task._id)}
                             color="secondary"

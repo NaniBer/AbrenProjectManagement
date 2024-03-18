@@ -163,6 +163,52 @@ const projectReducer = (state = initialState, action) => {
           tasks: newTasks,
         },
       };
+
+    case "DELETE_TODO":
+      const todoIdToDelete = action.payload;
+      // Find the index of the todo in the todos array
+      const todoIndexToDelete = state.todos.findIndex(
+        (todo) => todo._id === todoIdToDelete
+      );
+      // Remove the todo from the todos array in the state
+      return {
+        ...state,
+        todos: [
+          ...state.todos.slice(0, todoIndexToDelete),
+          ...state.todos.slice(todoIndexToDelete + 1),
+        ],
+      };
+
+    case "ADD_TODO":
+      const newTodo = action.payload;
+      return {
+        ...state,
+        todos: [...state.todos, newTodo],
+      };
+
+    case "EDIT_TODO":
+      const updatedTodo = action.payload;
+      // Find the index of the todo in the todos array
+      const todoIndex = state.todos.findIndex(
+        (todo) => todo._id === updatedTodo._id
+      );
+      // Update the todo details in the state
+      return {
+        ...state,
+        todos: [
+          ...state.todos.slice(0, todoIndex),
+          updatedTodo,
+          ...state.todos.slice(todoIndex + 1),
+        ],
+      };
+
+    case "LOAD_TODOS":
+      const loadedTodos = action.payload;
+      return {
+        ...state,
+        todos: loadedTodos,
+      };
+
     default:
       return state;
   }

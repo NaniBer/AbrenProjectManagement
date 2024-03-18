@@ -63,6 +63,7 @@ const Milestone = () => {
   const colors = tokens(theme.palette.mode);
   const project = useSelector((state) => state.project.project);
   const milestones = useSelector((state) => state.project.project.milestones);
+  const tasks = useSelector((state) => state.project.project.tasks);
 
   const dispatch = useDispatch();
   const [MilestoneName, setMilestoneName] = useState("");
@@ -81,6 +82,7 @@ const Milestone = () => {
   const [submittedMilestones, setSubmittedMilestones] = useState([]);
 
   const [errors, setErrors] = useState({}); // State variable to hold validation errors
+  const [milestoneTasks, setMilestoneTasks] = useState({});
 
   useEffect(() => {
     if (project && project.resources) {
@@ -88,11 +90,27 @@ const Milestone = () => {
       // const resourceNames = resources.map((resource) => resource.ResourceName);
       // console.log(resourceNames);
       setProjectResources(resources);
+      console.log();
       if (milestones) {
         setSubmittedMilestones(milestones);
       }
     }
   }, [milestones]);
+  useEffect(() => {
+    // Filter tasks associated with each milestone when milestones change
+    if (submittedMilestones.length > 0 && tasks.length > 0) {
+      const tasksMap = {};
+      console.log(tasks);
+      submittedMilestones.forEach((milestone) => {
+        const milestoneTasks = tasks.filter(
+          (task) => task.milestone === milestone._id
+        );
+        tasksMap[milestone._id] = milestoneTasks;
+      });
+
+      setMilestoneTasks(tasksMap);
+    }
+  }, [submittedMilestones, tasks]);
 
   const handleMilestoneNameChange = (e) => {
     setMilestoneName(e.target.value);
@@ -766,6 +784,24 @@ const Milestone = () => {
                     {milestone.ResourceQuantity}
                   </Typography>
                 </Typography>
+
+                {milestoneTasks[milestone._id] &&
+                  milestoneTasks[milestone._id].length > 0 && (
+                    <Box mt={2}>
+                      {`Tasks: ${milestoneTasks[milestone._id].length} `}
+                      {milestoneTasks[milestone._id].map((task, taskIndex) => (
+                        <Typography
+                          variant="body1"
+                          component="span"
+                          color={colors.greenAccent[400]}
+                          key={taskIndex}
+                        >
+                          {task.TaskName}
+                        </Typography>
+                      ))}
+                    </Box>
+                  )}
+
                 <Box
                   display="flex"
                   justifyContent="space-between"

@@ -5,6 +5,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import Swal from "sweetalert2";
 import {
   Box,
   List,
@@ -27,25 +28,57 @@ const Calendar = () => {
   const [projectData, setProjectData] = useState([]);
   const [assignedTask, setAssignedTask] = useState([]);
   const [todoList, setTodoList] = useState([]);
+  const [isCalendarVisible, setIsCalendarVisible] = useState(true); // State to manage visibility of FullCalendar
   const user = useSelector((state) => state.auth.user);
+  const project = useSelector((state) => state.auth.user.projects);
   const userid = user._id;
-  // console.log("Hello");
+  // console.log(project);
   useEffect(() => {
     const fetchData = async () => {
       try {
         console.log(userid);
-        const response = await fetch(`/Users/getEvents/${userid}`);
+        const response = await fetch(`/Users/CalendarData/${userid}`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         const { tasks, projects, todos } = data;
 
         // Assign fetched data to state variables
         setAssignedTask(tasks);
         setProjectData(projects);
         setTodoList(todos);
+        // console.log(todos);
+        const combinedEvents = [
+          ...projects.map((project) => ({
+            id: project._id,
+            title: project.ProjectName,
+            start: project.StartDate,
+            end: project.EndDate,
+            allDay: true,
+            type: "Project Event",
+          })),
+          ...todos.map((todo) => ({
+            id: todo._id,
+            title: todo.TodoName,
+            end: todo.Date, // Assuming todo has a 'DueDate' property
+            allDay: true,
+            type: "Personal To-Do",
+          })),
+          ...tasks.map((task) => ({
+            id: task._id,
+            title: task.TaskName,
+            start: task.StartDate,
+            end: task.DueDate,
+            allDay: true,
+            type: "Project Task",
+          })),
+        ];
+        console.log(combinedEvents);
+
+        // Set currentEvents state with combined events
+        setCurrentEvents(combinedEvents);
       } catch (error) {
         console.error(error);
         throw new Error("Failed to fetch events data");
@@ -71,13 +104,79 @@ const Calendar = () => {
     }
   };
 
+  // const handleEventClick = (selected) => {
+  //   if (
+  //     window.confirm(
+  //       `Are you sure you want to delete the event '${selected.event.title}'`
+  //     )
+  //   ) {
+  //     selected.event.remove();
+  //   }
   const handleEventClick = (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
-      )
-    ) {
-      selected.event.remove();
+    // Close the FullCalendar component when the event is clicked
+    setIsCalendarVisible(false);
+
+    // Extract necessary information from the event
+    const { title, start, end, type } = selected.event;
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
+    const formattedStart = start.toLocaleDateString("en-US", options);
+    const formattedEnd = end.toLocaleDateString("en-US", options);
+
+    Swal.fire({
+      title: title,
+      html: `
+        <b>Start:</b> ${formattedStart}<br>
+        <b>End:</b> ${formattedEnd}
+      `,
+      icon: "info",
+      confirmButtonText: "Close",
+    }).then(() => {
+      // Set the FullCalendar component to be visible again after closing the Swal
+      setIsCalendarVisible(true);
+    });
+  };
+  const eventListClicked = (event) => {
+    const { title, start, end, type } = event;
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
+    const endDateObject = new Date(end);
+    console.log(event);
+    const formattedEnd = endDateObject.toLocaleDateString("en-US", options);
+    if (start) {
+      const startDateObject = new Date(start);
+      const formattedStart = startDateObject.toLocaleDateString(
+        "en-US",
+        options
+      );
+      Swal.fire({
+        title: title,
+        html: `
+         ${type}<br>
+    <b>Start Date:</b> ${formattedStart}<br>
+    <b>Due Date:</b> ${formattedEnd}
+      `,
+        icon: "info",
+        confirmButtonText: "Close",
+      });
+    } else {
+      Swal.fire({
+        title: title,
+        html: `
+         ${type}<br>
+        <b>Due Date:</b> ${formattedEnd}
+      `,
+        icon: "info",
+        confirmButtonText: "Close",
+      });
     }
   };
 
@@ -106,7 +205,9 @@ const Calendar = () => {
                   backgroundColor: colors.greenAccent[500],
                   margin: "10px 0",
                   borderRadius: "2px",
+                  cursor: "pointer",
                 }}
+                onClick={() => eventListClicked(event)}
               >
                 <ListItemText
                   primary={event.title}
@@ -131,7 +232,7 @@ const Calendar = () => {
             height="75vh"
             plugins={[
               dayGridPlugin,
-              timeGridPlugin,
+              // timeGridPlugin,
               interactionPlugin,
               listPlugin,
             ]}
@@ -144,7 +245,8 @@ const Calendar = () => {
             editable={true}
             selectable={true}
             selectMirror={true}
-            dayMaxEvents={true}
+            dayMaxEvents={true} // Show all events for each day
+            dayMaxEventRows={true} // Show all events without collapsing
             select={handleDateClick}
             eventClick={handleEventClick}
             eventsSet={(events) => setCurrentEvents(events)}
@@ -155,12 +257,14 @@ const Calendar = () => {
                 start: project.StartDate,
                 end: project.EndDate,
                 allDay: true,
+                type: "Project Event",
               })),
               ...todoList.map((task) => ({
                 id: task.id,
                 title: task.TodoName,
-                end: task.date,
+                end: task.Date, // Assuming todo has a 'DueDate' property
                 allDay: true,
+                type: "Personal To-Do",
               })),
               // Add assignedTask data as initial events
               ...assignedTask.map((task) => ({
@@ -169,6 +273,7 @@ const Calendar = () => {
                 start: task.StartDate,
                 end: task.EndDate,
                 allDay: true,
+                type: "Project Task",
               })),
             ]}
           />

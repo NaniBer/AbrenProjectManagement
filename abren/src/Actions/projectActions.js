@@ -48,3 +48,22 @@ export const replaceTasks = (newTasks) => ({
   type: "REPLACE_TASKS",
   payload: newTasks,
 });
+
+export const addTodo = (newTodo) => ({
+  type: "ADD_TODO",
+  payload: newTodo,
+});
+
+export const deleteTodo = (id) => ({
+  type: "DELETE_TODO",
+  payload: id,
+});
+
+export const editTodo = (updatedTodo) => ({
+  type: "EDIT_TODO",
+  payload: updatedTodo,
+});
+export const loadTodos = (todos) => ({
+  type: "LOAD_TODOS",
+  payload: todos,
+});

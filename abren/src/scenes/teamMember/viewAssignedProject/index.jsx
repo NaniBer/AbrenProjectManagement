@@ -14,6 +14,7 @@ import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
 import { dummyProjectData } from "../../../data/mockData";
 import { useSelector, useDispatch } from "react-redux";
+import Swal from "sweetalert2";
 
 const formatDate = (startDate, endDate) => {
   const formattedStartDate = new Date(startDate);
@@ -46,7 +47,19 @@ const Project = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [projectList, setProjectList] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    // Show loading spinner
+    Swal.fire({
+      title: "Loading",
+      html: "Fetching projects...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     fetch(`/Users/projectsByTeamMember/${userid}`)
       .then((response) => {
         if (!response.ok) {
@@ -55,12 +68,24 @@ const Project = () => {
         return response.json();
       })
       .then((projects) => {
+        // Hide loading spinner
+        Swal.close();
         // Handle the retrieved projects data
         console.log("Projects assigned to the team member:", projects);
         setProjectList(projects);
       })
       .catch((error) => {
         console.error("Error:", error);
+        // Hide loading spinner and show error message
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch projects",
+        });
+      })
+      .finally(() => {
+        // Update loading state to false
+        setLoading(false);
       });
   }, []);
 
@@ -79,34 +104,40 @@ const Project = () => {
           title="View My Projects"
           subtitle="View project I am assigned to"
         />
-
-        <Grid container spacing={2}>
-          {projectList.map((project, index) => (
-            <Grid item xs={12} key={index}>
-              <Card
-                sx={{
-                  marginTop: "20px",
-                  backgroundColor: colors.primary[400],
-                  borderRadius: "15px",
-                }}
-              >
-                <CardContent sx={{ textAlign: "left" }}>
-                  <Typography
-                    variant="h4"
-                    sx={{ mb: 1 }}
-                    color={colors.primary[110]}
-                    onClick={() => handleProjectClick(project)}
-                  >
-                    {project.ProjectName}
-                  </Typography>
-                  <Typography variant="body1">
-                    {project.ProjectDescription}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        {projectList.length === 0 ? (
+          <Typography variant="h4" sx={{ mb: 1 }} color={colors.primary[110]}>
+            No projects to juggle just yet! Hang tight, and when you're assigned
+            to one, it'll burst onto this screen like confetti.
+          </Typography>
+        ) : (
+          <Grid container spacing={2}>
+            {projectList.map((project, index) => (
+              <Grid item xs={12} key={index}>
+                <Card
+                  sx={{
+                    marginTop: "20px",
+                    backgroundColor: colors.primary[400],
+                    borderRadius: "15px",
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "left" }}>
+                    <Typography
+                      variant="h4"
+                      sx={{ mb: 1 }}
+                      color={colors.primary[110]}
+                      onClick={() => handleProjectClick(project)}
+                    >
+                      {project.ProjectName}
+                    </Typography>
+                    <Typography variant="body1">
+                      {project.ProjectDescription}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
 
       {/* Render project details */}
@@ -130,9 +161,6 @@ const Project = () => {
             >
               {selectedProject.ProjectName}
             </Typography>
-            {/* <Typography variant="body1" color={colors.greenAccent[400]}>
-              Start Date: {selectedProject.startDate}
-            </Typography> */}
             <Typography marginBottom="8px">
               <AccessTimeIcon color="secondary" />
 
@@ -143,9 +171,8 @@ const Project = () => {
                 marginRight="5px"
                 color={colors.greenAccent[400]}
               >
-                {/* Due Date:  */}
+                {formatDate(selectedProject.StartDate, selectedProject.EndDate)}
               </Typography>
-              {formatDate(selectedProject.StartDate, selectedProject.EndDate)}
             </Typography>
             <Typography marginBottom="8px">
               <Typography

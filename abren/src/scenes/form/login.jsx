@@ -84,7 +84,7 @@ const Login = () => {
         response.json().then((data) => {
           const user = data.user;
           console.log({ user });
-
+          const notification = data.notifications;
           const id = user._id.toString();
           console.log(id);
           fetch("/Users/getProjects", {
@@ -97,9 +97,13 @@ const Login = () => {
               //Logged in successfully
               response.json().then((data) => {
                 if (!admin) {
-                  user.projects = data;
-                  // console.log(user.projects);
-                  dispatch(loginSucess(user));
+                  const userData = {
+                    user: user, // User object
+                    notifications: notification, // Array of notification objects
+                  };
+                  userData.user.projects = data;
+
+                  dispatch(loginSucess(userData));
                   navigate("/user/");
                 } else {
                   dispatch(loginSucess(user));
@@ -114,26 +118,6 @@ const Login = () => {
         console.error("Request failed with status code:", statusCode);
       }
     });
-
-    // Simulating login process
-    if (username === "example@example.com" && password === "password123") {
-      // Successful login
-      alert("Login successful!");
-
-      // Remember Me feature
-      if (rememberMe) {
-        // Save login credentials in localStorage or cookies
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-      } else {
-        // Clear saved login credentials
-        localStorage.removeItem("username");
-        localStorage.removeItem("password");
-      }
-    } else {
-      // Failed login
-      setErrors({ login: "Invalid Username or password" });
-    }
   };
 
   // Retrieve saved login credentials on component mount

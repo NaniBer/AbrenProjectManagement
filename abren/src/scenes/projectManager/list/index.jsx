@@ -7,6 +7,7 @@ import {
   Typography,
   useTheme,
   Avatar,
+  MenuItem,
   Tooltip,
   Grid,
 } from "@mui/material";
@@ -69,10 +70,12 @@ const Task = () => {
   const [subTasks, setSubtasks] = useState([{ name: "", completed: false }]);
   const [expandedCardIndex, setExpandedCardIndex] = useState(-1);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [milestone, setMilestione] = useState("");
   const [edit, setEdit] = useState(false);
   const [editedTask, setEditedTask] = useState();
   const project = useSelector((state) => state.project.project);
   const tasks = project.tasks;
+  const milestones = project.milestones;
 
   const handleTaskNameChange = (e) => {
     setTaskName(e.target.value);
@@ -127,6 +130,10 @@ const Task = () => {
     setEdit(false);
     setIsFormOpen(false);
   };
+  const handleMilestoneChange = (e) => {
+    console.log(e.target.value);
+    setMilestione(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,6 +149,7 @@ const Task = () => {
             _id: user._id,
             name: user.name,
           })),
+          milestone,
         },
         { abortEarly: false }
       );
@@ -155,6 +163,7 @@ const Task = () => {
         assignedTo,
         subTasks,
         projectId: project._id,
+        milestone,
         status: 0,
       };
       console.log(newTask);
@@ -163,7 +172,6 @@ const Task = () => {
       const isDuplicate = submittedTasks.some(
         (task) => task.TaskName === TaskName
       );
-      console.log(newTask);
 
       if (isDuplicate) {
         // Close loading modal
@@ -601,6 +609,37 @@ const Task = () => {
                       },
                     }}
                   />
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                  <TextField
+                    id="milestone"
+                    select
+                    label="Milestone"
+                    variant="outlined"
+                    fullWidth
+                    value={milestone}
+                    onChange={handleMilestoneChange}
+                    sx={{
+                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#868dfb",
+                        },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      sx: {
+                        "&.Mui-focused": {
+                          color: "#868dfb",
+                        },
+                      },
+                    }}
+                  >
+                    {milestones.map((milestone) => (
+                      <MenuItem key={milestone._id} value={milestone._id}>
+                        {milestone.MilestoneName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Box>
               </Grid>
               <Grid item xs={12}>

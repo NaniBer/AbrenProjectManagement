@@ -38,7 +38,7 @@ function UserRoute() {
           {/* <AdminPage/> */}
           <SidebarProjectManager />
           <main className="content">
-            <TopbarTM />
+            <TopbarPM />
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route
@@ -64,7 +64,7 @@ function UserRoute() {
               <Route path="/kanban" element={<Kanban />}></Route>
               <Route path="/project" element={<Project />}></Route>
               <Route path="/resource" element={<Resource />}></Route>
-              <Route path="/list" element={<List />}></Route>
+              <Route path="/tasks" element={<List />}></Route>
               <Route path="/milestone" element={<Milestone />}></Route>
               <Route path="/analytic" element={<Analytic />}></Route>
               <Route path="/projectInfo" element={<ProjectInfo />}></Route>

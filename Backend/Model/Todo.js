@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 TodoSchema = mongoose.Schema({
+  UserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
   TodoName: {
     type: String,
     required: true,
@@ -8,10 +12,7 @@ TodoSchema = mongoose.Schema({
     type: Date,
     required: false,
   },
-  UserId: {
-    type: mongoose.Schema.Types.ObjectId,
-    // required: true
-  },
+
   Priority: {
     type: String,
     required: true,

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
+const { ObjectId } = require("mongodb");
 const UserRouter = express.Router();
 // const BudgetPlan = require('../Model/BudgetPlan');
 // const ProjectDetails = require('../Model/ProjectDetails');
@@ -12,6 +12,7 @@ const Milestones = require("../Model/Milestones");
 const Tasks = require("../Model/Tasks");
 const Todo = require("../Model/Todo");
 const Users = require("../Model/Users");
+const { createNotification } = require("../Model/Notification");
 
 //project Manager
 //assign tasks for team members
@@ -26,28 +27,45 @@ UserRouter.post("/TaskAssign", async (req, res) => {
       projectId,
       subTasks,
       status,
+      milestone,
     } = req.body;
-    //const milestone = await Milestones.findById(milestone)
-    const task = new Tasks({
-      TaskName,
-      assignedTo,
-      StartDate,
-      EndDate,
-      TaskDescription,
-      projectId,
-      subTasks,
-      status,
-    });
-    console.log(task);
 
-    await task.save();
+    let task; // Variable to store the newly created task
 
-    res.status(201).json({ message: "Task assigned successfully", task });
+    // Assuming assignedTo is an array, loop through each user ID
+    for (const userId of assignedTo) {
+      task = new Tasks({
+        TaskName,
+        assignedTo: userId, // Assigning each task to a single user
+        StartDate,
+        EndDate,
+        TaskDescription,
+        projectId,
+        subTasks,
+        status,
+        milestone,
+      });
+
+      console.log(task);
+
+      await task.save();
+
+      createNotification(
+        userId,
+        projectId,
+        "taskAssigned",
+        "📋 New Task Assigned! Click to view details."
+      );
+    }
+
+    // Send the newly created task along with the response
+    res.status(201).json({ message: "Task assigned successfully", task: task });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 UserRouter.put("/updateTask/:id", async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -203,14 +221,48 @@ UserRouter.post("/addTodolist", async (req, res) => {
 UserRouter.get("/view/:userId", async (req, res) => {
   try {
     // const loggedInUserId = req.params.userId;
-    const loggedInUserId = req.session.userId;
-    console.log(loggedInUserId);
+    // const loggedInUserId = req.session.userId;
+    // console.log(loggedInUserId);
+
+    const { userId } = req.params;
 
     // Retrieve all todos where UserId matches the logged-in user's ID
-    const todos = await Todo.find({ UserId: loggedInUserId });
+    const todos = await Todo.find({ UserId: userId });
     console.log(todos);
 
     res.status(200).json({ success: true, todos });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+UserRouter.put("/updateTodo/:id", async (req, res) => {
+  try {
+    const todoId = req.params.id;
+
+    if (!todoId) {
+      return res.status(400).json({ success: false, error: "Invalid Todo ID" });
+    }
+
+    const { TodoName, Date, Priority, Status, Viewed } = req.body;
+
+    const existingTodo = await Todo.findById(todoId);
+
+    if (!existingTodo) {
+      return res.status(404).json({ success: false, error: "Todo not found" });
+    }
+
+    existingTodo.TodoName = TodoName;
+    existingTodo.Date = Date;
+    existingTodo.Priority = Priority;
+    existingTodo.Status = Status;
+    existingTodo.Viewed = Viewed;
+
+    await existingTodo.save();
+
+    console.log("Todo Edited");
+    res.status(200).json({ success: true, updatedTodo: existingTodo });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -221,22 +273,23 @@ UserRouter.get("/view/:userId", async (req, res) => {
 UserRouter.delete("/delete/:taskId", async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    // console.log(taskId);
+    console.log(taskId);
 
     // Check if the todo exists
     const todo = await Todo.findById(taskId);
-    console.log(todo);
+
     if (!todo) {
       return res.status(404).json({ success: false, error: "Todo not found" });
     }
 
     // Check if the todo belongs to the logged-in user
-    if (todo.UserId !== req.session.userId) {
-      return res.status(403).json({ success: false, error: "Unauthorized" });
-    }
+    // if (todo.UserId !== req.session.userId) {
+    //   return res.status(403).json({ success: false, error: "Unauthorized" });
+    // }
 
     // Delete the todo
     await Todo.findByIdAndDelete(taskId);
+    console.log("Todo deleted");
     res
       .status(200)
       .json({ success: true, message: "Todo deleted successfully" });
@@ -392,6 +445,14 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
     // Save the updated project
     const updatedProject = await project.save();
     console.log(updatedProject);
+    createNotification(
+      teamMembers,
+      projectId,
+      "projectAssigned",
+      "🎉 You've been assigned to Project " +
+        projectName +
+        "! Click to view details."
+    );
 
     res.status(200).json(updatedProject);
   } catch (error) {
@@ -404,7 +465,7 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
 UserRouter.get("/test/", async (req, res) => {
   try {
     // Get the count of task records
-    const tasks = await Tasks.find();
+    const tasks = await Todo.find();
     res.json(tasks);
   } catch (error) {
     console.error(error);
@@ -467,12 +528,21 @@ UserRouter.put("/updateProgressoftask/:taskId", async (req, res) => {
     const updatedTask = await Tasks.findByIdAndUpdate(taskId, {
       status: status,
     });
-    console.log(updatedTask.status);
+    console.log(updatedTask);
 
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
     }
     console.log("task updated");
+    const project = await Projects.findById(updatedTask.projectId);
+
+    console.log(project);
+    createNotification(
+      project.ProjectManager,
+      taskId,
+      "progressUpdated",
+      `🔧 Task "${updatedTask.TaskName}" updated. Click to view.`
+    );
 
     res.json({
       message: "Task status updated successfully",
@@ -808,6 +878,95 @@ UserRouter.get("/getEvents/:userId", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+UserRouter.get("/CalendarData/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // const userIdObj = mongoose.Types.ObjectId(userId);
+    const userIdObj = new ObjectId(userId);
+    // Fetch projects where the user is the project manager or a team member
+    const projects = await Projects.find({
+      $or: [{ ProjectManager: userIdObj }, { teamMembers: userIdObj }],
+    }).exec();
+
+    // Fetch todos assigned to the user
+    const todos = await Todo.find({ UserId: userIdObj }).exec();
+
+    // Check if the user is a project manager based on projects where they are the project manager
+    const projectManagerProjects = await Projects.find({
+      ProjectManager: userIdObj,
+    }).exec();
+    const isProjectManager = projectManagerProjects.length > 0;
+
+    // Fetch tasks based on user role
+    let tasks;
+    if (isProjectManager) {
+      tasks = await Tasks.find().exec(); // Fetch all tasks for project manager
+    } else {
+      tasks = await Tasks.find({ assignedTo: userIdObj }).exec(); // Fetch tasks assigned to the user
+    }
+
+    // Prepare the response data
+    const responseData = {
+      projects,
+      todos,
+      tasks,
+    };
+
+    // Send the response
+    res.json(responseData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+UserRouter.get("/ProjectAnalyticsReportData/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Check if the user is a project manager in any project
+    const projects = await Projects.find({ ProjectManager: userId }).exec();
+
+    // If the user is a project manager, retrieve project details and associated tasks
+    if (projects.length > 0) {
+      const projectDetails = await Promise.all(
+        projects.map(async (project) => {
+          // Fetch team members' details from the user table
+          const teamMembersDetails = await Users.aggregate([
+            { $match: { _id: { $in: project.teamMembers } } },
+            {
+              $project: {
+                _id: 1,
+                name: { $concat: ["$firstname", " ", "$lastname"] },
+              },
+            },
+          ]).exec();
+
+          // Fetch tasks associated with the project
+          const tasks = await Tasks.find({ projectId: project._id }).exec();
+
+          return {
+            projectName: project.ProjectName,
+            startDate: project.StartDate,
+            endDate: project.EndDate,
+            teamMembers: teamMembersDetails,
+            tasks: tasks,
+          };
+        })
+      );
+
+      // Send project details as response
+      res.json(projectDetails);
+    } else {
+      // If the user is not a project manager in any project
+      res.json({ message: "User is not a project manager in any project" });
+    }
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

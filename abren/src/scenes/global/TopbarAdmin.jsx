@@ -1,5 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  useTheme,
+  Menu,
+  MenuItem,
+  Badge,
+  ListItemIcon,
+  Typography,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
@@ -24,7 +33,7 @@ const Topbar = () => {
       description: "kaizen is a tech company ",
       projectmanager: "saronbisrat.kaizen",
       status: "active",
-      startDate: '2024-03-14',
+      startDate: "2024-03-14",
     },
     {
       id: 2,
@@ -32,15 +41,20 @@ const Topbar = () => {
       description: "kaizen is a tech company ",
       projectmanager: "saronbisrat.kaizen",
       status: "active",
-      startDate: '2024-03-18',
+      startDate: "2024-03-18",
     },
   ]);
+
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     const calculateNotificationCount = () => {
       // Calculate notification count based on project assignment to a project manager
-      const projectsWithNotification = projects.filter(project => project.projectmanager !== "" && isNotificationRequired(project.startDate));
+      const projectsWithNotification = projects.filter(
+        (project) =>
+          project.projectmanager !== "" &&
+          isNotificationRequired(project.startDate)
+      );
       setNotificationCount(projectsWithNotification.length);
     };
 
@@ -123,12 +137,12 @@ const Topbar = () => {
             display: "flex",
             alignItems: "center",
             color: colors.grey[100],
-            '&:hover': {
+            "&:hover": {
               backgroundColor: colors.primary[200],
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+          <ListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
             <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
           Profile
@@ -139,12 +153,12 @@ const Topbar = () => {
             display: "flex",
             alignItems: "center",
             color: colors.grey[100],
-            '&:hover': {
+            "&:hover": {
               backgroundColor: colors.primary[200],
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+          <ListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
             <ExitToAppIcon fontSize="small" />
           </ListItemIcon>
           Logout
@@ -164,13 +178,15 @@ const Topbar = () => {
             to="/viewproject"
             onClick={() => {
               // Decrease notification count when menu item is clicked
-              setNotificationCount(prevCount => prevCount - 1);
+              setNotificationCount((prevCount) => prevCount - 1);
               setAnchorElNotification(null);
             }}
-            sx={{ whiteSpace: 'normal' }}
+            sx={{ whiteSpace: "normal" }}
           >
             <ListItemIcon>
-              <span style={{ fontSize: "26px", color: colors.primary[110] }}>&#8226;</span>
+              <span style={{ fontSize: "26px", color: colors.primary[110] }}>
+                &#8226;
+              </span>
             </ListItemIcon>
             <Typography>{project.projectname}</Typography>
           </MenuItem>

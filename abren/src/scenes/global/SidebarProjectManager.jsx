@@ -20,6 +20,8 @@ import { profile } from "../../data/mockData";
 import Logo from "../../images/abren2.png";
 import { useSelector, useDispatch } from "react-redux";
 import { loadProject } from "../../Actions/projectActions";
+import Swal from "sweetalert2";
+
 const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -69,6 +71,15 @@ const Sidebar = () => {
     setFirstName(firstNamedata);
   }, [user]);
   const handleProjectSelect = async (projectId) => {
+    // Show loading message
+    Swal.fire({
+      title: "Loading",
+      text: "Fetching project data...",
+      icon: "info",
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    });
+
     console.log(projectId);
     await fetch(`/Users/getProject/${projectId}`, {
       method: "POST",
@@ -88,8 +99,32 @@ const Sidebar = () => {
         } else if (statusCode == 200) return response.json();
       })
       .then((data) => {
+        // Close loading message
+        Swal.close();
+
+        // Show success message
+        Swal.fire({
+          title: "Success",
+          text: "Project data fetched successfully!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500, // Close after 1.5 seconds
+        });
+
         dispatch(loadProject(data));
         console.log(data);
+      })
+      .catch((error) => {
+        // Close loading message
+        Swal.close();
+
+        // Show error message
+        Swal.fire({
+          title: "Error",
+          text: error.message,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       });
   };
 
@@ -205,9 +240,6 @@ const Sidebar = () => {
                     >
                       {firstName}
                     </Typography>
-                    <Typography variant="h5" color={colors.greenAccent[500]}>
-                      Project Manager
-                    </Typography>
                   </Box>
                 </Box>
               )}
@@ -284,7 +316,7 @@ const Sidebar = () => {
                 />
                 <Item
                   title="Report"
-                  to="user/report"
+                  to="/user/report"
                   icon={<SummarizeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}

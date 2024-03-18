@@ -78,37 +78,6 @@ const App = () => {
               </span>
             </div>
 
-            {/* <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                color: isResourceSelected ? "#6870fa" : "inherit",
-                cursor: "pointer",
-              }}
-              onClick={() => handleItemClick("Edit")}
-            >
-              <EditIcon sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
-                Edit Project Details
-              </span>
-            </div> */}
-            {/* <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                color: isProjectInfoSelected ? "#6870fa" : "inherit",
-                cursor: "pointer",
-              }}
-              onClick={() => handleItemClick("ProjectInfo")}
-            >
-              <CheckCircleOutline sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
-                Project Info
-              </span>
-            </div> */}
-
             <div
               style={{
                 flex: 0.2,
@@ -124,6 +93,22 @@ const App = () => {
                 Resource
               </span>
             </div>
+            <div
+              style={{
+                flex: 0.2,
+                textAlign: "center",
+                padding: "2px",
+                marginLeft: "-2px",
+                color: isMilestoneSelected ? "#6870fa" : "inherit",
+                cursor: "pointer",
+              }}
+              onClick={() => handleItemClick("Milestone")}
+            >
+              <Timeline sx={{ fontSize: 16 }} />
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
+                Milestones
+              </span>
+            </div>
 
             <div
               style={{
@@ -137,44 +122,9 @@ const App = () => {
               onClick={() => handleItemClick("List")}
             >
               <FormatListBulleted sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>List</span>
+              <span style={{ marginLeft: "2px", fontSize: "14px" }}>Tasks</span>
             </div>
-            {/* <div
-              style={{ flex: 0.2, textAlign: "center", padding: "2px", marginLeft: "-2px" }}
-              onClick={() => handleItemClick("Board")}
-            >
-              <Dashboard sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>Board</span>
-            </div> */}
-            {/* <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                // color: isListSelected ? "#6870fa" : "inherit",
-                cursor: "pointer",
-              }}
-              onClick={() => handleItemClick("List")}
-            >
-              <Dashboard sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>Kanban</span>
-            </div> */}
-           
-            {/* <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                color: isCalendarSelected ? "#6870fa" : "inherit",
-                cursor: "pointer",
-              }}
-              onClick={() => handleItemClick("Calendar")}
-            >
-              <Event sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
-                Calendar
-              </span>
-            </div> */}
+
             <div
               style={{
                 flex: 0.2,
@@ -211,22 +161,6 @@ const App = () => {
                 }}
               >
                 Project Analytics
-              </span>
-            </div>
-            <div
-              style={{
-                flex: 0.2,
-                textAlign: "center",
-                padding: "2px",
-                marginLeft: "-2px",
-                color: isMilestoneSelected ? "#6870fa" : "inherit",
-                cursor: "pointer",
-              }}
-              onClick={() => handleItemClick("Milestone")}
-            >
-              <Timeline sx={{ fontSize: 16 }} />
-              <span style={{ marginLeft: "2px", fontSize: "14px" }}>
-                Milestones
               </span>
             </div>
           </div>
