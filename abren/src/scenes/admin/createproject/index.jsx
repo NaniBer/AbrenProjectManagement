@@ -12,7 +12,7 @@ import { tokens } from "../../../theme";
 const Form = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
   const [activeUsers, setActiveUsers] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -70,10 +70,6 @@ const Form = () => {
     setSelectedUser(value);
   };
 
-  // const handleCreateProject = (event) => {
-  //   event.preventDefault();
-
-  // }
   const checkoutSchema = yup.object().shape({
     projectname: yup.string().required("Required"),
     description: yup.string().required("Required"),

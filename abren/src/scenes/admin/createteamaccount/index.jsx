@@ -6,8 +6,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../../components/Header";
 import swal from "sweetalert";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 const Form = () => {
-  const user = useSelector((state) => state.auth.user);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [loading, setLoading] = useState(false);
   const [, setUsername] = useState("");
@@ -16,15 +16,13 @@ const Form = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
-  const storeState = useSelector((state) => state);
-  useEffect(() => {
-    console.log(storeState.auth.admin._id);
-  }, []);
+  const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
 
-  const handleFormSubmit = (values, formik) => {
+  const handleFormSubmit = async (values, formik) => {
     const { firstName, lastName, username, email, password } = values;
     console.log(firstName, lastName, username, email, password);
-    const adminId = storeState.auth.user._id;
+    const adminId = user._id;
     const formData = {
       firstName,
       lastName,
@@ -33,6 +31,7 @@ const Form = () => {
       password,
       adminId,
     };
+
     if (
       values.firstName &&
       values.lastName &&
@@ -40,39 +39,52 @@ const Form = () => {
       values.username &&
       values.password
     ) {
-      setLoading(true);
+      swal({
+        title: "Loading...",
+        text: "User is being created",
+        buttons: false,
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+        icon: "info",
+      });
+
       formik.resetForm();
 
-      // Perform your form submission logic here
-      formik.setSubmitting(false); // Set submitting to false after successful submission
-      fetch("/admin/CreateUsers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-        .then((response) => {
-          const statusCode = response.status;
-          console.log(statusCode);
-          if (statusCode == 201) {
-            // Show success SweetAlert
-            swal(
-              "User Account Created",
-              "The new user account has been created successfully.",
-              "success"
-            );
-            console.log("Created Successfully");
-          } else if (statusCode == 409) {
-            swal(
-              "Username exists",
-              "The new user account has not been created successfully.",
-              "Fail"
-            );
-          }
-          return response.json();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
+      try {
+        const response = await fetch("/admin/CreateUsers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         });
+
+        const statusCode = response.status;
+        console.log(statusCode);
+
+        if (statusCode === 201) {
+          // Show success SweetAlert
+          swal(
+            "User Account Created",
+            "The new user account has been created successfully.",
+            "success"
+          );
+          console.log("Created Successfully");
+          navigate("/admin/viewuser");
+        } else if (statusCode === 409) {
+          // Show error SweetAlert
+          swal(
+            "Username exists",
+            "The new user account has not been created successfully.",
+            "error"
+          );
+        }
+
+        // Close loading SweetAlert
+        swal.close();
+      } catch (error) {
+        console.error("Error:", error);
+        // Close loading SweetAlert on error
+        swal.close();
+      }
     }
   };
   const handleFirstNameChange = (event, handleChange) => {

@@ -27,9 +27,22 @@ const Team = () => {
   const [updatedUsername, setUpdatedUsername] = useState("");
 
   useEffect(() => {
+    // Show loading SweetAlert
+    swal({
+      title: "Loading...",
+      text: "Please wait while we fetch data",
+      buttons: false,
+      closeOnClickOutside: false,
+      closeOnEsc: false,
+      icon: "info",
+    });
+
     fetch("/admin/getUsers")
       .then((response) => response.json())
       .then((data) => {
+        // Close loading SweetAlert
+        swal.close();
+
         const fetchedData = data.map((row) => ({
           ...row,
           id: row._id,
@@ -38,8 +51,14 @@ const Team = () => {
         }));
         console.log(fetchedData);
         setTeamData(fetchedData);
+      })
+      .catch((error) => {
+        // Close loading SweetAlert on error
+        swal.close();
+        console.error("Error fetching data:", error);
       });
   }, []);
+
   const handleDisable = (rowId) => {
     const updatedTeamData = teamData.map((row) => {
       if (row.id === rowId) {
@@ -74,10 +93,21 @@ const Team = () => {
 
   const handleModalSave = () => {
     const id = selectedRow.id;
-    const firstname = updatedFirstName || selectedRow.firstname;
-    const lastname = updatedLastName || selectedRow.lastname;
-    const email = updatedEmail || selectedRow.email;
-    const username = updatedUsername || selectedRow.username;
+    const firstname = (updatedFirstName || selectedRow.firstname).trim();
+    const lastname = (updatedLastName || selectedRow.lastname).trim();
+    const email = (updatedEmail || selectedRow.email).trim();
+    const username = (updatedUsername || selectedRow.username).trim();
+
+    // Check if any of the fields contain only whitespace
+    if (
+      firstname === "" ||
+      lastname === "" ||
+      email === "" ||
+      username === ""
+    ) {
+      swal("Error!", "Please provide valid input for all fields.", "error");
+      return;
+    }
 
     const formData = {
       firstName: firstname,
@@ -85,7 +115,6 @@ const Team = () => {
       email,
       username,
     };
-    console.log(formData);
 
     fetch(`/admin/updateUser/${id}`, {
       method: "PUT",
@@ -94,12 +123,9 @@ const Team = () => {
     })
       .then((response) => {
         if (response.status === 200) {
-          console.log(response.status);
           // Update the teamData state with the new data
           const updatedTeamData = teamData.map((row) => {
-            console.log(id);
             if (row.id === id) {
-              console.log(firstname, lastname, email, username);
               return {
                 ...row,
                 firstname: firstname,
@@ -110,7 +136,6 @@ const Team = () => {
             }
             return row;
           });
-          console.log(updatedTeamData);
           setTeamData(updatedTeamData);
           handleCloseModal();
           swal("Updated!", "The row has been updated.", "success");

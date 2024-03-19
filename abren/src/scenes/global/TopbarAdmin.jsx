@@ -19,6 +19,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { useSelector } from "react-redux";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -26,6 +27,9 @@ const Topbar = () => {
   const colorMode = useContext(ColorModeContext);
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
+  const user = useSelector((state) => state.auth.user);
+  // console.log(user.firsy);
+  const Name = user.firstname + " " + user.lastname;
   const [projects, setProjects] = useState([
     {
       id: 1,
@@ -86,22 +90,25 @@ const Topbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
-      {/* SEARCH BAR */}
       <Box
         display="flex"
-        backgroundColor={colors.primary[400]}
         borderRadius="20px"
-        width="500px"
+        alignContent="center"
+        alignItems="center"
         sx={{ margin: "auto" }}
       >
-        <InputBase
-          sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
-          inputProps={{ style: { borderRadius: "20px" } }}
-        />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
+        <Box display="flex" alignItems="center">
+          <Typography variant="h3" component="span" mr={1}>
+            Welcome,{" "}
+            <Typography
+              component="span"
+              variant="h3"
+              sx={{ color: colors.greenAccent[400] }}
+            >
+              {Name}
+            </Typography>
+          </Typography>
+        </Box>
       </Box>
 
       {/* ICONS */}
@@ -113,11 +120,7 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton onClick={handleNotificationIconClick}>
-          <Badge badgeContent={notificationCount} color="error">
-            <NotificationsOutlinedIcon />
-          </Badge>
-        </IconButton>
+
         <IconButton onClick={handleProfileIconClick}>
           <PersonOutlinedIcon />
         </IconButton>

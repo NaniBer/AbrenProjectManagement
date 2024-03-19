@@ -31,10 +31,23 @@ const Viewproject = () => {
   const [usernames, setUsernames] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   useEffect(() => {
+    swal({
+      title: "Loading...",
+      text: "Fetching project data",
+      icon: "info",
+      buttons: false,
+      closeOnClickOutside: false,
+      closeOnEsc: false,
+    });
+
     fetch("/admin/getProjects")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch project data");
+        }
+        return response.json();
+      })
       .then((data) => {
-        // console.log(data);
         const fetchedData = data.map((row) => ({
           ...row,
           id: row._id,
@@ -42,8 +55,16 @@ const Viewproject = () => {
           projectname: row.ProjectName,
           projectmanager: row.ProjectManager[0].name,
         }));
-        // console.log(fetchedData);
         setProjectData(fetchedData);
+        swal.close();
+      })
+      .catch((error) => {
+        console.error("Error fetching project data:", error);
+        swal({
+          title: "Error",
+          text: "Failed to fetch project data",
+          icon: "error",
+        });
       });
   }, []);
 
