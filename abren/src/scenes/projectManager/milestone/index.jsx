@@ -63,6 +63,8 @@ const Milestone = () => {
   const colors = tokens(theme.palette.mode);
   const project = useSelector((state) => state.project.project);
   const milestones = useSelector((state) => state.project.project.milestones);
+  const resource = useSelector((state) => state.project.project.resources);
+  console.log(milestones);
   const tasks = useSelector((state) => state.project.project.tasks);
 
   const dispatch = useDispatch();
@@ -80,6 +82,9 @@ const Milestone = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedMilestones, setSubmittedMilestones] = useState([]);
+  const [resourceInputs, setResourceInputs] = useState([
+    { resource: "", quantity: 0 },
+  ]);
 
   const [errors, setErrors] = useState({}); // State variable to hold validation errors
   const [milestoneTasks, setMilestoneTasks] = useState({});
@@ -112,6 +117,9 @@ const Milestone = () => {
     }
   }, [submittedMilestones, tasks]);
 
+  const handleAddResource = () => {
+    setResourceInputs([...resourceInputs, { resource: "", quantity: 0 }]);
+  };
   const handleMilestoneNameChange = (e) => {
     setMilestoneName(e.target.value);
   };
@@ -128,18 +136,39 @@ const Milestone = () => {
   const handleAllocatedBudgetChange = (e) => {
     setAllocatedBudget(e.target.value);
   };
-  const handleResourceChange = (e) => {
-    console.log(e.target.value);
-    setResources([...resources, e.target.value]);
+  // const handleResourceChange = (e) => {
+  //   console.log(e.target.value);
+  //   setResources([...resources, e.target.value]);
+  // };
+  const handleResourceChange = (index, e) => {
+    const { value } = e.target;
+    const newInputs = [...resourceInputs];
+    newInputs[index].resource = value;
+    setResourceInputs(newInputs);
   };
-  const handleResourceQuantityChange = (e) => {
-    setResourceQuantity(e.target.value);
+
+  const handleResourceQuantityChange = (index, e) => {
+    const { value } = e.target;
+    const newInputs = [...resourceInputs];
+    newInputs[index].quantity = value;
+    console.log(newInputs);
+    setResourceInputs(newInputs);
   };
+
+  // const handleResourceQuantityChange = (e) => {
+  //   setResourceQuantity(e.target.value);
+  // };
   const getResourceIdByName = (resourceName) => {
     const resource = projectResources.find(
       (resource) => projectResources.ResourceName === resourceName
     );
     return resource ? resource._id : null;
+  };
+  const getResourceNameById = (resourceId) => {
+    const resource = projectResources.find(
+      (resource) => resource._id === resourceId
+    );
+    return resource ? resource.ResourceName : "";
   };
 
   const handleSubmit = async (e) => {
@@ -147,13 +176,17 @@ const Milestone = () => {
     const backendMilestone = {
       MilestoneName,
       MilestoneDescription,
-      ResourceQuantity,
-      AllocatedBudget,
-      Priority,
       Status,
+      Priority,
+      AllocatedBudget,
+      resourceList: resourceInputs.map((input) => ({
+        resourceId: input.resource,
+        quantity: input.quantity,
+      })),
     };
+    console.log(backendMilestone);
     backendMilestone.projectId = project._id;
-    backendMilestone.ResourceId = resources;
+
     console.log(backendMilestone);
     const isDuplicate = submittedMilestones.some(
       (milestone) => milestone.MilestoneName === MilestoneName
@@ -178,10 +211,10 @@ const Milestone = () => {
         // Editing an existing Milestone
         const resourceId = getResourceIdByName(backendMilestone.ResourceName);
         console.log(resourceId);
-        backendMilestone.ResourceId = resourceId;
+        // backendMilestone.ResourceId = resourceId;
 
         try {
-          console.log(backendMilestone);
+          // console.log(backendMilestone);
           const response = await fetch(
             `/Users/updateMilestone/${editedMilestone._id}`,
             {
@@ -208,6 +241,7 @@ const Milestone = () => {
           setResourceQuantity(0);
           setAllocatedBudget(0);
           setPriority("");
+          setResourceInputs([]);
           setIsFormOpen(false);
 
           // Update submitted resources
@@ -216,10 +250,10 @@ const Milestone = () => {
             backendMilestone,
           ]);
 
-          dispatch(editMilestone(data.updatedMilestone));
+          // dispatch(editMilestone(data.updatedMilestone));
 
-          // Close loading modal
-          swal.close();
+          // // Close loading modal
+          // swal.close();
 
           // Show success message
           swal("Success!", "Milestone updated successfully", "success");
@@ -247,6 +281,7 @@ const Milestone = () => {
               ...prevMilestones,
               backendMilestone,
             ]);
+
             dispatch(addMilestone(data.milestone));
 
             // Clear the form fields
@@ -257,6 +292,7 @@ const Milestone = () => {
             setResourceQuantity(0);
             setAllocatedBudget(0);
             setPriority("");
+            setResourceInputs([]);
             setIsFormOpen(false);
 
             // Close loading modal
@@ -287,17 +323,14 @@ const Milestone = () => {
     setPriority(milestone.Priority);
     setAllocatedBudget(milestone.AllocatedBudget);
 
-    setResourceQuantity(milestone.ResourceQuantity);
-    const foundResource = projectResources.find(
-      (resource) => resource._id === milestone.ResourceId
-    );
+    // Set resourceInputs with the resources and quantities associated with the milestone
+    const milestoneResourceInputs = milestone.resourceList.map((resource) => ({
+      resource: resource.resourceId,
+      quantity: resource.quantity,
+    }));
+    setResourceInputs(milestoneResourceInputs);
 
-    // Set the selected resource name
-    if (foundResource) {
-      setResources(foundResource.ResourceName);
-      console.log(foundResource.ResourceName);
-    }
-    // Remove the selected milestones from the submitted milestoness list
+    // Remove the selected milestone from the submitted milestones list
     setSubmittedMilestones((prevMilestones) => {
       const updatedMilestones = [...prevMilestones];
       updatedMilestones.splice(index, 1);
@@ -305,7 +338,6 @@ const Milestone = () => {
     });
 
     // Open the form for editing the milestone
-
     setIsFormOpen(true);
     seteditedMilestone(milestone);
     setEdit(true);
@@ -379,14 +411,25 @@ const Milestone = () => {
   };
 
   const handleCancel = () => {
+    // Add the edited milestone back to the submitted milestones list
+    if (editedMilestone) {
+      setSubmittedMilestones((prevMilestones) => [
+        ...prevMilestones,
+        editedMilestone,
+      ]);
+    }
+
+    // Reset form fields and states
     setMilestoneName("");
     setMilestoneDescription("");
     setStatus("");
     setPriority("");
     setAllocatedBudget(0);
     setResources([]);
+    setResourceInputs([]);
     setResourceQuantity(0);
     setIsFormOpen(false);
+    setEdit(false);
     setErrors({}); // Reset errors to clear any validation errors
   };
 
@@ -490,37 +533,6 @@ const Milestone = () => {
                       }}
                     />
                   </Box>
-                  <Box sx={{ mb: 2 }}>
-                    <TextField
-                      id="status"
-                      select
-                      label="Status"
-                      variant="outlined"
-                      fullWidth
-                      value={Status}
-                      onChange={handleStatusChange}
-                      error={!!errors.status}
-                      helperText={errors.status}
-                      sx={{
-                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                          {
-                            borderColor: "#868dfb",
-                          },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          "&.Mui-focused": {
-                            color: "#868dfb",
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="Not Started">Not Started</MenuItem>
-                      <MenuItem value="In Progress">In Progress</MenuItem>
-                      <MenuItem value="Completed">Completed</MenuItem>
-                    </TextField>
-                  </Box>
                 </Grid>
                 <Grid item xs={6}>
                   <Box sx={{ mb: 2 }}>
@@ -582,6 +594,37 @@ const Milestone = () => {
                   </Box>
                   <Box sx={{ mb: 2 }}>
                     <TextField
+                      id="status"
+                      select
+                      label="Status"
+                      variant="outlined"
+                      fullWidth
+                      value={Status}
+                      onChange={handleStatusChange}
+                      error={!!errors.status}
+                      helperText={errors.status}
+                      sx={{
+                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                          {
+                            borderColor: "#868dfb",
+                          },
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                        sx: {
+                          "&.Mui-focused": {
+                            color: "#868dfb",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="Not Started">Not Started</MenuItem>
+                      <MenuItem value="In Progress">In Progress</MenuItem>
+                      <MenuItem value="Completed">Completed</MenuItem>
+                    </TextField>
+                  </Box>
+                  {/* <Box sx={{ mb: 2 }}>
+                    <TextField
                       id="resource"
                       select
                       label="Resource"
@@ -612,54 +655,105 @@ const Milestone = () => {
                         </MenuItem>
                       ))}
                     </TextField>
-                  </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <TextField
-                      id="resourceQuantity"
-                      label="Resource Quantity"
-                      variant="outlined"
-                      fullWidth
-                      value={ResourceQuantity}
-                      onChange={handleResourceQuantityChange}
-                      error={!!errors.quantity}
-                      helperText={errors.quantity}
-                      sx={{
-                        "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                          {
-                            borderColor: "#868dfb",
-                          },
-                      }}
-                      InputLabelProps={{
-                        shrink: true,
-                        sx: {
-                          "&.Mui-focused": {
-                            color: "#868dfb",
-                          },
-                        },
-                      }}
-                    />
-                  </Box>
+                  </Box> */}
                 </Grid>
-                <Grid item xs={12}>
-                  <Box display="flex" justifyContent="space-between">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      startIcon={<AddIcon />}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleCancel}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Grid>
+              </Grid>
+              <Box sx={{ mb: 2 }}>
+                {resourceInputs.map((input, index) => (
+                  <Grid container spacing={2} key={index}>
+                    <Grid item xs={8}>
+                      <Box sx={{ mb: 2 }}>
+                        <TextField
+                          id={`resource-${index}`}
+                          select
+                          label="Resource"
+                          variant="outlined"
+                          fullWidth
+                          value={input.resource}
+                          onChange={(e) => handleResourceChange(index, e)}
+                          sx={{
+                            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                              {
+                                borderColor: "#868dfb",
+                              },
+                          }}
+                          InputLabelProps={{
+                            shrink: true,
+                            sx: {
+                              "&.Mui-focused": {
+                                color: "#868dfb",
+                              },
+                            },
+                          }}
+                        >
+                          {projectResources.map((resource) => (
+                            <MenuItem key={resource._id} value={resource._id}>
+                              {resource.ResourceName}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Box sx={{ mb: 2 }}>
+                        <TextField
+                          id={`quantity-${index}`}
+                          label="Quantity"
+                          variant="outlined"
+                          fullWidth
+                          value={input.quantity}
+                          onChange={(e) =>
+                            handleResourceQuantityChange(index, e)
+                          }
+                          error={!!errors.quantity}
+                          helperText={errors.quantity}
+                          sx={{
+                            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                              {
+                                borderColor: "#868dfb",
+                              },
+                          }}
+                          InputLabelProps={{
+                            shrink: true,
+                            sx: {
+                              "&.Mui-focused": {
+                                color: "#868dfb",
+                              },
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                ))}
+                <Box sx={{ mb: 2 }}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleAddResource}
+                  >
+                    Add Resource
+                  </Button>
+                </Box>
+              </Box>
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="space-between">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    startIcon={<AddIcon />}
+                  >
+                    Add
+                  </Button>
+                </Box>
               </Grid>
             </form>
           </Box>
@@ -707,7 +801,7 @@ const Milestone = () => {
                   textAlign: "left",
                 }}
               >
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" component="span" gutterBottom>
                   Description:
                   <Typography
                     variant="body1"
@@ -730,7 +824,7 @@ const Milestone = () => {
                 <Typography variant="body1" gutterBottom>
                   Status:{" "}
                   <Typography variant="body1" component="span">
-                    {milestone.status}
+                    {milestone.Status}
                   </Typography>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -765,24 +859,18 @@ const Milestone = () => {
                   </Typography>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  Resource required:{" "}
-                  <Typography
-                    variant="body1"
-                    component="span"
-                    color={colors.greenAccent[400]}
-                  >
-                    {milestone.resources}
-                  </Typography>
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Quantity of resource:{" "}
-                  <Typography
-                    variant="body1"
-                    component="span"
-                    color={colors.greenAccent[400]}
-                  >
-                    {milestone.ResourceQuantity}
-                  </Typography>
+                  Resource required:
+                  {milestone.resourceList.map((resource, idx) => (
+                    <Typography
+                      key={idx}
+                      variant="body1"
+                      component="span"
+                      color={colors.greenAccent[400]}
+                    >
+                      {getResourceNameById(resource.resourceId)} -{" "}
+                      {resource.quantity}
+                    </Typography>
+                  ))}
                 </Typography>
 
                 {milestoneTasks[milestone._id] &&

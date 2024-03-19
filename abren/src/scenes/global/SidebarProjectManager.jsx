@@ -150,184 +150,199 @@ const Sidebar = () => {
     >
       <Box
         sx={{
+          position: "sticky",
+          top: 0,
           height: "100vh",
-          display: "flex",
-          flexDirection: "column",
+          overflowY: "auto",
+          width: isCollapsed ? "90px" : "320px",
+          transition: "width 0.3s ease",
         }}
       >
-        <div
-          style={{
-            borderRadius: "20px",
-            overflow: "hidden",
-            marginLeft: "10px",
-            marginTop: "10px",
-            flex: "1",
+        <Box
+          sx={{
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          <ProSidebar collapsed={isCollapsed}>
-            <Menu iconShape="square">
-              {/* LOGO AND MENU ICON */}
-              <MenuItem
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
-                style={{
-                  margin: "10px 0 20px 0",
-                  color: colors.grey[100],
-                }}
-              >
-                {!isCollapsed && (
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    ml="15px"
-                  >
-                    {/* <Typography variant="h3" color={colors.grey[100]}>
+          <div
+            style={{
+              borderRadius: "20px",
+              overflow: "hidden",
+              marginLeft: "10px",
+              marginTop: "10px",
+              flex: "1",
+            }}
+          >
+            <ProSidebar collapsed={isCollapsed}>
+              <Menu iconShape="square">
+                {/* LOGO AND MENU ICON */}
+                <MenuItem
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+                  style={{
+                    margin: "10px 0 20px 0",
+                    color: colors.grey[100],
+                  }}
+                >
+                  {!isCollapsed && (
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      ml="15px"
+                    >
+                      {/* <Typography variant="h3" color={colors.grey[100]}>
                   ADMINIS
                 </Typography> */}
-                    <img alt="idk" width="80px" height="80px" src={Logo}></img>
+                      <img
+                        alt="idk"
+                        width="80px"
+                        height="80px"
+                        src={Logo}
+                      ></img>
 
-                    <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                      <MenuOutlinedIcon />
-                    </IconButton>
-                  </Box>
-                )}
-              </MenuItem>
+                      <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                        <MenuOutlinedIcon />
+                      </IconButton>
+                    </Box>
+                  )}
+                </MenuItem>
 
-              {!isCollapsed && (
-                <Box mb="25px">
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    {/* <img
+                {!isCollapsed && (
+                  <Box mb="25px">
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      {/* <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
                   src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
-                    <div
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        borderRadius: "50%",
-                        backgroundColor: "lightgray",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <span
+                      <div
                         style={{
-                          fontSize: "40px",
-                          fontWeight: "bold",
-                          color: colors.primary[110],
+                          width: "100px",
+                          height: "100px",
+                          borderRadius: "50%",
+                          backgroundColor: "lightgray",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          cursor: "pointer",
                         }}
                       >
-                        {initialsArray}
-                      </span>
-                    </div>
+                        <span
+                          style={{
+                            fontSize: "40px",
+                            fontWeight: "bold",
+                            color: colors.primary[110],
+                          }}
+                        >
+                          {initialsArray}
+                        </span>
+                      </div>
+                    </Box>
+                    <Box textAlign="center">
+                      <Typography
+                        variant="h2"
+                        color={colors.grey[100]}
+                        fontWeight="bold"
+                        sx={{ m: "10px 0 0 0" }}
+                      >
+                        {firstName}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h2"
-                      color={colors.grey[100]}
-                      fontWeight="bold"
-                      sx={{ m: "10px 0 0 0" }}
-                    >
-                      {firstName}
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
-
-              <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-                <Item
-                  title="Dashboard"
-                  to="/pm/"
-                  icon={<HomeOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                <Typography
-                  variant="h6"
-                  color={colors.grey[300]}
-                  sx={{ m: "15px 0 5px 20px" }}
-                >
-                  Projects You Lead
-                </Typography>
-
-                {projects.length === 0 ? (
-                  <Typography variant="body1" sx={{ m: "0 0 5px 20px" }}>
-                    No projects yet! Stay tuned
-                  </Typography>
-                ) : (
-                  projects.map((project, index) => (
-                    <Item
-                      key={index}
-                      title={project.ProjectName}
-                      to="/user/project"
-                      icon={<AccountTreeOutlinedIcon />}
-                      selected={selected}
-                      setSelected={setSelected}
-                      onClick={() => handleProjectSelect(project._id)}
-                    />
-                  ))
                 )}
-                <Typography
-                  variant="h6"
-                  color={colors.grey[300]}
-                  sx={{ m: "15px 0 5px 20px" }}
-                >
-                  Projects You're On
-                </Typography>
-                <Item
-                  title="View Assigned Project"
-                  to="/user/viewAssignedProject"
-                  icon={<AccountTreeOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                <Item
-                  title="View Assigned Task"
-                  to="/user/viewAssignedTask"
-                  icon={<FormatListBulletedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
 
-                <Typography
-                  variant="h6"
-                  color={colors.grey[300]}
-                  sx={{ m: "15px 0 5px 20px" }}
-                >
-                  Pages
-                </Typography>
-                <Item
-                  title="Kanban"
-                  to="/user/kanban"
-                  icon={<PersonOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                <Item
-                  title="Calendar"
-                  to="/user/calendar"
-                  icon={<PersonOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                <Item
-                  title="Report"
-                  to="/user/report"
-                  icon={<SummarizeOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                {/* <Typography
+                <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+                  <Item
+                    title="Dashboard"
+                    to="/pm/"
+                    icon={<HomeOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[300]}
+                    sx={{ m: "15px 0 5px 20px" }}
+                  >
+                    Projects You Lead
+                  </Typography>
+
+                  {projects.length === 0 ? (
+                    <Typography variant="body1" sx={{ m: "0 0 5px 20px" }}>
+                      No projects yet! Stay tuned
+                    </Typography>
+                  ) : (
+                    projects.map((project, index) => (
+                      <Item
+                        key={index}
+                        title={project.ProjectName}
+                        to="/user/project"
+                        icon={<AccountTreeOutlinedIcon />}
+                        selected={selected}
+                        setSelected={setSelected}
+                        onClick={() => handleProjectSelect(project._id)}
+                      />
+                    ))
+                  )}
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[300]}
+                    sx={{ m: "15px 0 5px 20px" }}
+                  >
+                    Projects You're On
+                  </Typography>
+                  <Item
+                    title="View Assigned Project"
+                    to="/user/viewAssignedProject"
+                    icon={<AccountTreeOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  <Item
+                    title="View Assigned Task"
+                    to="/user/viewAssignedTask"
+                    icon={<FormatListBulletedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[300]}
+                    sx={{ m: "15px 0 5px 20px" }}
+                  >
+                    Pages
+                  </Typography>
+                  <Item
+                    title="Kanban"
+                    to="/user/kanban"
+                    icon={<PersonOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  <Item
+                    title="Calendar"
+                    to="/user/calendar"
+                    icon={<PersonOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  <Item
+                    title="Report"
+                    to="/user/report"
+                    icon={<SummarizeOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                  />
+                  {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -356,10 +371,11 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
         */}
-              </Box>
-            </Menu>
-          </ProSidebar>
-        </div>
+                </Box>
+              </Menu>
+            </ProSidebar>
+          </div>
+        </Box>
       </Box>
     </Box>
   );

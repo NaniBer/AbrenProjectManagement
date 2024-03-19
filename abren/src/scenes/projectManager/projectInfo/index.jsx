@@ -45,6 +45,7 @@ const Project = () => {
   const [StartDate, setStartDate] = useState("");
   const [EndDate, setEndDate] = useState("");
   const [Budget, setBudget] = useState("");
+  const [budgetPlan, setBudgetPlan] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedProjects, setSubmittedProjects] = useState(project);
   const [validationErrors, setValidationErrors] = useState({});
@@ -148,7 +149,6 @@ const Project = () => {
       setValidationErrors({});
       setIsFormOpen(false);
       setEditingIndex(-1);
-      setSelectedTeamMembers([]); // Clear selected team members
       setSelectedTeamMembers([]); // Clear selected team members
     } catch (error) {
       console.error(error);
@@ -308,43 +308,7 @@ const Project = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Box sx={{ mb: 2 }}>
-                  <Autocomplete
-                    multiple
-                    id="teamMembers"
-                    options={activeUsers}
-                    getOptionLabel={(option) => `${option.name}`}
-                    value={selectedTeamMembers}
-                    onChange={(event, value) => setSelectedTeamMembers(value)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Team Members"
-                        fullWidth
-                        error={!!validationErrors.teamMembers}
-                        helperText={validationErrors.teamMembers}
-                        placeholder="Project Manager"
-                      />
-                    )}
-                    sx={{
-                      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                          borderColor: "#868dfb",
-                        },
-                    }}
-                    InputLabelProps={{
-                      shrink: true,
-                      sx: {
-                        "&.Mui-focused": {
-                          color: validationErrors.EndDate ? "red" : "#868dfb",
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-              </Grid>
+
               <Grid item xs={6}>
                 <Box sx={{ mb: 2 }}>
                   <Autocomplete
@@ -444,6 +408,8 @@ const Project = () => {
                     }}
                   />
                 </Box>
+              </Grid>
+              <Grid item xs={12}>
                 <Box sx={{ mb: 2 }}>
                   <TextField
                     id="Budget"
@@ -556,31 +522,48 @@ const Project = () => {
                   Team Members:
                 </Typography>
                 {submittedProjects.teamMembers &&
+                submittedProjects.teamMembers.length > 0 ? (
                   submittedProjects.teamMembers.map((member) => (
-                    <Tooltip
-                      key={member._id}
-                      title={member.name}
-                      placement="top"
+                    //   <Tooltip
+                    //     key={member._id}
+                    //     title={member.name}
+                    //     placement="top"
+                    //   >
+                    //     <Avatar
+                    //       key={member._id}
+                    //       sx={{
+                    //         bgcolor: colors.primary[110],
+                    //         height: "30px",
+                    //         width: "30px",
+                    //         mr: 1,
+                    //         mb: 2,
+                    //         cursor: "pointer",
+                    //       }}
+                    //     >
+                    //       {member.name}
+                    //     </Avatar>
+                    //   </Tooltip>
+                    // ))
+                    <Typography
+                      component="span"
+                      variant="body1"
+                      sx={{ mr: 1, marginBottom: 2 }}
                     >
-                      <Avatar
-                        key={member._id}
-                        sx={{
-                          bgcolor: colors.primary[110],
-                          height: "30px",
-                          width: "30px",
-                          mr: 1,
-                          mb: 2,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {member.name
-                          .split(" ")
-                          .map((word) => word.charAt(0))
-                          .join("")}
-                      </Avatar>
-                    </Tooltip>
-                  ))}
+                      {member.name}
+                    </Typography>
+                  ))
+                ) : (
+                  <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{ mb: 1, color: colors.grey[300] }}
+                  >
+                    Not Assigned
+                  </Typography>
+                )}
               </Box>
+              {console.log(submittedProjects)}
+
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <Typography
                   component="span"
@@ -589,7 +572,19 @@ const Project = () => {
                 >
                   Start Date:{" "}
                 </Typography>
-                {dayjs(submittedProjects?.StartDate).format("YYYY.MM.DD")}
+                {submittedProjects.StartDate ? (
+                  <Typography component="span" variant="body1" sx={{ mb: 1 }}>
+                    {dayjs(submittedProjects.StartDate).format("YYYY.MM.DD")}
+                  </Typography>
+                ) : (
+                  <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{ mb: 1, color: colors.grey[300] }}
+                  >
+                    Not Assigned
+                  </Typography>
+                )}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <Typography
@@ -597,10 +592,21 @@ const Project = () => {
                   color={colors.greenAccent[400]}
                   sx={{ mr: 1 }}
                 >
-                  {" "}
-                  End Date:{" "}
-                </Typography>{" "}
-                {dayjs(submittedProjects?.EndDate).format("YYYY.MM.DD")}
+                  Start Date:{" "}
+                </Typography>
+                {submittedProjects.EndDate ? (
+                  <Typography component="span" variant="body1" sx={{ mb: 1 }}>
+                    {dayjs(submittedProjects.EndDate).format("YYYY.MM.DD")}
+                  </Typography>
+                ) : (
+                  <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{ mb: 1, color: colors.grey[300] }}
+                  >
+                    Not Assigned
+                  </Typography>
+                )}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <Typography
@@ -611,7 +617,19 @@ const Project = () => {
                   {" "}
                   Budget:{" "}
                 </Typography>
-                {submittedProjects.Budget}
+                {submittedProjects.Budget ? (
+                  <Typography variant="body1" component="span" sx={{ mb: 1 }}>
+                    {submittedProjects.Budget}
+                  </Typography>
+                ) : (
+                  <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{ mb: 1, color: colors.grey[300] }}
+                  >
+                    Not Assigned
+                  </Typography>
+                )}
               </Typography>
               <Box display="flex" justifyContent="flex-end">
                 <Button

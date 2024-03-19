@@ -28,7 +28,7 @@ const ProjectSchema = mongoose.Schema({
     // required: true
   },
   AllocatedCost: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId, // this is the sum of allocatedbudget in BudgetPlan
     ref: "BudgetPlan",
     //required: true
   },

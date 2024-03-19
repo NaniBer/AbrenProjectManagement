@@ -465,8 +465,8 @@ UserRouter.post("/addProjectDetails/:projectId", async (req, res) => {
 UserRouter.get("/test/", async (req, res) => {
   try {
     // Get the count of task records
-    const tasks = await Todo.find();
-    res.json(tasks);
+    await Milestones.deleteMany({});
+    res.json("hii");
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
@@ -690,12 +690,21 @@ UserRouter.post("/addMilestone", async (req, res) => {
       projectId,
       MilestoneName,
       MilestoneDescription,
-      ResourceId,
+      resourceList,
       ResourceQuantity,
       AllocatedBudget,
       Priority,
       Status,
     } = req.body;
+    console.log(
+      projectId,
+      MilestoneName,
+      MilestoneDescription,
+      resourceList,
+      AllocatedBudget,
+      Priority,
+      Status
+    );
 
     // Check if the project exists
     const project = await Projects.findById(projectId);
@@ -703,8 +712,7 @@ UserRouter.post("/addMilestone", async (req, res) => {
       projectId,
       MilestoneName,
       MilestoneDescription,
-      ResourceId,
-      ResourceQuantity,
+      resourceList,
       AllocatedBudget,
       Priority,
       Status
@@ -718,8 +726,7 @@ UserRouter.post("/addMilestone", async (req, res) => {
       projectId,
       MilestoneName,
       MilestoneDescription,
-      ResourceId,
-      ResourceQuantity,
+      resourceList,
       AllocatedBudget,
       Priority,
       Status,
@@ -974,4 +981,23 @@ UserRouter.get("/ProjectAnalyticsReportData/:userId", async (req, res) => {
   }
 });
 
+UserRouter.get("/tasksWith3DaysLeft", async (req, res) => {
+  try {
+    // Calculate the date 3 days from now
+    const deadlineThreshold = new Date();
+    deadlineThreshold.setDate(deadlineThreshold.getDate() + 3);
+
+    // Find tasks with deadlines exactly 3 days from now
+    const tasksWith3DaysLeft = await Tasks.find({
+      EndDate: deadlineThreshold,
+    }).toArray();
+
+    res.status(200).json({ success: true, tasksWith3DaysLeft });
+  } catch (error) {
+    console.error("Error fetching tasks with 3 days left:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Error fetching tasks with 3 days left" });
+  }
+});
 module.exports = UserRouter;

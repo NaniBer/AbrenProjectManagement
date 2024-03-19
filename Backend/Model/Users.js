@@ -25,12 +25,15 @@ const usersSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    default: "admin",
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin",
-    required: true,
+    ref: "Users",
+    // required: true,
+  },
+  Role: {
+    type: String,
+    enum: ["SystemAdmin", "User"],
   },
 });
 

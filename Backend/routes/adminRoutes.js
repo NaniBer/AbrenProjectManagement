@@ -75,11 +75,51 @@ router.post("/addAdmin", async (req, res) => {
     res.status(500).json({ message: "Error creating user" });
   }
 });
+router.post("/addUser", async (req, res) => {
+  try {
+    const { firstname, lastname, email, disabled, username, password, Role } =
+      req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create a new user instance
+    const newUser = new Users({
+      firstname,
+      lastname,
+      email,
+      disabled: disabled || false, // Default value for disabled
+      username,
+      password: hashedPassword,
+      Role,
+    });
+
+    // Save the new user to the database
+    const savedUser = await newUser.save();
+
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+// router.delete("/deleteUser/:id", async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+
+//     // Find the user by ID and delete it
+//     const deletedUser = await Users.findByIdAndDelete(userId);
+
+//     if (!deletedUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     res.status(200).json({ message: "User deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 //Get admin users list
 router.get("/getAdmins", async (req, res) => {
   try {
-    const adminsList = await Admin.find();
+    const adminsList = await Users.find();
     res.json(adminsList);
   } catch (err) {
     console.error("Error retrieving Admin list:", err);

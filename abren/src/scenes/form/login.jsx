@@ -69,55 +69,52 @@ const Login = () => {
 
     const formData = { username, password };
 
-    if (admin) {
-      formData.type = "admin";
-    } else {
-      formData.type = "user";
-    }
-    fetch("/auth/Login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    }).then((response) => {
-      const statusCode = response.status;
-      if (statusCode === 200) {
-        response.json().then((data) => {
-          const user = data.user;
-          console.log({ user });
-          const notification = data.notifications;
-          const id = user._id.toString();
-          console.log(id);
-          fetch("/Users/getProjects", {
+    try {
+      const response = await fetch("/auth/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const user = data.user;
+        console.log(user);
+        const notification = data.notifications;
+        const id = user._id.toString();
+        console.log(id);
+
+        if (user.Role === "SystemAdmin") {
+          dispatch(loginSucess({ user: user }));
+          navigate("/admin");
+        } else {
+          const projectsResponse = await fetch("/Users/getProjects", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: id }),
-          }).then((response) => {
-            const statusCode = response.status;
-            if (statusCode === 200) {
-              //Logged in successfully
-              response.json().then((data) => {
-                if (!admin) {
-                  const userData = {
-                    user: user, // User object
-                    notifications: notification, // Array of notification objects
-                  };
-                  userData.user.projects = data;
-
-                  dispatch(loginSucess(userData));
-                  navigate("/user/");
-                } else {
-                  dispatch(loginSucess(user));
-                  navigate("/admin");
-                }
-              });
-            }
           });
-        });
+
+          if (projectsResponse.ok) {
+            const projectsData = await projectsResponse.json();
+
+            const userData = {
+              user: user,
+              notifications: notification,
+            };
+            userData.user.projects = projectsData;
+            dispatch(loginSucess(userData));
+
+            navigate("/user/");
+          } else {
+            console.error("Failed to fetch projects:", projectsResponse.status);
+          }
+        }
       } else {
-        // Handle non-200 status codes if needed
-        console.error("Request failed with status code:", statusCode);
+        console.error("Login failed:", response.status);
       }
-    });
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   // Retrieve saved login credentials on component mount
@@ -229,72 +226,27 @@ const Login = () => {
               )}
             </div>
             <div
-              className="col"
-              style={{ display: "flex", alignItems: "center" }}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
             >
-              <div className="mb-3  form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="admin"
-                  checked={admin}
-                  onChange={handleAdminChange}
-                />
-                <label
-                  className="form-check-label px-2"
-                  htmlFor="admin"
-                  style={{
-                    color: colors.primary[500],
-                  }}
-                >
-                  I am an Admin
-                </label>
-              </div>
-              <div className="mb-3  form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={handleRememberMeChange}
-                />
-                <label
-                  className="form-check-label px-2"
-                  htmlFor="rememberMe"
-                  style={{
-                    color: colors.primary[500],
-                  }}
-                >
-                  Remember Me
-                </label>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{
+                  backgroundColor: "#213D52",
+                  width: "200px",
+                  paddingBottom: "5px",
+                  marginBottom: "5px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                Log In
+              </button>
             </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{
-                backgroundColor: "#213D52",
-                width: "200px",
-                paddingBottom: "5px",
-                marginBottom: "5px",
-              }}
-            >
-              Log In
-            </button>
           </form>
-          <div style={{ marginTop: "10px", textAlign: "center" }}>
-            <p
-              style={{
-                color: colors.primary[500],
-                fontSize: "15px",
-              }}
-            >
-              Don't have an account?{" "}
-              <a href="/form" style={{ color: "#213D52" }}>
-                Sign Up
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>

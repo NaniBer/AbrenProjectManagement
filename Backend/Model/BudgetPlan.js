@@ -11,8 +11,7 @@ const BudgetPlanSchema = mongoose.Schema({
     required: true,
   },
   AllocatedFor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Resources",
+    type: String,
     required: true,
   },
 });

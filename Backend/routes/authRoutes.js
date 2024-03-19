@@ -10,47 +10,21 @@ const { Notification } = require("../Model/Notification"); // Import the Notific
 
 router.post("/Login", async (req, res) => {
   try {
-    const { username, password, type } = req.body;
-
-    if (type === "admin") {
-      const admin = await Admin.findOne({ username });
-      if (!admin) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const passwordMatch = await bcrypt.compare(password, admin.password);
-      if (!passwordMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      req.session.adminId = admin._id;
-
-      // Fetch notifications for admin (if applicable)
-      const notifications = []; // Modify this to fetch notifications from the database
-      res.status(200).json({ user: admin, notifications });
-    } else {
-      const user = await Users.findOne({ username });
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      req.session.userId = user._id;
-
-      // Fetch notifications for user
-      if (type === "user") {
-        // Fetch notifications for user
-        const userNotifications = await Notification.find({
-          userId: user._id,
-        });
-        console.log(userNotifications);
-        res.status(200).json({ user, notifications: userNotifications });
-      }
+    // console.log(req.body);
+    const { username, password } = req.body;
+    // Check if the user exists
+    const users = await Users.findOne({ username });
+    if (!users) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    // Compare the provided password with the hashed password
+    const passwordMatch = await bcrypt.compare(password, users.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    req.session.userId = users._id;
+    res.status(200).json({ message: "Login successful", user: users });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in" });

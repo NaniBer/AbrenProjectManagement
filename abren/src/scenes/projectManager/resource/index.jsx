@@ -13,6 +13,7 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
+import * as Yup from "yup";
 import swal from "sweetalert";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -44,6 +45,7 @@ const Resource = () => {
   const [Frequency, setFrequency] = useState(0);
   const [edit, setEdit] = useState(false);
   const [editedResource, setEditedResource] = useState();
+  const [errors, setErrors] = useState({});
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [submittedResources, setSubmittedResources] = useState([]);
@@ -59,6 +61,20 @@ const Resource = () => {
     setResourceName((prevValue) => prevValue.trim());
   };
 
+  const validationSchema = Yup.object().shape({
+    ResourceName: Yup.string().trim().required("Resource Name is required"),
+    Category: Yup.string().required("Category is required"),
+    Quantity: Yup.number()
+      .positive("Quantity must be a positive number")
+      .required("Quantity is required"),
+    Cost: Yup.number()
+      .positive("Cost must be a positive number")
+      .required("Cost is required"),
+    Frequency: Yup.number()
+      .min(0, "Frequency must be a non-negative number")
+      .required("Frequency is required"),
+  });
+
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
     setCategory(selectedCategory);
@@ -70,127 +86,92 @@ const Resource = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Calculate total cost
-    let totalCost;
-    if (Frequency === 0) {
-      totalCost = Quantity * Cost;
-    } else {
-      totalCost = Quantity * Cost * Frequency;
-    }
-    console.log(budget);
 
-    // Check if total cost exceeds budget
-    if (totalCost >= budget) {
-      // Show error message for exceeding budget
-      swal("Error!", "Total cost exceeds budget", "error");
-      return; // Exit function early
-    }
+    try {
+      await validationSchema.validate(
+        {
+          ResourceName,
+          Category,
+          Quantity,
+          Cost,
+          Frequency,
+        },
+        { abortEarly: false }
+      );
 
-    let CostCategory;
-
-    if (Category === "Material") {
-      CostCategory = "per Item";
-    } else if (Category === "Work") {
-      CostCategory = "per unit of time";
-    } else if (Frequency === 0) {
-      CostCategory = "one-time";
-    }
-
-    const backendResource = {
-      ResourceName,
-      Category,
-      projectId,
-      Quantity,
-      CostCategory,
-      Cost,
-      Frequency,
-    };
-    const isDuplicate = submittedResources.some(
-      (resource) => resource.ResourceName === ResourceName
-    );
-    if (isDuplicate) {
-      // Close loading modal
-      swal.close();
-      // Show error message for duplicate name
-      swal("Error!", "Resource name already exists", "error");
-    } else {
-      // Show loading modal
-      swal({
-        title: "Please wait...",
-        text: edit ? "Updating resource" : "Adding resource",
-        buttons: false,
-        closeOnEsc: false,
-        closeOnClickOutside: false,
-        icon: "info",
-      });
-
-      if (edit) {
-        // Editing an existing resource
-        try {
-          const response = await fetch(
-            `/Users/updateResource/${editedResource._id}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(backendResource),
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          console.log(data);
-
-          // Clear the form fields
-          setResourceName("");
-          setCategory("");
-          setQuantity(0);
-          setCost("");
-          setFrequency(0);
-          setIsFormOpen(false);
-
-          // Update submitted resources
-          setSubmittedResources((prevResources) => [
-            ...prevResources,
-            backendResource,
-          ]);
-
-          dispatch(editResource(data.updatedResource));
-
-          // Close loading modal
-          swal.close();
-
-          // Show success message
-          swal("Success!", "Resource updated successfully", "success");
-        } catch (error) {
-          console.error("Error updating resource:", error);
-          // Close loading modal
-          swal.close();
-        }
+      // Calculate total cost
+      let totalCost;
+      if (Frequency === 0) {
+        totalCost = Quantity * Cost;
       } else {
-        // Creating a new resource
-        try {
-          console.log("Adding");
-          const response = await fetch("/Users/addResource", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(backendResource),
-          });
-          if (response.status === 201) {
+        totalCost = Quantity * Cost * Frequency;
+      }
+
+      // Check if total cost exceeds budget
+      if (totalCost >= budget) {
+        // Show error message for exceeding budget
+        swal("Error!", "Total cost exceeds budget", "error");
+        return; // Exit function early
+      }
+
+      let CostCategory;
+
+      if (Category === "Material") {
+        CostCategory = "per Item";
+      } else if (Category === "Work") {
+        CostCategory = "per unit of time";
+      } else if (Frequency === 0) {
+        CostCategory = "one-time";
+      }
+
+      const backendResource = {
+        ResourceName,
+        Category,
+        projectId,
+        Quantity,
+        CostCategory,
+        Cost,
+        Frequency,
+      };
+
+      const isDuplicate = submittedResources.some(
+        (resource) => resource.ResourceName === ResourceName
+      );
+
+      if (isDuplicate) {
+        // Show error message for duplicate name
+        swal("Error!", "Resource name already exists", "error");
+      } else {
+        // Show loading modal
+        swal({
+          title: "Please wait...",
+          text: edit ? "Updating resource" : "Adding resource",
+          buttons: false,
+          closeOnEsc: false,
+          closeOnClickOutside: false,
+          icon: "info",
+        });
+
+        if (edit) {
+          // Editing an existing resource
+          try {
+            const response = await fetch(
+              `/Users/updateResource/${editedResource._id}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(backendResource),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const data = await response.json();
-            console.log(data.resource);
-            backendResource._id = data.resource._id;
-            backendResource.TotalCost = data.resource.TotalCost;
-            // Update submitted resources
-            setSubmittedResources((prevResources) => [
-              ...prevResources,
-              backendResource,
-            ]);
-            dispatch(addResource(data.resource));
+
             // Clear the form fields
             setResourceName("");
             setCategory("");
@@ -198,19 +179,74 @@ const Resource = () => {
             setCost("");
             setFrequency(0);
             setIsFormOpen(false);
+
+            setErrors({});
+
+            // Update submitted resources
+            setSubmittedResources((prevResources) => [
+              ...prevResources,
+              backendResource,
+            ]);
+
+            dispatch(editResource(data.updatedResource));
+
             // Close loading modal
             swal.close();
+
             // Show success message
-            swal("Success!", "Resource added successfully", "success");
-          } else {
-            throw new Error("Failed to create resource");
+            swal("Success!", "Resource updated successfully", "success");
+          } catch (error) {
+            console.error("Error updating resource:", error);
+            // Close loading modal
+            swal.close();
           }
-        } catch (error) {
-          console.error("Error creating resource:", error);
-          // Close loading modal
-          swal.close();
+        } else {
+          // Creating a new resource
+          try {
+            const response = await fetch("/Users/addResource", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(backendResource),
+            });
+            if (response.status === 201) {
+              const data = await response.json();
+              backendResource._id = data.resource._id;
+              backendResource.TotalCost = data.resource.TotalCost;
+              // Update submitted resources
+              setSubmittedResources((prevResources) => [
+                ...prevResources,
+                backendResource,
+              ]);
+              dispatch(addResource(data.resource));
+              // Clear the form fields
+              setResourceName("");
+              setCategory("");
+              setQuantity(0);
+              setCost("");
+              setFrequency(0);
+              setIsFormOpen(false);
+              // Close loading modal
+              swal.close();
+              // Show success message
+              swal("Success!", "Resource added successfully", "success");
+            } else {
+              throw new Error("Failed to create resource");
+            }
+          } catch (error) {
+            console.error("Error creating resource:", error);
+            // Close loading modal
+            swal.close();
+          }
         }
       }
+    } catch (error) {
+      // If validation fails, display errors and update form state
+      const validationErrors = {};
+      error.inner.forEach((e) => {
+        validationErrors[e.path] = e.message;
+      });
+      // Update state to show validation errors
+      setErrors(validationErrors);
     }
   };
 
@@ -334,12 +370,15 @@ const Resource = () => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
+              backgroundColor: colors.primary[400],
+              borderRadius: "20px",
               boxShadow: 24,
               p: 4,
-              maxWidth: 500,
+              maxWidth: 600,
+              height: "85%",
               width: "100%",
               outline: "none",
+              overflow: "auto",
             }}
           >
             <Typography variant="h5" sx={{ mb: 2 }}>
@@ -359,16 +398,23 @@ const Resource = () => {
                   value={ResourceName}
                   onChange={handleResourceNameChange}
                   onBlur={handleResourceNameBlur}
+                  error={!!errors.ResourceName}
+                  helperText={
+                    errors.ResourceName
+                      ? errors.ResourceName
+                      : "Enter the name of the resource"
+                  }
                   sx={{
+                    borderColor: errors.ResourceName ? "red" : "#868dfb",
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
-                        borderColor: "#868dfb",
+                        borderColor: errors.ResourceName ? "red" : "#868dfb",
                       },
                   }}
                   InputLabelProps={{
                     sx: {
                       "&.Mui-focused": {
-                        color: "#868dfb",
+                        color: errors.ResourceName ? "red" : "#868dfb",
                       },
                     },
                   }}
@@ -384,16 +430,23 @@ const Resource = () => {
                   fullWidth
                   value={Category}
                   onChange={handleCategoryChange}
+                  error={!!errors.Category}
+                  helperText={
+                    errors.Category
+                      ? "Category is required."
+                      : "Select the category of the resource from the dropdown."
+                  }
                   sx={{
+                    borderColor: errors.Category ? "red" : "#868dfb",
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
-                        borderColor: "#868dfb",
+                        borderColor: errors.Category ? "red" : "#868dfb",
                       },
                   }}
                   InputLabelProps={{
                     sx: {
                       "&.Mui-focused": {
-                        color: "#868dfb",
+                        color: errors.Category ? "red" : "#868dfb",
                       },
                     },
                   }}
@@ -407,22 +460,29 @@ const Resource = () => {
                 <TextField
                   id="Quantity"
                   label="Quantity"
-                  helperText='If the resource type is set to "Work", the Quantity represents the number of hours to be Work.'
+                  // helperText='If the resource type is set to "Work", the Quantity represents the number of hours to be Work.'
                   variant="outlined"
                   fullWidth
                   type="number"
                   value={Quantity}
+                  error={!!errors.Quantity}
+                  helperText={
+                    errors.Quantity
+                      ? "Quantity must be a positive number."
+                      : "Enter the quantity of the resource. Must be a positive number."
+                  }
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   sx={{
+                    borderColor: errors.Quantity ? "red" : "#868dfb",
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
-                        borderColor: "#868dfb",
+                        borderColor: errors.Quantity ? "red" : "#868dfb",
                       },
                   }}
                   InputLabelProps={{
                     sx: {
                       "&.Mui-focused": {
-                        color: "#868dfb",
+                        color: errors.Quantity ? "red" : "#868dfb",
                       },
                     },
                   }}
@@ -437,6 +497,12 @@ const Resource = () => {
                   type="number"
                   value={Cost}
                   onChange={handleCostChange}
+                  error={!!errors.Cost}
+                  helperText={
+                    errors.Cost
+                      ? "Cost must be a positive number."
+                      : "Enter the cost of the resource. Must be a positive number."
+                  }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">ETB </InputAdornment>
@@ -448,15 +514,16 @@ const Resource = () => {
                     ),
                   }}
                   sx={{
+                    borderColor: errors.Cost ? "red" : "#868dfb",
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
-                        borderColor: "#868dfb",
+                        borderColor: errors.Cost ? "red" : "#868dfb",
                       },
                   }}
                   InputLabelProps={{
                     sx: {
                       "&.Mui-focused": {
-                        color: "#868dfb",
+                        color: errors.Cost ? "red" : "#868dfb",
                       },
                     },
                   }}
@@ -469,27 +536,56 @@ const Resource = () => {
                   label="Frequency"
                   variant="outlined"
                   fullWidth
-                  helperText="If left at 0, it will be considered a one-time occurrence."
+                  // helperText="If left at 0, it will be considered a one-time occurrence."
                   type="number"
                   value={Frequency}
                   onChange={(e) => setFrequency(Number(e.target.value))}
+                  error={!!errors.Frequency}
+                  helperText={
+                    errors.Frequency
+                      ? "Frequency must be a non-negative number."
+                      : "Enter the frequency of the resource. Must be a non-negative number."
+                  }
                   sx={{
+                    borderColor: errors.Frequency ? "red" : "#868dfb",
                     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                       {
-                        borderColor: "#868dfb",
+                        borderColor: errors.Frequency ? "red" : "#868dfb",
                       },
                   }}
                   InputLabelProps={{
                     sx: {
                       "&.Mui-focused": {
-                        color: "#868dfb",
+                        color: errors.Frequency ? "red" : "#868dfb",
                       },
                     },
                   }}
                 />
               </Box>
 
-              <Box display="flex" justifyContent="flex-end">
+              <Box display="flex" justifyContent="space-between">
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    // Clear all fields
+                    setResourceName("");
+                    setCategory("");
+                    setQuantity(0);
+                    setCost("");
+                    setFrequency(0);
+                    // Reset error color
+                    setErrors({});
+                  }}
+                  sx={{
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.common.white,
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    padding: "10px 20px",
+                  }}
+                >
+                  Cancel
+                </Button>
                 <Button
                   type="submit"
                   variant="contained"
@@ -559,7 +655,7 @@ const Resource = () => {
                       component="span"
                       color={colors.greenAccent[400]}
                     >
-                      {resource.Cost}
+                      {resource.Cost} ETB {resource.CostCategory}
                     </Typography>
                   </Typography>
 
@@ -581,7 +677,7 @@ const Resource = () => {
                       component="span"
                       color={colors.greenAccent[400]}
                     >
-                      {resource.TotalCost}
+                      {resource.TotalCost} ETB
                     </Typography>
                   </Typography>
 

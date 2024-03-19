@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   Badge,
+  Typography,
   ListItemIcon,
 } from "@mui/material";
 import { useContext } from "react";
@@ -35,6 +36,9 @@ const Topbar = () => {
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [tasks, setTasks] = useState(PMtodolost);
   const notifications = useSelector((state) => state.auth.notifications); // Fetching notifications from Redux state
+  const user = useSelector((state) => state.auth.user);
+  const firstName = user.firstname + " " + user.lastname;
+  console.log(user);
 
   useEffect(() => {
     const today = new Date();
@@ -123,26 +127,28 @@ const Topbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
-      {/* SEARCH BAR */}
       <Box
         display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="20px" // Increase the border radius to make it rounder
-        width="500px" // Adjust the width of the search bar
-        sx={{ margin: "auto" }} // Center the search bar horizontally
+        borderRadius="20px"
+        alignContent="center"
+        alignItems="center"
+        sx={{ margin: "auto" }}
       >
-        <InputBase
-          sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
-          inputProps={{ style: { borderRadius: "20px" } }} // Round the input field
-        />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
+        <Box display="flex" alignItems="center">
+          <Typography variant="h3" component="span" mr={1}>
+            Welcome,{" "}
+            <Typography
+              component="span"
+              variant="h3"
+              sx={{ color: colors.greenAccent[400] }}
+            >
+              {firstName}
+            </Typography>
+          </Typography>
+        </Box>
       </Box>
-
       {/* ICONS */}
-      <Box display="flex">
+      <Box display="flex" justifyContent="flex-end">
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <DarkModeOutlinedIcon />

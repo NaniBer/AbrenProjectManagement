@@ -18,7 +18,7 @@ const Form = () => {
   const [validationErrors, setValidationErrors] = useState({});
   const storeState = useSelector((state) => state);
   useEffect(() => {
-    console.log(storeState.auth.user._id);
+    console.log(storeState.auth.admin._id);
   }, []);
 
   const handleFormSubmit = (values, formik) => {
