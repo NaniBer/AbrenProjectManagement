@@ -2,12 +2,10 @@ import React, { useContext, useState, useEffect } from "react";
 import { Box, IconButton, useTheme, Menu, MenuItem, Badge, ListItemIcon, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
-import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
@@ -20,61 +18,51 @@ const Topbar = () => {
 
   const [anchorElProfile, setAnchorElProfile] = useState(null);
   const [anchorElNotification, setAnchorElNotification] = useState(null);
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      projectname: "Kaizen website",
-      description: "kaizen is a tech company ",
-      projectmanager: "saronbisrat.kaizen",
-      status: "active",
-      startDate: '2024-03-14',
-    },
-    {
-      id: 2,
-      projectname: "New website",
-      description: "kaizen is a tech company ",
-      projectmanager: "saronbisrat.kaizen",
-      status: "active",
-      startDate: '2024-03-18',
-    },
-  ]);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const calculateNotificationCount = () => {
-      // Calculate notification count based on project assignment to a project manager
-      const projectsWithNotification = projects.filter(project => project.projectmanager !== "" && isNotificationRequired(project.startDate));
-      setNotificationCount(projectsWithNotification.length);
-    };
-
-    calculateNotificationCount();
-
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [projects]);
-
-  const isNotificationRequired = (startDate) => {
-    const today = new Date();
-    const projectStartDate = new Date(startDate);
-    // Calculate the difference in milliseconds between today and the project start date
-    const differenceInTime = projectStartDate.getTime() - today.getTime();
-    // Calculate the difference in days
-    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-    // If the project start date is within the next 7 days, return true for notification requirement
-    return differenceInDays <= 7 && differenceInDays >= 0;
-  };
+    // Dummy data for notifications
+    const dummyData = [
+      {
+        userId: "614cfeae8e086a29d842a943",
+        projectId: "614d02409e071b3458b08724",
+        type: "projectAssigned",
+        message: "You have been assigned to a new project 'Kaizen website'.",
+        startDate: new Date("2024-03-20"),
+        endDate: new Date("2024-03-25"),
+        createdAt: new Date("2024-03-18"),
+      },
+      {
+        userId: "614cfeae8e086a29d842a943",
+        projectId: "614d02409e071b3458b08725",
+        type: "taskAssigned",
+        message: "You have a new task 'Update Homepage' assigned in project 'New website'. ",
+        startDate: new Date("2024-03-22"),
+        endDate: new Date("2024-03-24"),
+        createdAt: new Date("2024-03-18"),
+      },
+      {
+        userId: "614cfeae8e086a29d842a944",
+        projectId: "614d02409e071b3458b08726",
+        type: "approachingDeadline",
+        message: "The deadline for project 'Important Project' is approaching.",
+        startDate: new Date("2024-03-28"),
+        endDate: new Date("2024-03-30"),
+        createdAt: new Date("2024-03-19"),
+      },
+      {
+        userId: "614cfeae8e086a29d842a945",
+        projectId: "614d02409e071b3458b08727",
+        type: "lowResources",
+        message: "Low resources detected for the project 'Resource Management'. Act now to replenish resources.",
+        startDate: new Date("2024-03-25"),
+        endDate: new Date("2024-03-28"),
+        createdAt: new Date("2024-03-20"),
+      },
+      
+    ];
+    setNotifications(dummyData);
+  }, []);
 
   const handleProfileIconClick = (event) => {
     setAnchorElProfile(event.currentTarget);
@@ -88,19 +76,25 @@ const Topbar = () => {
     setAnchorElNotification(event.currentTarget);
   };
 
+  const removeNotification = (index) => {
+    const updatedNotifications = [...notifications];
+    updatedNotifications.splice(index, 1);
+    setNotifications(updatedNotifications);
+  };
+
   return (
     <Box
       sx={{
         position: "sticky",
         top: 0,
-        zIndex: 1000, // Ensure topbar is above other content
-        backgroundColor: isScrolled ? colors.primary[400] : "transparent", // Change background color when scrolled
-        transition: "background-color 0.3s ease", // Smooth transition for background color change
+        zIndex: 1000,
+        backgroundColor: colors.background,
         borderRadius: "20px"
       }}
     >
       <Box display="flex" justifyContent="space-between" p={2}>
         {/* SEARCH BAR */}
+        {/* Implement your search bar here */}
         <Box
           display="flex"
           borderRadius="20px"
@@ -125,7 +119,7 @@ const Topbar = () => {
             )}
           </IconButton>
           <IconButton onClick={handleNotificationIconClick}>
-            <Badge badgeContent={notificationCount} color="error">
+            <Badge badgeContent={notifications.length} color="error">
               <NotificationsOutlinedIcon />
             </Badge>
           </IconButton>
@@ -144,32 +138,14 @@ const Topbar = () => {
             component={Link}
             to="/updateandreset"
             onClick={handleCloseProfileMenu}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              color: colors.grey[100],
-              '&:hover': {
-                backgroundColor: colors.primary[200],
-              },
-            }}
           >
-            <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+            <ListItemIcon>
               <PersonOutlineIcon fontSize="small" />
             </ListItemIcon>
             Profile
           </MenuItem>
-          <MenuItem
-            onClick={handleCloseProfileMenu}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              color: colors.grey[100],
-              '&:hover': {
-                backgroundColor: colors.primary[200],
-              },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
+          <MenuItem onClick={handleCloseProfileMenu}>
+            <ListItemIcon>
               <ExitToAppIcon fontSize="small" />
             </ListItemIcon>
             Logout
@@ -178,32 +154,64 @@ const Topbar = () => {
 
         {/* Notification Menu */}
         <Menu
-          anchorEl={anchorElNotification}
-          open={Boolean(anchorElNotification)}
-          onClose={() => setAnchorElNotification(null)}
-        >
-          {projects.map((project, index) => (
-            <MenuItem
-              key={index}
-              component={Link}
-              to="/viewproject"
-              onClick={() => {
-                // Decrease notification count when menu item is clicked
-                setNotificationCount(prevCount => prevCount - 1);
-                setAnchorElNotification(null);
-              }}
-              sx={{ whiteSpace: 'normal' }}
-            >
-              <ListItemIcon>
-                <span style={{ fontSize: "26px", color: colors.primary[110] }}>&#8226;</span>
-              </ListItemIcon>
-              <Typography>{project.projectname}</Typography>
-            </MenuItem>
-          ))}
-        </Menu>
+  anchorEl={anchorElNotification}
+  open={Boolean(anchorElNotification)}
+  onClose={() => setAnchorElNotification(null)}
+  PaperProps={{
+    sx: {
+      width: 320, // Adjust the width as per your requirement
+      maxHeight: 300, // Adjust the max height as per your requirement
+      overflowY: "auto", // Enable vertical scrolling if necessary
+    },
+  }}
+>
+  {notifications.map((notification, index) => {
+    const daysUntilDeadline = Math.ceil((notification.endDate - new Date()) / (1000 * 3600 * 24));
+
+    let dateText = '';
+    if (notification.type === 'projectAssigned' || notification.type === 'taskAssigned') {
+      const diffDays = Math.ceil((notification.startDate - new Date()) / (1000 * 3600 * 24));
+      if (diffDays === 0) {
+        dateText = 'today';
+      } else if (diffDays === 1) {
+        dateText = 'tomorrow';
+      } else {
+        dateText = `${diffDays} day${diffDays > 1 ? 's' : ''} from now`;
+      }
+    } else if (notification.type === 'approachingDeadline') {
+      if (daysUntilDeadline === 0) {
+        dateText = 'today';
+      } else if (daysUntilDeadline === 1) {
+        dateText = 'tomorrow';
+      } else {
+        dateText = `${daysUntilDeadline} day${daysUntilDeadline > 1 ? 's' : ''} `;
+      }
+    }
+
+    return (
+      <MenuItem key={index} onClick={() => removeNotification(index)}>
+        <ListItemIcon>
+          <span style={{ fontSize: "20px", color: notification.type === 'lowResources' ? 'red' : colors.primary[110], marginRight: "8px" }}>•</span>
+        </ListItemIcon>
+        <Box>
+          <Typography sx={{ whiteSpace: 'normal', overflowWrap: "break-word" }}>{notification.message}</Typography>
+          {dateText && (
+            <Typography variant="caption" sx={{ color: colors.grey[300] }}>
+              {notification.type === 'approachingDeadline' ? 'Due in: ' : 'Starts '}{dateText}
+            </Typography>
+          )}
+        </Box>
+      </MenuItem>
+    );
+  })}
+</Menu>
+
+
+
       </Box>
     </Box>
   );
 };
 
 export default Topbar;
+

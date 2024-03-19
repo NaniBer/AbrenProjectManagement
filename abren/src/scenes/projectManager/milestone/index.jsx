@@ -50,6 +50,36 @@ const schema = yup.object().shape({
     .positive("Quantity must be a positive number")
     .required("Quantity is required"),
 });
+const dummyMilestones = [
+  {
+    milestoneName: "Milestone 1",
+    description: "This is the description for Milestone 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    status: "Not Started",
+    priority: "High",
+    budget: 1000,
+    resources: ["Resource 1", "Resource 2"],
+    quantity: 5,
+  },
+  {
+    milestoneName: "Milestone 2",
+    description: "This is the description for Milestone 2. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    status: "In Progress",
+    priority: "Medium",
+    budget: 2000,
+    resources: ["Resource 3", "Resource 4"],
+    quantity: 8,
+  },
+  {
+    milestoneName: "Milestone 3",
+    description: "This is the description for Milestone 3. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    status: "Completed",
+    priority: "Low",
+    budget: 1500,
+    resources: ["Resource 5", "Resource 6"],
+    quantity: 3,
+  },
+];
+
 
 const Milestone = () => {
   const theme = useTheme();
