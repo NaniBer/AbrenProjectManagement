@@ -572,7 +572,6 @@ UserRouter.post("/getProjects", async (req, res) => {
   }
 });
 
-// Get information of the project
 UserRouter.post("/getProject/:projectId", async (req, res) => {
   try {
     const projectId = req.params.projectId;
@@ -581,7 +580,7 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
       { $match: { _id: objectId } },
       {
         $lookup: {
-          from: "milestones", // Name of the Milestones collection
+          from: "milestones",
           localField: "_id",
           foreignField: "projectId",
           as: "milestones",
@@ -605,8 +604,8 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
       },
       {
         $lookup: {
-          from: "users", // Assuming user details are stored in the "users" collection
-          localField: "ProjectManager", // Assuming ProjectManager field stores user ObjectId
+          from: "users",
+          localField: "ProjectManager",
           foreignField: "_id",
           as: "projectManagerDetails",
         },
@@ -653,23 +652,28 @@ UserRouter.post("/getProject/:projectId", async (req, res) => {
       },
       {
         $project: {
-          projectManagerDetails: 0, // Exclude projectManagerDetails array from final result
+          projectManagerDetails: 0,
           teamMembersDetails: 0,
-          // TeamMembers: 0,
         },
       },
     ]);
-    console.log(project);
 
     if (!project || project.length === 0) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Check if the logged-in user is authorized to view this project
-    // if (project[0].ProjectManager.toString() !== req.session.userId) {
-    //   return res.status(403).json({ message: "Unauthorized" });
-    // }
-    console.log(project[0]);
+    // Calculate total cost of resources
+    const totalCostOfResources = project[0].resources.reduce(
+      (acc, resource) => acc + resource.TotalCost,
+      0
+    );
+
+    console.log(totalCostOfResources);
+    // Calculate used budget
+    const usedBudget = project[0].Budget - totalCostOfResources;
+
+    // Add usedBudget field to the project object
+    project[0].usedBudget = usedBudget;
 
     res.status(200).json(project[0]);
   } catch (err) {

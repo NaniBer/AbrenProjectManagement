@@ -260,17 +260,23 @@ const Sidebar = () => {
                   Projects You Lead
                 </Typography>
 
-                {projects.map((project, index) => (
-                  <Item
-                    key={index}
-                    title={project.ProjectName}
-                    to="/user/project"
-                    icon={<AccountTreeOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    onClick={() => handleProjectSelect(project._id)}
-                  />
-                ))}
+                {projects.length === 0 ? (
+                  <Typography variant="body1" sx={{ m: "0 0 5px 20px" }}>
+                    No projects yet! Stay tuned
+                  </Typography>
+                ) : (
+                  projects.map((project, index) => (
+                    <Item
+                      key={index}
+                      title={project.ProjectName}
+                      to="/user/project"
+                      icon={<AccountTreeOutlinedIcon />}
+                      selected={selected}
+                      setSelected={setSelected}
+                      onClick={() => handleProjectSelect(project._id)}
+                    />
+                  ))
+                )}
                 <Typography
                   variant="h6"
                   color={colors.grey[300]}
